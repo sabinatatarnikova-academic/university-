@@ -1,5 +1,7 @@
 package com.foxminded.university.model;
 
+import com.foxminded.university.model.classes.StudyClass;
+import com.foxminded.university.model.users.Student;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,14 +31,14 @@ public class Group {
     private String groupName;
 
     @OneToMany(mappedBy = "group")
-    private List<User> users;
+    private List<Student> students;
 
     @OneToMany(mappedBy = "group")
     private List<StudyClass> studyClasses;
 
-    public Group(String groupName, List<User> users, List<StudyClass> classes) {
+    public Group(String groupName, List<Student> students, List<StudyClass> classes) {
         this.groupName = groupName;
-        this.users = users;
+        this.students = students;
         this.studyClasses = classes;
     }
 }

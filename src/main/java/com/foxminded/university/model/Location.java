@@ -1,7 +1,6 @@
 package com.foxminded.university.model;
 
-import com.foxminded.university.model.enums.Classroom;
-import com.foxminded.university.model.enums.Department;
+import com.foxminded.university.model.classes.OfflineClass;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,15 +28,15 @@ public class Location {
     private String id;
 
     @Column(name = "department", length = 50)
-    private Department department;
+    private String department;
 
     @Column(name = "classroom", length = 50)
-    private Classroom classroom;
+    private String classroom;
 
     @OneToMany(mappedBy = "location")
-    private List<StudyClass> studyClass;
+    private List<OfflineClass> studyClass;
 
-    public Location(Department department, Classroom classroom, List<StudyClass> classes) {
+    public Location(String department, String classroom, List<OfflineClass> classes) {
         this.classroom = classroom;
         this.department = department;
         this.studyClass = classes;

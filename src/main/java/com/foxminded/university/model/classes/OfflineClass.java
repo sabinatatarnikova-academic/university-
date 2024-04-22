@@ -1,0 +1,23 @@
+package com.foxminded.university.model.classes;
+
+import com.foxminded.university.model.Location;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@EqualsAndHashCode(callSuper = true)
+@Entity
+@DiscriminatorValue("offline")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class OfflineClass extends StudyClass{
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private Location location;
+}

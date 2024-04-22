@@ -1,5 +1,6 @@
 package com.foxminded.university.model;
 
+import com.foxminded.university.model.classes.StudyClass;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
