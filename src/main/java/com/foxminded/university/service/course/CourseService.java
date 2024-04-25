@@ -1,18 +1,17 @@
 package com.foxminded.university.service.course;
 
 import com.foxminded.university.model.Course;
-import com.foxminded.university.model.classes.StudyClass;
 
 import java.util.List;
 
 public interface CourseService {
-    void saveCourse(String courseName, List<StudyClass> classes);
+    void saveCourse(Course course);
 
     Course findCourseById(String courseId);
 
     Course findCourseByName(String courseName);
 
-    void updateCourse(String courseId, String courseName, List<StudyClass> classes);
+    void updateCourse(Course course);
 
     void deleteCourseById(String courseId);
 

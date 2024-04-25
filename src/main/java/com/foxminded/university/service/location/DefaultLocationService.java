@@ -1,7 +1,6 @@
 package com.foxminded.university.service.location;
 
 import com.foxminded.university.model.Location;
-import com.foxminded.university.model.classes.OfflineClass;
 import com.foxminded.university.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -19,11 +18,11 @@ public class DefaultLocationService implements LocationService {
     private final LocationRepository locationRepository;
 
     @Override
-    public void saveLocation(String department, String classroom, List<OfflineClass> classes) {
-        log.info("Adding new location: department - {}, classroom - {}, classes - {}", department, classroom, classes);
-        Location location = new Location(department, classroom, classes);
+    public void saveLocation(Location location) {
+        log.info("Adding new location: department - {}, classroom - {}, classes - {}", location.getDepartment(), location.getClassroom(), location.getStudyClass());
+
         locationRepository.save(location);
-        log.info("Saved location: department - {}, classroom - {}, classes - {}", department, classroom, classes);
+        log.info("Saved location: department - {}, classroom - {}, classes - {}", location.getDepartment(), location.getClassroom(), location.getStudyClass());
     }
 
     @Override
@@ -43,11 +42,10 @@ public class DefaultLocationService implements LocationService {
     }
 
     @Override
-    public void updateLocation(String locationId, String department, String classroom, List<OfflineClass> classes) {
-        log.info("Updating location with id {}, department - {}, classroom - {}, classes - {}", locationId, department, classroom, classes);
-        Location location = new Location(locationId, department, classroom, classes);
+    public void updateLocation(Location location) {
+        log.info("Updating location with id {}, department - {}, classroom - {}, classes - {}", location.getId(),location.getDepartment(), location.getClassroom(), location.getStudyClass());
         locationRepository.save(location);
-        log.info("Updated location with id {}, department - {}, classroom - {}, classes - {}", locationId, department, classroom, classes);
+        log.info("Updated location with id {}, department - {}, classroom - {}, classes - {}", location.getId(),location.getDepartment(), location.getClassroom(), location.getStudyClass());
     }
 
     @Override

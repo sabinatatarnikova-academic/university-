@@ -1,7 +1,5 @@
 package com.foxminded.university.service.user;
 
-import com.foxminded.university.model.Group;
-import com.foxminded.university.model.classes.StudyClass;
 import com.foxminded.university.model.users.Student;
 import com.foxminded.university.model.users.Teacher;
 import com.foxminded.university.model.users.User;
@@ -24,27 +22,17 @@ public class DefaultUserService implements UserService{
     private final UserRepository userRepository;
 
     @Override
-    public void saveStudent(String firstName, String lastName, Group group) {
-        log.info("Adding new student: firstName - {}, lastName - {}, group - {}", firstName, lastName, group);
-        StudentDTO student =  StudentDTO.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .group(group)
-                .build();
-        userRepository.save(convertStudentDtoToEntity(student));
-        log.info("Saved student: firstName - {}, lastName - {}, group - {}", firstName, lastName, group);
+    public void saveStudent(StudentDTO studentDTO) {
+        log.info("Adding new student: firstName - {}, lastName - {}, group - {}", studentDTO.getFirstName(),studentDTO.getLastName(), studentDTO.getGroup());
+        userRepository.save(convertStudentDtoToEntity(studentDTO));
+        log.info("Saved student: firstName - {}, lastName - {}, group - {}", studentDTO.getFirstName(),studentDTO.getLastName(), studentDTO.getGroup());
     }
 
     @Override
-    public void saveTeacher(String firstName, String lastName, List<StudyClass> classes) {
-        log.info("Adding new teacher: firstName - {}, lastName - {}, classes - {}", firstName, lastName, classes);
-        TeacherDTO teacher =  TeacherDTO.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .studyClasses(classes)
-                .build();
+    public void saveTeacher(TeacherDTO teacher) {
+        log.info("Adding new teacher: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), teacher.getStudyClasses());
         userRepository.save(convertTeacherDtoToEntity(teacher));
-        log.info("Saved teacher: firstName - {}, lastName - {}, classes - {}", firstName, lastName, classes);
+        log.info("Saved teacher: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), teacher.getStudyClasses());
     }
 
     @Override
@@ -56,27 +44,17 @@ public class DefaultUserService implements UserService{
     }
 
     @Override
-    public void updateStudent(String userId, String firstName, String lastName, Group group) {
-        log.info("Updating student info: firstName - {}, lastName - {}, group - {}", firstName, lastName, group);
-        StudentDTO student =  StudentDTO.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .group(group)
-                .build();
+    public void updateStudent(StudentDTO student) {
+        log.info("Updating student info: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroup());
         userRepository.save(convertStudentDtoToEntity(student));
-        log.info("Updated student info: firstName - {}, lastName - {}, group - {}", firstName, lastName, group);
+        log.info("Updated student info: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroup());
     }
 
     @Override
-    public void updateTeacher(String userId, String firstName, String lastName, List<StudyClass> classes) {
-        log.info("Updating teacher info: firstName - {}, lastName - {}, classes - {}", firstName, lastName, classes);
-        TeacherDTO teacher =  TeacherDTO.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .studyClasses(classes)
-                .build();
+    public void updateTeacher(TeacherDTO teacher) {
+        log.info("Updating teacher info: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), teacher.getStudyClasses());
         userRepository.save(convertTeacherDtoToEntity(teacher));
-        log.info("Updated teacher info: firstName - {}, lastName - {}, classes - {}", firstName, lastName, classes);
+        log.info("Updated teacher info: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), teacher.getStudyClasses());
     }
 
     @Override

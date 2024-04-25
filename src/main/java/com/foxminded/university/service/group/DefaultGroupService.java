@@ -1,8 +1,6 @@
 package com.foxminded.university.service.group;
 
 import com.foxminded.university.model.Group;
-import com.foxminded.university.model.classes.StudyClass;
-import com.foxminded.university.model.users.Student;
 import com.foxminded.university.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,11 +18,10 @@ public class DefaultGroupService implements GroupService {
     private final GroupRepository groupRepository;
 
     @Override
-    public void saveGroup(String groupName, List<Student> students, List<StudyClass> classes) {
-        log.info("Adding new group: group name - {}, classes - {}", groupName, classes);
-        Group group = new Group(groupName,students, classes);
+    public void saveGroup(Group group) {
+        log.info("Adding new group: group name - {}, classes - {}",group.getGroupName(), group.getStudyClasses());
         groupRepository.save(group);
-        log.info("Saved group with name - {}, classes - {}", groupName, classes);
+        log.info("Saved group with name - {}, classes - {}", group.getGroupName(), group.getStudyClasses());
     }
 
     @Override
@@ -44,11 +41,10 @@ public class DefaultGroupService implements GroupService {
     }
 
     @Override
-    public void updateGroup(String groupId, String groupName, List<Student> students, List<StudyClass> classes) {
-        log.info("Updating group with id {} and name {}", groupId, groupName);
-        Group group = new Group(groupId, groupName,students, classes);
+    public void updateGroup(Group group) {
+        log.info("Updating group with id {} and name {}", group.getId(), group.getGroupName());
         groupRepository.save(group);
-        log.info("Updated group with id - {}, name - {}", groupId, groupName);
+        log.info("Updated group with id - {}, name - {}", group.getId(), group.getGroupName());
     }
 
     @Override

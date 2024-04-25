@@ -1,24 +1,21 @@
 package com.foxminded.university.service.studyClasses;
 
-import com.foxminded.university.model.Course;
-import com.foxminded.university.model.Group;
-import com.foxminded.university.model.Location;
 import com.foxminded.university.model.classes.StudyClass;
-import com.foxminded.university.model.users.User;
+import com.foxminded.university.model.classes.dtos.OfflineClassDTO;
+import com.foxminded.university.model.classes.dtos.OnlineClassDTO;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface StudyClassService {
-    void saveOnlineClass(LocalDateTime startTime, LocalDateTime endTime, Course course, User teacher, Group group, String url);
+    void saveOnlineClass(OnlineClassDTO studyClass);
 
-    void saveOfflineClass(LocalDateTime startTime, LocalDateTime endTime, Course course, User teacher, Group group, Location location);
+    void saveOfflineClass(OfflineClassDTO studyClass);
 
     StudyClass findClassById(String classId);
 
-    void updateOnlineClass(String classId,LocalDateTime startTime, LocalDateTime endTime, Course course, User teacher, Group group, String url);
+    void updateOnlineClass(OnlineClassDTO studyClass);
 
-    void updateOfflineClass(String classId,LocalDateTime startTime, LocalDateTime endTime, Course course, User teacher, Group group, Location location);
+    void updateOfflineClass(OfflineClassDTO studyClass);
 
     void deleteClassById(String classId);
 

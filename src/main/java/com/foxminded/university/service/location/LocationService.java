@@ -1,19 +1,18 @@
 package com.foxminded.university.service.location;
 
 import com.foxminded.university.model.Location;
-import com.foxminded.university.model.classes.OfflineClass;
 
 import java.util.List;
 
 public interface LocationService {
 
-    void saveLocation(String department, String classroom, List<OfflineClass> classes);
+    void saveLocation(Location location);
 
     Location findLocationById(String locationId);
 
     Location findLocationByDepartmentAndClassroom(String department, String classroom);
 
-    void updateLocation(String locationId, String department, String classroom,  List<OfflineClass> classes);
+    void updateLocation(Location location);
 
     void deleteLocationById(String locationId);
 

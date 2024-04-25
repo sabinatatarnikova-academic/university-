@@ -1,7 +1,6 @@
 package com.foxminded.university.service.course;
 
 import com.foxminded.university.model.Course;
-import com.foxminded.university.model.classes.StudyClass;
 import com.foxminded.university.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -19,11 +18,10 @@ public class DefaultCourseService implements CourseService{
     private final CourseRepository courseRepository;
 
     @Override
-    public void saveCourse(String courseName, List<StudyClass> classes) {
-        log.info("Adding new course: course name - {}, classes - {}", courseName, classes);
-        Course course = new Course(courseName, classes);
+    public void saveCourse(Course course) {
+        log.info("Adding new course: course name - {}, classes - {}",course.getName(),course.getStudyStudyClasses());
         courseRepository.save(course);
-        log.info("Saved course with name - {}, classes - {}", courseName, classes);
+        log.info("Saved course with name - {}, classes - {}",course.getName(),course.getStudyStudyClasses());
     }
 
     @Override
@@ -43,11 +41,10 @@ public class DefaultCourseService implements CourseService{
     }
 
     @Override
-    public void updateCourse(String courseId, String courseName, List<StudyClass> classes) {
-        log.info("Updating course with id {} and name {}", courseId, courseName);
-        Course course = new Course(courseId, courseName, classes);
+    public void updateCourse(Course course) {
+        log.info("Updating course with id {} and name {}", course.getId(), course.getName());
         courseRepository.save(course);
-        log.info("Updated course with id - {}, name - {}", courseId, courseName);
+        log.info("Updated course with id - {}, name - {}", course.getId(), course.getName());
     }
 
     @Override

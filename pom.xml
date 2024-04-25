@@ -158,6 +158,8 @@
                 <configuration>
                     <excludes>
                         <exclude>**/model/**</exclude>
+                        <exclude>**/DemoApplication.class/**</exclude>
+                        <exclude>**/DataSourceConfig.class/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>

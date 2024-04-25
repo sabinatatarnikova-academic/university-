@@ -1,14 +1,10 @@
 package com.foxminded.university.service.studyClasses;
 
-import com.foxminded.university.model.Course;
-import com.foxminded.university.model.Group;
-import com.foxminded.university.model.Location;
 import com.foxminded.university.model.classes.OfflineClass;
 import com.foxminded.university.model.classes.OnlineClass;
 import com.foxminded.university.model.classes.StudyClass;
 import com.foxminded.university.model.classes.dtos.OfflineClassDTO;
 import com.foxminded.university.model.classes.dtos.OnlineClassDTO;
-import com.foxminded.university.model.users.User;
 import com.foxminded.university.repository.StudyClassRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -16,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -27,33 +22,17 @@ public class DefaultStudyClassService implements StudyClassService{
     private final StudyClassRepository studyClassRepository;
 
     @Override
-    public void saveOnlineClass(LocalDateTime startTime, LocalDateTime endTime, Course course, User teacher, Group group, String url) {
-        log.info("Adding new online class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, url - {}", startTime, endTime, course, teacher, group, url);
-        OnlineClassDTO studyClass =  OnlineClassDTO.builder()
-                .startTime(startTime)
-                .endTime(endTime)
-                .course(course)
-                .teacher(teacher)
-                .group(group)
-                .url(url)
-                .build();
+    public void saveOnlineClass(OnlineClassDTO studyClass) {
+        log.info("Adding new online class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, url - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getTeacher(),studyClass.getGroup(), studyClass.getUrl());
         studyClassRepository.save(convertOnlineClassDtoToEntity(studyClass));
-        log.info("Saved online class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, url - {}", startTime, endTime, course, teacher, group, url);
+        log.info("Saved online class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, url - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getTeacher(),studyClass.getGroup(), studyClass.getUrl());
     }
 
     @Override
-    public void saveOfflineClass(LocalDateTime startTime, LocalDateTime endTime, Course course, User teacher, Group group, Location location) {
-        log.info("Adding new offline class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, location - {}", startTime, endTime, course, teacher, group, location);
-        OfflineClassDTO studyClass =  OfflineClassDTO.builder()
-                .startTime(startTime)
-                .endTime(endTime)
-                .course(course)
-                .teacher(teacher)
-                .group(group)
-                .location(location)
-                .build();
+    public void saveOfflineClass(OfflineClassDTO studyClass) {
+        log.info("Adding new offline class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getTeacher(),studyClass.getGroup(), studyClass.getLocation());
         studyClassRepository.save(convertOfflineClassDtoToEntity(studyClass));
-        log.info("Saved offline class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, location - {}", startTime, endTime, course, teacher, group, location);
+        log.info("Saved offline class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getTeacher(),studyClass.getGroup(), studyClass.getLocation());
     }
 
     @Override
@@ -65,33 +44,17 @@ public class DefaultStudyClassService implements StudyClassService{
     }
 
     @Override
-    public void updateOnlineClass(String classId, LocalDateTime startTime, LocalDateTime endTime, Course course, User teacher, Group group, String url) {
-        log.info("Updating new online class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, url - {}", startTime, endTime, course, teacher, group, url);
-        OnlineClassDTO studyClass =  OnlineClassDTO.builder()
-                .startTime(startTime)
-                .endTime(endTime)
-                .course(course)
-                .teacher(teacher)
-                .group(group)
-                .url(url)
-                .build();
+    public void updateOnlineClass(OnlineClassDTO studyClass) {
+        log.info("Updating new online class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, url - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getTeacher(),studyClass.getGroup(), studyClass.getUrl());
         studyClassRepository.save(convertOnlineClassDtoToEntity(studyClass));
-        log.info("Updated online class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, url - {}", startTime, endTime, course, teacher, group, url);
+        log.info("Updated online class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, url - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getTeacher(),studyClass.getGroup(), studyClass.getUrl());
     }
 
     @Override
-    public void updateOfflineClass(String classId, LocalDateTime startTime, LocalDateTime endTime, Course course, User teacher, Group group, Location location) {
-        log.info("Updating  offline class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, location - {}", startTime, endTime, course, teacher, group, location);
-        OfflineClassDTO studyClass =  OfflineClassDTO.builder()
-                .startTime(startTime)
-                .endTime(endTime)
-                .course(course)
-                .teacher(teacher)
-                .group(group)
-                .location(location)
-                .build();
+    public void updateOfflineClass(OfflineClassDTO studyClass) {
+        log.info("Updating  offline class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getTeacher(),studyClass.getGroup(), studyClass.getLocation());
         studyClassRepository.save(convertOfflineClassDtoToEntity(studyClass));
-        log.info("Updated offline class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, location - {}", startTime, endTime, course, teacher, group, location);
+        log.info("Updated offline class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getTeacher(),studyClass.getGroup(), studyClass.getLocation());
     }
 
     @Override
@@ -115,6 +78,7 @@ public class DefaultStudyClassService implements StudyClassService{
         onlineClass.setStartTime(onlineClassDTO.getStartTime());
         onlineClass.setEndTime(onlineClassDTO.getEndTime());
         onlineClass.setCourse(onlineClassDTO.getCourse());
+        onlineClass.setTeacher(onlineClassDTO.getTeacher());
         onlineClass.setGroup(onlineClassDTO.getGroup());
         onlineClass.setUrl(onlineClassDTO.getUrl());
         return onlineClass;
@@ -126,6 +90,7 @@ public class DefaultStudyClassService implements StudyClassService{
         offlineClass.setStartTime(offlineClassDTO.getStartTime());
         offlineClass.setEndTime(offlineClassDTO.getEndTime());
         offlineClass.setCourse(offlineClassDTO.getCourse());
+        offlineClass.setTeacher(offlineClassDTO.getTeacher());
         offlineClass.setGroup(offlineClassDTO.getGroup());
         offlineClass.setLocation(offlineClassDTO.getLocation());
         return offlineClass;

@@ -1,6 +1,7 @@
 package com.foxminded.university.model;
 
 import com.foxminded.university.model.classes.OfflineClass;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,7 +34,7 @@ public class Location {
     @Column(name = "classroom", length = 50)
     private String classroom;
 
-    @OneToMany(mappedBy = "location")
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OfflineClass> studyClass;
 
     public Location(String department, String classroom, List<OfflineClass> classes) {

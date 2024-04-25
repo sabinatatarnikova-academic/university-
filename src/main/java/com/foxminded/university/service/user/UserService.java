@@ -1,22 +1,22 @@
 package com.foxminded.university.service.user;
 
-import com.foxminded.university.model.Group;
-import com.foxminded.university.model.classes.StudyClass;
 import com.foxminded.university.model.users.User;
+import com.foxminded.university.model.users.dtos.StudentDTO;
+import com.foxminded.university.model.users.dtos.TeacherDTO;
 
 import java.util.List;
 
 public interface UserService {
 
-    void saveStudent(String firstName, String lastName, Group group);
+    void saveStudent(StudentDTO studentDTO);
 
-    void saveTeacher(String firstName, String lastName, List<StudyClass> classes);
+    void saveTeacher(TeacherDTO teacherDTO);
 
     User findUserById(String userId);
 
-    void updateStudent(String userId, String firstName, String lastName, Group group);
+    void updateStudent(StudentDTO studentDTO);
 
-    void updateTeacher(String userId, String firstName, String lastName,List<StudyClass> classes);
+    void updateTeacher(TeacherDTO teacherDTO);
 
     void deleteUserById(String userId);
 
