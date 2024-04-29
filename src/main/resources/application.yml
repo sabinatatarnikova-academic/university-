@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/university
+    username: university_user
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform:
+      - profile: "postgres"
+        value: "org.hibernate.dialect.PostgreSQLDialect"
+      - profile: "default"
+        value: "org.hibernate.dialect.H2Dialect"
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  flyway:
+    baseline-on-migrate: true
+    enabled: true
+    locations: classpath:db/migration
