@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -147,7 +148,7 @@ class DefaultUserServiceTest {
                 .build();
 
         userService.saveStudent(studentToSave);
-        List<User> users = userService.findAllUsersWithPagination(0, 5);
+        List<User> users = userService.findAllUsersWithPagination(0, 5).toList();
         Student actualStudent = (Student) users.get(4);
 
         assertEquals(studentToSave.getFirstName(), actualStudent.getFirstName());
@@ -164,7 +165,7 @@ class DefaultUserServiceTest {
                 .build();
 
         userService.saveTeacher(teacherToSave);
-        List<User> users = userService.findAllUsersWithPagination(0, 5);
+        List<User> users = userService.findAllUsersWithPagination(0, 5).toList();
         Teacher actualTeacher = (Teacher) users.get(4);
 
         assertEquals(teacherToSave.getFirstName(), actualTeacher.getFirstName());
@@ -174,14 +175,14 @@ class DefaultUserServiceTest {
 
     @Test
     void findUserById() {
-        User user = userService.findAllUsersWithPagination(0, 4).get(3);
+        User user = userService.findAllUsersWithPagination(0, 4).toList().get(3);
         String userId = user.getId();
         assertEquals(user, userService.findUserById(userId));
     }
 
     @Test
     void updateStudent() {
-        User user = userService.findAllUsersWithPagination(0, 4).get(3);
+        User user = userService.findAllUsersWithPagination(0, 4).toList().get(3);
         String userId = user.getId();
 
         StudentDTO studentToSave = StudentDTO.builder()
@@ -201,7 +202,7 @@ class DefaultUserServiceTest {
 
     @Test
     void updateTeacher() {
-        User user = userService.findAllUsersWithPagination(0, 4).get(0);
+        User user = userService.findAllUsersWithPagination(0, 4).toList().get(0);
         String userId = user.getId();
 
         TeacherDTO teacherToSave = TeacherDTO.builder()
@@ -221,7 +222,7 @@ class DefaultUserServiceTest {
 
     @Test
     void deleteUserById() {
-        User user = userService.findAllUsersWithPagination(0, 4).get(0);
+        User user = userService.findAllUsersWithPagination(0, 4).toList().get(0);
         String userId = user.getId();
 
         userService.deleteUserById(userId);
@@ -231,9 +232,25 @@ class DefaultUserServiceTest {
     @Test
     void findAllUsersWithPagination() {
         List<User> expectedUsers = Arrays.asList(alice, bob, charlie);
-        List<User> actualUsers = userService.findAllUsersWithPagination(0, 3);
+        Page<User> actualUsers = userService.findAllUsersWithPagination(0, 3);
         actualUsers.forEach(user -> user.setId(null));
 
-        assertEquals(expectedUsers, actualUsers);
+        assertEquals(expectedUsers, actualUsers.stream().toList());
+    }
+    @Test
+    void findAllStudents() {
+        List<Student> expectedStudents = Arrays.asList(charlie, diana);
+        Page<Student> actualStudents = userService.findAllStudentsWithPagination(0,2);
+        actualStudents.forEach(user -> user.setId(null));
+
+        assertEquals(expectedStudents, actualStudents.toList());
+    }
+    @Test
+    void findAllTeachers() {
+        List<Teacher> expectedTeachers = Arrays.asList(alice, bob);
+        Page<Teacher> actualTeachers = userService.findAllTeachersWithPagination(0,2);
+        actualTeachers.forEach(user -> user.setId(null));
+
+        assertEquals(expectedTeachers, actualTeachers.toList());
     }
 }

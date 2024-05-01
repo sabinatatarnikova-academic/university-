@@ -4,6 +4,13 @@ spring:
     username: university_user
     password: password
     driver-class-name: org.postgresql.Driver
+  application:
+    name: Bootstrap Spring Boot
+  thymeleaf:
+    cache: false
+    enabled: true
+    prefix: classpath:/templates/
+    suffix: .html
   jpa:
     database-platform:
       - profile: "postgres"
@@ -11,7 +18,7 @@ spring:
       - profile: "default"
         value: "org.hibernate.dialect.H2Dialect"
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     show-sql: true
   flyway:
     baseline-on-migrate: true

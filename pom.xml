@@ -23,6 +23,7 @@
         <log4j.version>2.23.1</log4j.version>
         <lombock.version>1.18.30</lombock.version>
         <jpa.version>3.2.4</jpa.version>
+        <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
     </properties>
 
     <dependencies>
@@ -77,9 +78,22 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>${h2database.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf</artifactId>
+            <version>${thymeleaf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>

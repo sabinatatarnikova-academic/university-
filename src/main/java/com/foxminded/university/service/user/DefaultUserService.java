@@ -10,9 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -65,11 +64,25 @@ public class DefaultUserService implements UserService{
     }
 
     @Override
-    public List<User> findAllUsersWithPagination(int pageNumber, int pageSize) {
-        log.info("Searching for user with page size {} and pageSize {}", pageNumber, pageSize);
+    public Page<User> findAllUsersWithPagination(int pageNumber, int pageSize) {
+        log.info("Searching for users with page size {} and pageSize {}", pageNumber, pageSize);
         Page<User> pageResult = userRepository.findAll(PageRequest.of(pageNumber, pageSize));
         log.info("Found {} users", pageResult.getTotalPages());
-        return pageResult.toList();
+        return pageResult;
+    }
+
+    @Override
+    public Page<Student> findAllStudentsWithPagination(int pageNumber, int pageSize) {
+        log.info("Searching for all students");
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return userRepository.findAllStudents(pageable);
+    }
+
+    @Override
+    public Page<Teacher> findAllTeachersWithPagination(int pageNumber, int pageSize) {
+        log.info("Searching for all teachers");
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return userRepository.findAllTeachers(pageable);
     }
 
     private Student convertStudentDtoToEntity(StudentDTO studentDTO) {

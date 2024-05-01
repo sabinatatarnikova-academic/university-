@@ -1,10 +1,11 @@
 package com.foxminded.university.service.user;
 
+import com.foxminded.university.model.users.Student;
+import com.foxminded.university.model.users.Teacher;
 import com.foxminded.university.model.users.User;
 import com.foxminded.university.model.users.dtos.StudentDTO;
 import com.foxminded.university.model.users.dtos.TeacherDTO;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface UserService {
 
@@ -20,5 +21,9 @@ public interface UserService {
 
     void deleteUserById(String userId);
 
-    List<User> findAllUsersWithPagination(int pageNumber, int pageSize);
+    Page<User> findAllUsersWithPagination(int pageNumber, int pageSize);
+
+    Page<Student> findAllStudentsWithPagination(int pageNumber, int pageSize);
+
+    Page<Teacher> findAllTeachersWithPagination(int pageNumber, int pageSize);
 }
