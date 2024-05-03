@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class DefaultController {
 
     private UserService userService;
+    private Utils utils;
 
     @GetMapping("/")
     public String getWelcomePage(){
@@ -22,15 +23,15 @@ public class DefaultController {
     }
 
     @GetMapping("/student")
-    public String showStudentsList(Model model, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
-        Page<Student> studentPage = userService.findAllStudentsWithPagination(page, size);
+    public String showStudentsList(Model model, @RequestParam(defaultValue = "0") String pageStr, @RequestParam(defaultValue = "10") String sizeStr) {
+        Page<Student> studentPage = userService.findAllStudentsWithPagination(utils.getResult(pageStr, sizeStr).get(0), utils.getResult(pageStr,sizeStr).get(1));
         model.addAttribute("studentPage", studentPage);
         return "student";
     }
 
     @GetMapping("/teacher")
-    public String showTeachersList(Model model, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
-        Page<Teacher> teacherPage = userService.findAllTeachersWithPagination(page, size);
+    public String showTeachersList(Model model, @RequestParam(defaultValue = "0") String pageStr, @RequestParam(defaultValue = "10") String sizeStr) {
+        Page<Teacher> teacherPage = userService.findAllTeachersWithPagination(utils.getResult(pageStr, sizeStr).get(0), utils.getResult(pageStr,sizeStr).get(1));
         model.addAttribute("teacherPage", teacherPage);
         return "teacher";
     }

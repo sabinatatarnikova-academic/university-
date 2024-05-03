@@ -1,4 +1,4 @@
-package com.foxminded.university.service.controller;
+package com.foxminded.university.controller;
 
 import com.foxminded.university.controller.DefaultController;
 import com.foxminded.university.model.Group;
