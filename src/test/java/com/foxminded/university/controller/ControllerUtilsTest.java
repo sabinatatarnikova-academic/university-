@@ -6,15 +6,15 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-class UtilsTest {
+class ControllerUtilsTest {
 
-    private final Utils utils = new Utils();
+    private final ControllerUtils controllerUtils = new ControllerUtils();
 
     @Test
     void testGetResultWhenValidCase() {
         Integer firstExpected = 5;
         Integer secondExpected = 15;
-        Map<Integer, Integer> result = utils.getResult("5", "15");
+        Map<Integer, Integer> result = controllerUtils.getValidatedPageParameters("5", "15");
         assertEquals(firstExpected, result.get(0));
         assertEquals(secondExpected, result.get(1));
     }
@@ -23,7 +23,7 @@ class UtilsTest {
     void testGetResultWhenFullInvalidCase() {
         Integer firstExpected = 0;
         Integer secondExpected = 10;
-        Map<Integer, Integer> result = utils.getResult("test", "invalid");
+        Map<Integer, Integer> result = controllerUtils.getValidatedPageParameters("test", "invalid");
         assertEquals(firstExpected, result.get(0));
         assertEquals(secondExpected, result.get(1));
     }
@@ -32,7 +32,7 @@ class UtilsTest {
     void testGetResultWhenPageInvalidValue() {
         Integer firstExpected = 0;
         Integer secondExpected = 15;
-        Map<Integer, Integer> result = utils.getResult("test", "15");
+        Map<Integer, Integer> result = controllerUtils.getValidatedPageParameters("test", "15");
         assertEquals(firstExpected, result.get(0));
         assertEquals(secondExpected, result.get(1));
     }
@@ -40,7 +40,7 @@ class UtilsTest {
     void testGetResultWhenSizeInvalidValue() {
         Integer firstExpected = 4;
         Integer secondExpected = 10;
-        Map<Integer, Integer> result = utils.getResult("4", "invalid");
+        Map<Integer, Integer> result = controllerUtils.getValidatedPageParameters("4", "invalid");
         assertEquals(firstExpected, result.get(0));
         assertEquals(secondExpected, result.get(1));
     }

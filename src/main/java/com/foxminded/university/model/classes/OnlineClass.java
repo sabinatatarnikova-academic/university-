@@ -1,5 +1,6 @@
 package com.foxminded.university.model.classes;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
@@ -16,5 +17,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 public class OnlineClass extends StudyClass {
+
+    @Column(name = "url")
     private String url;
 }

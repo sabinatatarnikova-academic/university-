@@ -1,14 +1,14 @@
 package com.foxminded.university.controller;
 
-
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
-@Component
-public class Utils {
 
-    public Map<Integer, Integer> getResult(String pageStr, String sizeStr) {
+@Component
+public class ControllerUtils {
+
+    public Map<Integer, Integer> getValidatedPageParameters(String pageStr, String sizeStr) {
         Map<Integer, Integer> result = new HashMap<>();
         int page;
         int size;

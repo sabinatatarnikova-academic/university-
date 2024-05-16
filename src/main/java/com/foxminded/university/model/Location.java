@@ -23,6 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Location {
+
     @Id
     @Column(name = "location_id")
     @GeneratedValue(strategy = GenerationType.UUID)

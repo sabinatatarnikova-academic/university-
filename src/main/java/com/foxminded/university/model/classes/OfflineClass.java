@@ -18,7 +18,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class OfflineClass extends StudyClass{
+public class OfflineClass extends StudyClass {
+
     @ManyToOne
     @JoinColumn(name = "location_id")
     private Location location;

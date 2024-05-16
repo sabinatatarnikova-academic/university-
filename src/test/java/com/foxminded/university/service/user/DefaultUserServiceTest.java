@@ -54,6 +54,9 @@ class DefaultUserServiceTest {
     private Location fdu;
     private OnlineClass onlineClass;
     private OfflineClass offlineClass;
+    private final String username = "username";
+    private final String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
+    private final String rawPassword = "password";
 
     @BeforeEach
     public void init() {
@@ -85,10 +88,16 @@ class DefaultUserServiceTest {
         alice = Teacher.builder()
                 .firstName("Alice")
                 .lastName("Smith")
+                .username(username)
+                .password(password)
+                .rawPassword(rawPassword)
                 .build();
         bob = Teacher.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
+                .username(username)
+                .password(password)
+                .rawPassword(rawPassword)
                 .build();
         entityManager.persist(alice);
         entityManager.persist(bob);
@@ -98,11 +107,17 @@ class DefaultUserServiceTest {
                 .firstName("Charlie")
                 .lastName("Williams")
                 .group(groupA)
+                .username(username)
+                .password(password)
+                .rawPassword(rawPassword)
                 .build();
         diana = Student.builder()
                 .firstName("Diana")
                 .lastName("Brown")
                 .group(groupB)
+                .username(username)
+                .password(password)
+                .rawPassword(rawPassword)
                 .build();
         entityManager.persist(charlie);
         entityManager.persist(diana);
@@ -190,6 +205,9 @@ class DefaultUserServiceTest {
                 .firstName("Test")
                 .lastName("Test")
                 .group(groupA)
+                .password(password)
+                .rawPassword(rawPassword)
+                .username(username)
                 .build();
 
         userService.updateStudent(studentToSave);
@@ -210,6 +228,9 @@ class DefaultUserServiceTest {
                 .firstName("Test")
                 .lastName("Test")
                 .studyClasses(List.of(offlineClass, onlineClass))
+                .password(password)
+                .rawPassword(rawPassword)
+                .username(username)
                 .build();
 
         userService.updateTeacher(teacherToSave);

@@ -1,4 +1,4 @@
-package com.foxminded.university.service.studyClasses;
+package com.foxminded.university.service.classes;
 
 import com.foxminded.university.model.classes.OfflineClass;
 import com.foxminded.university.model.classes.OnlineClass;
@@ -6,11 +6,13 @@ import com.foxminded.university.model.classes.StudyClass;
 import com.foxminded.university.model.classes.dtos.OfflineClassDTO;
 import com.foxminded.university.model.classes.dtos.OnlineClassDTO;
 import com.foxminded.university.repository.StudyClassRepository;
+import com.foxminded.university.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,6 +22,16 @@ import java.util.List;
 public class DefaultStudyClassService implements StudyClassService{
 
     private final StudyClassRepository studyClassRepository;
+    private final UserRepository userRepository;
+
+
+    @Override
+    @Transactional
+    public void assignTeacherToClass(String teacherId, String classId) {
+        StudyClass studyClass = studyClassRepository.findById(classId).get();
+        studyClass.setTeacher(userRepository.findById(teacherId).get());
+        studyClassRepository.save(studyClass);
+    }
 
     @Override
     public void saveOnlineClass(OnlineClassDTO studyClass) {

@@ -10,7 +10,10 @@ CREATE TABLE users (
                        first_name VARCHAR(50),
                        last_name VARCHAR(50),
                        user_type VARCHAR(255),
-                       group_id VARCHAR(255) REFERENCES groups (group_id) -- Only relevant for students
+                       group_id     VARCHAR(255) REFERENCES groups (group_id), -- Only relevant for students
+                       username     VARCHAR(255),
+                       password     VARCHAR(255),
+                       raw_password VARCHAR(255)
 );
 
 -- Groups table

@@ -15,12 +15,13 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@DiscriminatorValue("teacher")
+@DiscriminatorValue("TEACHER")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class Teacher extends User{
+public class Teacher extends User {
+
     @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudyClass> studyClasses;
 }

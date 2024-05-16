@@ -23,6 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Course {
+
     @Id
     @Column (name = "course_id")
     @GeneratedValue(strategy = GenerationType.UUID)

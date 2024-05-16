@@ -8,7 +8,7 @@
 </head>
 <body>
 <div class="d-flex justify-content-evenly flex-column">
-    <h1>Student</h1>
+    <h1>Students</h1>
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -29,8 +29,8 @@
     </table>
     <div>
         <ul>
-            <li th:each="i : ${#numbers.sequence(0, studentPage.totalPages - 1)}">
-                <a th:href="@{/student(page=${i}, size=${studentPage.size})}" th:text="${i}"></a>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, studentPage.totalPages - 1)}">
+                <a class="page-link" th:href="@{/student(page=${i}, size=${studentPage.size})}" th:text="${i + 1}"></a>
             </li>
         </ul>
     </div>

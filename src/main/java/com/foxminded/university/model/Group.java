@@ -14,16 +14,19 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 
 @Entity
 @Table(name = "groups")
 @Data
+@ToString(exclude = {"students"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Group {
+
     @Id
     @Column(name = "group_id")
     @GeneratedValue(strategy = GenerationType.UUID)

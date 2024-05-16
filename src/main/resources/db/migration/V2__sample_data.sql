@@ -2,11 +2,17 @@ INSERT INTO groups (group_id, group_name)
 VALUES ('d15b0018-47e9-4281-9dc8-a5aaf2bdf951', 'Group A'),
        ('99e56438-c880-41ba-87aa-080b7413ad34', 'Group B');
 
-INSERT INTO users (user_id, first_name, last_name, user_type, group_id)
-VALUES ('9f6cfb74-e71e-4d00-86e8-3307e8b6865e', 'John', 'Doe', 'teacher', null),
-       ('f7d448d4-0423-4a65-8576-9846a1b5e694', 'Jane', 'Smith', 'teacher', null),
-       ('1f2c9f36-eae1-4d3b-8a1a-5ea47c5c7a97', 'Alice', 'Brown', 'student', 'd15b0018-47e9-4281-9dc8-a5aaf2bdf951'),
-       ('b4a1f4e9-f24e-488e-8ffa-3fb3e64fa004', 'Bob', 'Johnson', 'student', '99e56438-c880-41ba-87aa-080b7413ad34');
+INSERT INTO users (user_id, first_name, last_name, user_type, group_id, username, password, raw_password)
+VALUES ('9f6cfb74-e71e-4d00-86e8-3307e8b6865e', 'John', 'Doe', 'TEACHER', null, 'john.doe',
+        '$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66', 'password'),
+       ('f7d448d4-0423-4a65-8576-9846a1b5e694', 'Jane', 'Smith', 'TEACHER', null, 'jane.smith',
+        '$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66', 'password'),
+       ('1f2c9f36-eae1-4d3b-8a1a-5ea47c5c7a97', 'Alice', 'Brown', 'STUDENT', 'd15b0018-47e9-4281-9dc8-a5aaf2bdf951',
+        'alice.brown', '$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66', 'password'),
+       ('b4a1f4e9-f24e-488e-8ffa-3fb3e64fa004', 'Bob', 'Johnson', 'STUDENT', '99e56438-c880-41ba-87aa-080b7413ad34',
+        'bob.johnson', '$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66', 'password'),
+       ('admin-id', 'Admin', 'Admin', 'ADMIN', null, 'admin',
+        '$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66', 'password');
 
 
 INSERT INTO courses (course_id, course_name)

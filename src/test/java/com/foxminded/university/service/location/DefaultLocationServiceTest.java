@@ -47,6 +47,10 @@ class DefaultLocationServiceTest {
         entityManager.getEntityManager().createNativeQuery("DELETE FROM groups").executeUpdate();
         entityManager.getEntityManager().createNativeQuery("DELETE FROM locations").executeUpdate();
 
+        String username = "username";
+        String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
+        String rawPassword = "password";
+
         Group groupA = Group.builder()
                 .groupName("Group A")
                 .build();
@@ -69,10 +73,16 @@ class DefaultLocationServiceTest {
         Teacher alice = Teacher.builder()
                 .firstName("Alice")
                 .lastName("Smith")
+                .username(username)
+                .password(password)
+                .rawPassword(rawPassword)
                 .build();
         Teacher bob = Teacher.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
+                .username(username)
+                .password(password)
+                .rawPassword(rawPassword)
                 .build();
         entityManager.persist(alice);
         entityManager.persist(bob);
@@ -82,11 +92,17 @@ class DefaultLocationServiceTest {
                 .firstName("Charlie")
                 .lastName("Williams")
                 .group(groupA)
+                .username(username)
+                .password(password)
+                .rawPassword(rawPassword)
                 .build();
         Student diana = Student.builder()
                 .firstName("Diana")
                 .lastName("Brown")
                 .group(groupB)
+                .username(username)
+                .password(password)
+                .rawPassword(rawPassword)
                 .build();
         entityManager.persist(charlie);
         entityManager.persist(diana);

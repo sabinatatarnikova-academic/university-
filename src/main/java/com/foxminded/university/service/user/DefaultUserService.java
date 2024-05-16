@@ -19,17 +19,26 @@ import org.springframework.stereotype.Service;
 public class DefaultUserService implements UserService{
 
     private final UserRepository userRepository;
+    private final UserUtils utils;
 
     @Override
-    public void saveStudent(StudentDTO studentDTO) {
-        log.info("Adding new student: firstName - {}, lastName - {}, group - {}", studentDTO.getFirstName(),studentDTO.getLastName(), studentDTO.getGroup());
-        userRepository.save(convertStudentDtoToEntity(studentDTO));
-        log.info("Saved student: firstName - {}, lastName - {}, group - {}", studentDTO.getFirstName(),studentDTO.getLastName(), studentDTO.getGroup());
+    public void saveStudent(StudentDTO student) {
+        log.info("Adding new student: firstName - {}, lastName - {}, group - {}, username - {},rawPassword - {}, password - {}", student.getFirstName(), student.getLastName(), student.getGroup(), student.getUsername(), student.getRawPassword(), student.getPassword());
+        student.setUsername(UserUtils.generateUsername(student.getFirstName(), student.getLastName()));
+        String rawPassword = UserUtils.generatePassword();
+        student.setRawPassword(rawPassword);
+        student.setPassword(utils.encodePassword(rawPassword));
+        userRepository.save(convertStudentDtoToEntity(student));
+        log.info("Saved student: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroup());
     }
 
     @Override
     public void saveTeacher(TeacherDTO teacher) {
         log.info("Adding new teacher: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), teacher.getStudyClasses());
+        teacher.setUsername(UserUtils.generateUsername(teacher.getFirstName(), teacher.getLastName()));
+        String rawPassword = UserUtils.generatePassword();
+        teacher.setRawPassword(rawPassword);
+        teacher.setPassword(utils.encodePassword(rawPassword));
         userRepository.save(convertTeacherDtoToEntity(teacher));
         log.info("Saved teacher: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), teacher.getStudyClasses());
     }
@@ -45,6 +54,8 @@ public class DefaultUserService implements UserService{
     @Override
     public void updateStudent(StudentDTO student) {
         log.info("Updating student info: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroup());
+        student.setRawPassword(student.getPassword());
+        student.setPassword(utils.encodePassword(student.getPassword()));
         userRepository.save(convertStudentDtoToEntity(student));
         log.info("Updated student info: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroup());
     }
@@ -52,6 +63,8 @@ public class DefaultUserService implements UserService{
     @Override
     public void updateTeacher(TeacherDTO teacher) {
         log.info("Updating teacher info: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), teacher.getStudyClasses());
+        teacher.setRawPassword(teacher.getRawPassword());
+        teacher.setPassword(utils.encodePassword(teacher.getPassword()));
         userRepository.save(convertTeacherDtoToEntity(teacher));
         log.info("Updated teacher info: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), teacher.getStudyClasses());
     }
@@ -90,6 +103,9 @@ public class DefaultUserService implements UserService{
         student.setId(studentDTO.getId());
         student.setFirstName(studentDTO.getFirstName());
         student.setLastName(studentDTO.getLastName());
+        student.setUsername(studentDTO.getUsername());
+        student.setPassword(studentDTO.getPassword());
+        student.setRawPassword(studentDTO.getRawPassword());
         student.setGroup(studentDTO.getGroup());
         return student;
     }
@@ -98,6 +114,9 @@ public class DefaultUserService implements UserService{
         teacher.setId(teacherDTO.getId());
         teacher.setFirstName(teacherDTO.getFirstName());
         teacher.setLastName(teacherDTO.getLastName());
+        teacher.setPassword(teacherDTO.getPassword());
+        teacher.setUsername(teacherDTO.getUsername());
+        teacher.setRawPassword(teacherDTO.getRawPassword());
         teacher.setStudyClasses(teacherDTO.getStudyClasses());
         return teacher;
     }

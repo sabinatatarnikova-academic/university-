@@ -5,6 +5,7 @@ import com.foxminded.university.model.Course;
 import java.util.List;
 
 public interface CourseService {
+
     void saveCourse(Course course);
 
     Course findCourseById(String courseId);

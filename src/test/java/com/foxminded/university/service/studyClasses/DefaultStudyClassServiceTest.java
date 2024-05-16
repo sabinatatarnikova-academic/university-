@@ -11,6 +11,7 @@ import com.foxminded.university.model.classes.dtos.OnlineClassDTO;
 import com.foxminded.university.model.users.Student;
 import com.foxminded.university.model.users.Teacher;
 import com.foxminded.university.service.TestConfig;
+import com.foxminded.university.service.classes.DefaultStudyClassService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,6 +63,10 @@ class DefaultStudyClassServiceTest {
         entityManager.getEntityManager().createNativeQuery("DELETE FROM groups").executeUpdate();
         entityManager.getEntityManager().createNativeQuery("DELETE FROM locations").executeUpdate();
 
+        String username = "username";
+        String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
+        String rawPassword = "password";
+
         groupA = Group.builder()
                 .groupName("Group A")
                 .build();
@@ -84,10 +89,16 @@ class DefaultStudyClassServiceTest {
         alice = Teacher.builder()
                 .firstName("Alice")
                 .lastName("Smith")
+                .username(username)
+                .password(password)
+                .rawPassword(rawPassword)
                 .build();
         bob = Teacher.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
+                .username(username)
+                .password(password)
+                .rawPassword(rawPassword)
                 .build();
         entityManager.persist(alice);
         entityManager.persist(bob);
@@ -97,11 +108,17 @@ class DefaultStudyClassServiceTest {
                 .firstName("Charlie")
                 .lastName("Williams")
                 .group(groupA)
+                .username(username)
+                .password(password)
+                .rawPassword(rawPassword)
                 .build();
         diana = Student.builder()
                 .firstName("Diana")
                 .lastName("Brown")
                 .group(groupB)
+                .username(username)
+                .password(password)
+                .rawPassword(rawPassword)
                 .build();
         entityManager.persist(charlie);
         entityManager.persist(diana);
