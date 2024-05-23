@@ -1,10 +1,11 @@
 package com.foxminded.university.controller;
 
-import com.foxminded.university.model.classes.StudyClass;
-import com.foxminded.university.model.users.User;
-import com.foxminded.university.model.users.dtos.StudentDTO;
-import com.foxminded.university.model.users.dtos.TeacherDTO;
-import com.foxminded.university.model.users.dtos.UserDTO;
+import com.foxminded.university.utils.DefaultPage;
+import com.foxminded.university.utils.PageUtils;
+import com.foxminded.university.model.entity.users.User;
+import com.foxminded.university.model.dtos.users.StudentDTO;
+import com.foxminded.university.model.dtos.users.TeacherDTO;
+import com.foxminded.university.model.dtos.users.UserDTO;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
@@ -20,42 +21,40 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Map;
-
 @Controller
 @AllArgsConstructor
-@RequestMapping("/admin")
+@RequestMapping("/admin/users")
 public class AdminController {
 
     private UserService userService;
     private GroupService groupService;
     private StudyClassService studyClassService;
-    private ControllerUtils controllerUtils;
+    private PageUtils pageUtils;
 
     @GetMapping
     public String showAllUsersList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
-        Map<Integer, Integer> validatedParams = controllerUtils.getValidatedPageParameters(pageStr, sizeStr);
-        int page = validatedParams.get(0);
-        int size = validatedParams.get(1);
+        DefaultPage validatedParams = pageUtils.getValidatedPageParameters(pageStr, sizeStr);
+        int page = validatedParams.getPageNumber();
+        int size = validatedParams.getPageSize();
         Page<User> usersPage = userService.findAllUsersWithPagination(page, size);
         model.addAttribute("usersPage", usersPage);
         return "admin";
     }
 
-    @GetMapping("/new-user")
+    @GetMapping("/new")
     public String showAddUserForm(Model model) {
         model.addAttribute("user", new UserDTO());
         model.addAttribute("groups", groupService.findAllGroupsWithPagination(0, Integer.MAX_VALUE));
         return "add-user";
     }
 
-    @PostMapping("/new-user")
+    @PostMapping("/new")
     public String addUser(@ModelAttribute UserDTO user) {
         if (user.getUserType().equalsIgnoreCase("STUDENT")) {
             StudentDTO studentDTO = new StudentDTO();
             studentDTO.setFirstName(user.getFirstName());
             studentDTO.setLastName(user.getLastName());
-            studentDTO.setGroup(user.getGroup());
+            studentDTO.setGroupId(user.getGroupId());
             userService.saveStudent(studentDTO);
         } else if (user.getUserType().equalsIgnoreCase("TEACHER")) {
             TeacherDTO teacherDTO = new TeacherDTO();
@@ -63,10 +62,10 @@ public class AdminController {
             teacherDTO.setLastName(user.getLastName());
             userService.saveTeacher(teacherDTO);
         }
-        return "redirect:/admin";
+        return "redirect:/admin/users";
     }
 
-    @GetMapping("/edit-user")
+    @GetMapping("/edit")
     public String showEditUserForm(@RequestParam String id, Model model) {
         User user = userService.findUserById(id);
         UserDTO userDTO = UserDTO.builder()
@@ -76,7 +75,7 @@ public class AdminController {
                 .userType(user.getUserType())
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .rawPassword(user.getRawPassword())
+                .repeatedPassword(user.getRepeatedPassword())
                 .build();
         model.addAttribute("user", userDTO);
         model.addAttribute("groups", groupService.findAllGroupsWithPagination(0, Integer.MAX_VALUE));
@@ -84,36 +83,36 @@ public class AdminController {
         return "edit-user";
     }
 
-    @PostMapping("/edit-user")
+    @PostMapping("/edit")
     public String editUser(@ModelAttribute UserDTO user) {
         if (user.getUserType().equalsIgnoreCase("STUDENT")) {
             StudentDTO studentDTO = new StudentDTO();
             studentDTO.setId(user.getId());
             studentDTO.setFirstName(user.getFirstName());
             studentDTO.setLastName(user.getLastName());
-            studentDTO.setGroup(user.getGroup());
+            studentDTO.setGroupId(user.getGroupId());
             studentDTO.setUsername(user.getUsername());
-            studentDTO.setPassword(user.getRawPassword());
+            studentDTO.setPassword(user.getRepeatedPassword());
             userService.updateStudent(studentDTO);
         } else if (user.getUserType().equalsIgnoreCase("TEACHER")) {
             TeacherDTO teacherDTO = new TeacherDTO();
             teacherDTO.setId(user.getId());
             teacherDTO.setFirstName(user.getFirstName());
             teacherDTO.setLastName(user.getLastName());
-            teacherDTO.setStudyClasses(user.getStudyClasses());
             teacherDTO.setUsername(user.getUsername());
-            teacherDTO.setPassword(user.getRawPassword());
-            for (StudyClass studyClass : user.getStudyClasses()) {
-                studyClassService.assignTeacherToClass(user.getId(), studyClass.getId());
-            }
+            teacherDTO.setPassword(user.getRepeatedPassword());
+            teacherDTO.setStudyClassesIds(user.getStudyClassesIds());
+            user.getStudyClassesIds().forEach(string -> {
+                studyClassService.assignTeacherToClass(user.getId(), string);
+            });
             userService.updateTeacher(teacherDTO);
         }
-        return "redirect:/admin";
+        return "redirect:/admin/users";
     }
 
-    @DeleteMapping("/delete-user/{id}")
+    @DeleteMapping("/delete/{id}")
     public String deleteUser(@PathVariable("id") String id) {
         userService.deleteUserById(id);
-        return "redirect:/admin";
+        return "redirect:/admin/users";
     }
 }

@@ -1,13 +1,13 @@
 package com.foxminded.university.service.course;
 
-import com.foxminded.university.model.Course;
-import com.foxminded.university.model.Group;
-import com.foxminded.university.model.Location;
-import com.foxminded.university.model.classes.OfflineClass;
-import com.foxminded.university.model.classes.OnlineClass;
-import com.foxminded.university.model.users.Student;
-import com.foxminded.university.model.users.Teacher;
-import com.foxminded.university.service.TestConfig;
+import com.foxminded.university.model.entity.Course;
+import com.foxminded.university.model.entity.Group;
+import com.foxminded.university.model.entity.Location;
+import com.foxminded.university.model.entity.classes.OfflineClass;
+import com.foxminded.university.model.entity.classes.OnlineClass;
+import com.foxminded.university.model.entity.users.Student;
+import com.foxminded.university.model.entity.users.Teacher;
+import com.foxminded.university.config.TestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -75,14 +75,14 @@ class DefaultCourseServiceTest {
                 .lastName("Smith")
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(rawPassword)
                 .build();
         Teacher bob = Teacher.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(rawPassword)
                 .build();
         entityManager.persist(alice);
         entityManager.persist(bob);
@@ -94,7 +94,7 @@ class DefaultCourseServiceTest {
                 .group(groupA)
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(rawPassword)
                 .build();
         Student diana = Student.builder()
                 .firstName("Diana")
@@ -102,7 +102,7 @@ class DefaultCourseServiceTest {
                 .group(groupB)
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(rawPassword)
                 .build();
         entityManager.persist(charlie);
         entityManager.persist(diana);
@@ -165,6 +165,11 @@ class DefaultCourseServiceTest {
     }
 
     @Test
+    void assertThrowsExceptionIfCourseIsNotPresent(){
+        assertThrows(NoSuchElementException.class, () -> courseService.findCourseById("testId"));
+    }
+
+    @Test
     void findCourseByName() {
         Course course = courseService.findCourseByName("Mathematics");
         course.setId(null);
@@ -172,6 +177,11 @@ class DefaultCourseServiceTest {
                 .name("Mathematics")
                 .build();
         assertThat(course, is(courseA));
+    }
+
+    @Test
+    void assertThrowsExceptionIfCourseIsNotPresentByName(){
+        assertThrows(NoSuchElementException.class, () -> courseService.findCourseByName("test"));
     }
 
     @Test

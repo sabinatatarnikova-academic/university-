@@ -1,6 +1,8 @@
 package com.foxminded.university.controller;
 
-import com.foxminded.university.model.users.Teacher;
+import com.foxminded.university.utils.DefaultPage;
+import com.foxminded.university.utils.PageUtils;
+import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.service.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,12 +18,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class TeacherController {
 
     private UserService userService;
-    private ControllerUtils controllerUtils;
+    private PageUtils pageUtils;
 
     @GetMapping()
     public String showTeachersList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
-        int page = controllerUtils.getValidatedPageParameters(pageStr, sizeStr).get(0);
-        int size = controllerUtils.getValidatedPageParameters(pageStr, sizeStr).get(1);
+        DefaultPage validatedParams = pageUtils.getValidatedPageParameters(pageStr, sizeStr);
+        int page = validatedParams.getPageNumber();
+        int size = validatedParams.getPageSize();
         Page<Teacher> teacherPage = userService.findAllTeachersWithPagination(page, size);
         model.addAttribute("teacherPage", teacherPage);
         return "teacher";

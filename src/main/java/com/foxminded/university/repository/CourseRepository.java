@@ -1,6 +1,6 @@
 package com.foxminded.university.repository;
 
-import com.foxminded.university.model.Course;
+import com.foxminded.university.model.entity.Course;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

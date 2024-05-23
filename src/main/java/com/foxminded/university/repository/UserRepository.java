@@ -1,8 +1,8 @@
 package com.foxminded.university.repository;
 
-import com.foxminded.university.model.users.Student;
-import com.foxminded.university.model.users.Teacher;
-import com.foxminded.university.model.users.User;
+import com.foxminded.university.model.entity.users.Student;
+import com.foxminded.university.model.entity.users.Teacher;
+import com.foxminded.university.model.entity.users.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,13 +1,13 @@
 package com.foxminded.university.service.group;
 
-import com.foxminded.university.model.Course;
-import com.foxminded.university.model.Group;
-import com.foxminded.university.model.Location;
-import com.foxminded.university.model.classes.OfflineClass;
-import com.foxminded.university.model.classes.OnlineClass;
-import com.foxminded.university.model.users.Student;
-import com.foxminded.university.model.users.Teacher;
-import com.foxminded.university.service.TestConfig;
+import com.foxminded.university.model.entity.Course;
+import com.foxminded.university.model.entity.Group;
+import com.foxminded.university.model.entity.Location;
+import com.foxminded.university.model.entity.classes.OfflineClass;
+import com.foxminded.university.model.entity.classes.OnlineClass;
+import com.foxminded.university.model.entity.users.Student;
+import com.foxminded.university.model.entity.users.Teacher;
+import com.foxminded.university.config.TestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,14 +76,14 @@ class DefaultGroupServiceTest {
                 .lastName("Smith")
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(rawPassword)
                 .build();
         Teacher bob = Teacher.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(rawPassword)
                 .build();
         entityManager.persist(alice);
         entityManager.persist(bob);
@@ -94,7 +94,7 @@ class DefaultGroupServiceTest {
                 .lastName("Williams")
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(rawPassword)
                 .group(groupA)
                 .build();
         Student diana = Student.builder()
@@ -102,7 +102,7 @@ class DefaultGroupServiceTest {
                 .lastName("Brown")
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(rawPassword)
                 .group(groupB)
                 .build();
         entityManager.persist(charlie);
@@ -166,6 +166,11 @@ class DefaultGroupServiceTest {
     }
 
     @Test
+    void assertThrowsExceptionIfGroupIsNotPresent(){
+        assertThrows(NoSuchElementException.class, () -> groupService.findGroupById("testId"));
+    }
+
+    @Test
     void findGroupByName() {
         Group group = groupService.findGroupByName("Group A");
         group.setId(null);
@@ -173,6 +178,11 @@ class DefaultGroupServiceTest {
                 .groupName("Group A")
                 .build();
         assertThat(group, is(groupA));
+    }
+
+    @Test
+    void assertThrowsExceptionIfGroupIsNotPresentByName(){
+        assertThrows(NoSuchElementException.class, () -> groupService.findGroupByName("test"));
     }
 
     @Test

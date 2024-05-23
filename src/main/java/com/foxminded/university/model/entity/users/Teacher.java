@@ -1,6 +1,6 @@
-package com.foxminded.university.model.users;
+package com.foxminded.university.model.entity.users;
 
-import com.foxminded.university.model.classes.StudyClass;
+import com.foxminded.university.model.entity.classes.StudyClass;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;

@@ -1,6 +1,6 @@
 package com.foxminded.university.service.course;
 
-import com.foxminded.university.model.Course;
+import com.foxminded.university.model.entity.Course;
 
 import java.util.List;
 

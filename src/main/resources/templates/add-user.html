@@ -9,7 +9,7 @@
 <body>
 <div class="container mt-4">
     <h1>Add New User</h1>
-    <form method="post" th:action="@{/admin/new-user}" th:object="${user}">
+    <form method="post" th:action="@{/admin/users/new}" th:object="${user}">
         <div class="mb-3">
             <label class="form-label" for="firstName">First Name</label>
             <input class="form-control" id="firstName" th:field="*{firstName}" type="text">
@@ -27,7 +27,7 @@
         </div>
         <div class="mb-3">
             <label class="form-label" for="group">Group (only for students)</label>
-            <select class="form-select" id="group" th:field="*{group}">
+            <select class="form-select" id="group" th:field="*{groupId}">
                 <option th:each="group : ${groups}" th:text="${group.getGroupName()}" th:value="${group.id}"></option>
                 <option th:value="null">None (only for teacher)</option>
             </select>

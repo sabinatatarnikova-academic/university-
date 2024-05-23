@@ -1,4 +1,4 @@
-package com.foxminded.university.model.users;
+package com.foxminded.university.model.entity.users;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;

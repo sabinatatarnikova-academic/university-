@@ -2,7 +2,7 @@ INSERT INTO groups (group_id, group_name)
 VALUES ('d15b0018-47e9-4281-9dc8-a5aaf2bdf951', 'Group A'),
        ('99e56438-c880-41ba-87aa-080b7413ad34', 'Group B');
 
-INSERT INTO users (user_id, first_name, last_name, user_type, group_id, username, password, raw_password)
+INSERT INTO users (user_id, first_name, last_name, user_type, group_id, username, password, repeated_password)
 VALUES ('9f6cfb74-e71e-4d00-86e8-3307e8b6865e', 'John', 'Doe', 'TEACHER', null, 'john.doe',
         '$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66', 'password'),
        ('f7d448d4-0423-4a65-8576-9846a1b5e694', 'Jane', 'Smith', 'TEACHER', null, 'jane.smith',

@@ -1,6 +1,6 @@
 package com.foxminded.university.service.group;
 
-import com.foxminded.university.model.Group;
+import com.foxminded.university.model.entity.Group;
 
 import java.util.List;
 

@@ -1,18 +1,15 @@
-package com.foxminded.university.model.users.dtos;
+package com.foxminded.university.model.dtos.users;
 
-import com.foxminded.university.model.classes.StudyClass;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TeacherDTO {
+public class StudentDTO {
 
     private String id;
     private String firstName;
@@ -20,5 +17,5 @@ public class TeacherDTO {
     private String username;
     private String password;
     private String rawPassword;
-    private List<StudyClass> studyClasses;
+    private String groupId;
 }

@@ -1,8 +1,8 @@
-package com.foxminded.university.model.classes;
+package com.foxminded.university.model.entity.classes;
 
-import com.foxminded.university.model.Course;
-import com.foxminded.university.model.Group;
-import com.foxminded.university.model.users.User;
+import com.foxminded.university.model.entity.Course;
+import com.foxminded.university.model.entity.Group;
+import com.foxminded.university.model.entity.users.Teacher;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
@@ -49,7 +49,7 @@ public class StudyClass {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User teacher;
+    private Teacher teacher;
 
     @ManyToOne
     @JoinColumn(name = "group_id")

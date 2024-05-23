@@ -1,16 +1,16 @@
 package com.foxminded.university.service.user;
 
-import com.foxminded.university.model.Course;
-import com.foxminded.university.model.Group;
-import com.foxminded.university.model.Location;
-import com.foxminded.university.model.classes.OfflineClass;
-import com.foxminded.university.model.classes.OnlineClass;
-import com.foxminded.university.model.users.Student;
-import com.foxminded.university.model.users.Teacher;
-import com.foxminded.university.model.users.User;
-import com.foxminded.university.model.users.dtos.StudentDTO;
-import com.foxminded.university.model.users.dtos.TeacherDTO;
-import com.foxminded.university.service.TestConfig;
+import com.foxminded.university.model.dtos.users.StudentDTO;
+import com.foxminded.university.model.dtos.users.TeacherDTO;
+import com.foxminded.university.model.entity.Course;
+import com.foxminded.university.model.entity.Group;
+import com.foxminded.university.model.entity.Location;
+import com.foxminded.university.model.entity.classes.OfflineClass;
+import com.foxminded.university.model.entity.classes.OnlineClass;
+import com.foxminded.university.model.entity.users.Student;
+import com.foxminded.university.model.entity.users.Teacher;
+import com.foxminded.university.model.entity.users.User;
+import com.foxminded.university.config.TestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,13 +21,18 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertThrows;
 
 @DataJpaTest
@@ -54,11 +59,12 @@ class DefaultUserServiceTest {
     private Location fdu;
     private OnlineClass onlineClass;
     private OfflineClass offlineClass;
-    private final String username = "username";
-    private final String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
-    private final String rawPassword = "password";
+    private String username = "username";
+    private String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
+    private String repeatedPassword = "password";
 
     @BeforeEach
+    @Transactional
     public void init() {
         entityManager.getEntityManager().createNativeQuery("DELETE FROM classes").executeUpdate();
         entityManager.getEntityManager().createNativeQuery("DELETE FROM users").executeUpdate();
@@ -66,15 +72,15 @@ class DefaultUserServiceTest {
         entityManager.getEntityManager().createNativeQuery("DELETE FROM groups").executeUpdate();
         entityManager.getEntityManager().createNativeQuery("DELETE FROM locations").executeUpdate();
 
+
         groupA = Group.builder()
                 .groupName("Group A")
                 .build();
         groupB = Group.builder()
                 .groupName("Group B")
                 .build();
-        entityManager.persist(groupA);
-        entityManager.persist(groupB);
-
+        groupA = entityManager.merge(groupA);
+        groupB = entityManager.merge(groupB);
 
         math = Course.builder()
                 .name("Mathematics")
@@ -82,26 +88,25 @@ class DefaultUserServiceTest {
         physics = Course.builder()
                 .name("Physics")
                 .build();
-        entityManager.persist(math);
-        entityManager.persist(physics);
+        math = entityManager.merge(math);
+        physics = entityManager.merge(physics);
 
         alice = Teacher.builder()
                 .firstName("Alice")
                 .lastName("Smith")
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(repeatedPassword)
                 .build();
         bob = Teacher.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(repeatedPassword)
                 .build();
-        entityManager.persist(alice);
-        entityManager.persist(bob);
-
+        alice = entityManager.merge(alice);
+        bob = entityManager.merge(bob);
 
         charlie = Student.builder()
                 .firstName("Charlie")
@@ -109,7 +114,7 @@ class DefaultUserServiceTest {
                 .group(groupA)
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(repeatedPassword)
                 .build();
         diana = Student.builder()
                 .firstName("Diana")
@@ -117,20 +122,22 @@ class DefaultUserServiceTest {
                 .group(groupB)
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(repeatedPassword)
                 .build();
-        entityManager.persist(charlie);
-        entityManager.persist(diana);
+        charlie = entityManager.merge(charlie);
+        diana = entityManager.merge(diana);
+
         ics = Location.builder()
                 .department("ICS")
                 .classroom("101")
                 .build();
         fdu = Location.builder()
+
                 .department("FDU")
                 .classroom("102")
                 .build();
-        entityManager.persist(ics);
-        entityManager.persist(fdu);
+        ics = entityManager.merge(ics);
+        fdu = entityManager.merge(fdu);
 
         onlineClass = OnlineClass.builder()
                 .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
@@ -148,8 +155,8 @@ class DefaultUserServiceTest {
                 .group(groupB)
                 .location(ics)
                 .build();
-        entityManager.persist(onlineClass);
-        entityManager.persist(offlineClass);
+        onlineClass = entityManager.merge(onlineClass);
+        offlineClass = entityManager.merge(offlineClass);
 
         entityManager.flush();
     }
@@ -159,7 +166,7 @@ class DefaultUserServiceTest {
         StudentDTO studentToSave = StudentDTO.builder()
                 .firstName("Test")
                 .lastName("Test")
-                .group(groupA)
+                .groupId(groupA.getId())
                 .build();
 
         userService.saveStudent(studentToSave);
@@ -168,7 +175,7 @@ class DefaultUserServiceTest {
 
         assertEquals(studentToSave.getFirstName(), actualStudent.getFirstName());
         assertEquals(studentToSave.getLastName(), actualStudent.getLastName());
-        assertEquals(studentToSave.getGroup(), actualStudent.getGroup());
+        assertEquals(groupA, actualStudent.getGroup());
     }
 
     @Test
@@ -176,7 +183,7 @@ class DefaultUserServiceTest {
         TeacherDTO teacherToSave = TeacherDTO.builder()
                 .firstName("Test")
                 .lastName("Test")
-                .studyClasses(List.of(offlineClass, onlineClass))
+                .studyClassesIds(Set.of(onlineClass.getId(), offlineClass.getId()))
                 .build();
 
         userService.saveTeacher(teacherToSave);
@@ -185,7 +192,7 @@ class DefaultUserServiceTest {
 
         assertEquals(teacherToSave.getFirstName(), actualTeacher.getFirstName());
         assertEquals(teacherToSave.getLastName(), actualTeacher.getLastName());
-        assertEquals(teacherToSave.getStudyClasses(), actualTeacher.getStudyClasses());
+        assertThat(actualTeacher.getStudyClasses(), containsInAnyOrder(onlineClass, offlineClass));
     }
 
     @Test
@@ -193,6 +200,11 @@ class DefaultUserServiceTest {
         User user = userService.findAllUsersWithPagination(0, 4).toList().get(3);
         String userId = user.getId();
         assertEquals(user, userService.findUserById(userId));
+    }
+
+    @Test
+    void assertThrowsExceptionIfCourseIsNotPresent(){
+        assertThrows(NoSuchElementException.class, () -> userService.findUserById("testId"));
     }
 
     @Test
@@ -204,9 +216,9 @@ class DefaultUserServiceTest {
                 .id(userId)
                 .firstName("Test")
                 .lastName("Test")
-                .group(groupA)
+                .groupId(groupA.getId())
                 .password(password)
-                .rawPassword(rawPassword)
+                .rawPassword(repeatedPassword)
                 .username(username)
                 .build();
 
@@ -215,7 +227,7 @@ class DefaultUserServiceTest {
 
         assertEquals(studentToSave.getFirstName(), actualStudent.getFirstName());
         assertEquals(studentToSave.getLastName(), actualStudent.getLastName());
-        assertEquals(studentToSave.getGroup(), actualStudent.getGroup());
+        assertEquals(groupA, actualStudent.getGroup());
     }
 
     @Test
@@ -227,9 +239,9 @@ class DefaultUserServiceTest {
                 .id(userId)
                 .firstName("Test")
                 .lastName("Test")
-                .studyClasses(List.of(offlineClass, onlineClass))
+                .studyClassesIds(Set.of(offlineClass.getId(), onlineClass.getId()))
                 .password(password)
-                .rawPassword(rawPassword)
+                .rawPassword(repeatedPassword)
                 .username(username)
                 .build();
 
@@ -238,7 +250,7 @@ class DefaultUserServiceTest {
 
         assertEquals(teacherToSave.getFirstName(), actualTeacher.getFirstName());
         assertEquals(teacherToSave.getLastName(), actualTeacher.getLastName());
-        assertEquals(teacherToSave.getStudyClasses(), actualTeacher.getStudyClasses());
+        assertThat(actualTeacher.getStudyClasses(), containsInAnyOrder(onlineClass, offlineClass));
     }
 
     @Test

@@ -9,7 +9,7 @@
 <body>
 <div class="container mt-4">
     <h1>Edit User</h1>
-    <form method="post" th:action="@{/admin/edit-user}" th:object="${user}">
+    <form method="post" th:action="@{/admin/users/edit}" th:object="${user}">
         <input th:field="*{id}" type="hidden">
         <div class="mb-3">
             <label class="form-label" for="firstName">First Name</label>
@@ -28,7 +28,7 @@
         </div>
         <div class="mb-3">
             <label class="form-label" for="group">Group (only for students)</label>
-            <select class="form-select" id="group" th:field="*{group}">
+            <select class="form-select" id="group" th:field="*{groupId}">
                 <option th:each="group : ${groups}" th:text="${group.getGroupName()}" th:value="${group.id}"></option>
                 <option th:value="null">None (only for teacher)</option>
             </select>
@@ -39,11 +39,11 @@
         </div>
         <div class="mb-3">
             <label class="form-label" for="password">Password</label>
-            <input class="form-control" id="password" th:field="*{rawPassword}" type="text">
+            <input class="form-control" id="password" th:field="*{repeatedPassword}" type="text">
         </div>
         <div class="mb-3">
             <label class="form-label" for="studyClasses">Study classes (only for teachers)</label>
-            <select class="form-select" id="studyClasses" multiple th:field="*{studyClasses}">
+            <select class="form-select" id="studyClasses" multiple th:field="*{studyClassesIds}">
                 <option th:each="studyClass : ${studyClasses}"
                         th:text="${studyClass.course.name + '; Start time:' + studyClass.getStartTime() + '; End time:' + studyClass.getEndTime() + '; Group: ' + studyClass.getGroup().getGroupName()}"
                         th:value="${studyClass.id}"></option>

@@ -1,13 +1,13 @@
 package com.foxminded.university.service.location;
 
-import com.foxminded.university.model.Course;
-import com.foxminded.university.model.Group;
-import com.foxminded.university.model.Location;
-import com.foxminded.university.model.classes.OfflineClass;
-import com.foxminded.university.model.classes.OnlineClass;
-import com.foxminded.university.model.users.Student;
-import com.foxminded.university.model.users.Teacher;
-import com.foxminded.university.service.TestConfig;
+import com.foxminded.university.model.entity.Course;
+import com.foxminded.university.model.entity.Group;
+import com.foxminded.university.model.entity.Location;
+import com.foxminded.university.model.entity.classes.OfflineClass;
+import com.foxminded.university.model.entity.classes.OnlineClass;
+import com.foxminded.university.model.entity.users.Student;
+import com.foxminded.university.model.entity.users.Teacher;
+import com.foxminded.university.config.TestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -75,14 +75,14 @@ class DefaultLocationServiceTest {
                 .lastName("Smith")
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(rawPassword)
                 .build();
         Teacher bob = Teacher.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(rawPassword)
                 .build();
         entityManager.persist(alice);
         entityManager.persist(bob);
@@ -94,7 +94,7 @@ class DefaultLocationServiceTest {
                 .group(groupA)
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(rawPassword)
                 .build();
         Student diana = Student.builder()
                 .firstName("Diana")
@@ -102,7 +102,7 @@ class DefaultLocationServiceTest {
                 .group(groupB)
                 .username(username)
                 .password(password)
-                .rawPassword(rawPassword)
+                .repeatedPassword(rawPassword)
                 .build();
         entityManager.persist(charlie);
         entityManager.persist(diana);
@@ -164,6 +164,11 @@ class DefaultLocationServiceTest {
                 .classroom("101")
                 .build();
         assertThat(location, is(locationA));
+    }
+
+    @Test
+    void assertThrowsExceptionIfLocationIsNotPresent(){
+        assertThrows(NoSuchElementException.class, () -> locationService.findLocationById("testId"));
     }
 
     @Test

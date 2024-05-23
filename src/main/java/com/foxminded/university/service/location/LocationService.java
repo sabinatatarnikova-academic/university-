@@ -1,6 +1,6 @@
 package com.foxminded.university.service.location;
 
-import com.foxminded.university.model.Location;
+import com.foxminded.university.model.entity.Location;
 
 import java.util.List;
 

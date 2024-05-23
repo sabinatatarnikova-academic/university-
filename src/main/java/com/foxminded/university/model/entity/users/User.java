@@ -1,4 +1,4 @@
-package com.foxminded.university.model.users;
+package com.foxminded.university.model.entity.users;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -45,6 +45,6 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "raw_password")
-    private String rawPassword;
+    @Column(name = "repeated_password")
+    private String repeatedPassword;
 }

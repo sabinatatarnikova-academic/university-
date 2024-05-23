@@ -1,6 +1,6 @@
-package com.foxminded.university.model.users;
+package com.foxminded.university.model.entity.classes;
 
-import com.foxminded.university.model.Group;
+import com.foxminded.university.model.entity.Location;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -13,14 +13,14 @@ import lombok.experimental.SuperBuilder;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@DiscriminatorValue("STUDENT")
+@DiscriminatorValue("offline")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class Student extends User{
+public class OfflineClass extends StudyClass {
 
     @ManyToOne
-    @JoinColumn(name = "group_id")
-    private Group group;
+    @JoinColumn(name = "location_id")
+    private Location location;
 }

@@ -1,7 +1,7 @@
-package com.foxminded.university.model;
+package com.foxminded.university.model.entity;
 
-import com.foxminded.university.model.classes.StudyClass;
-import com.foxminded.university.model.users.Student;
+import com.foxminded.university.model.entity.classes.StudyClass;
+import com.foxminded.university.model.entity.users.Student;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
