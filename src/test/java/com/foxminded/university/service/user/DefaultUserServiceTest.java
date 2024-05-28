@@ -1,5 +1,7 @@
 package com.foxminded.university.service.user;
 
+import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.model.dtos.classes.StudyClassDTO;
 import com.foxminded.university.model.dtos.users.StudentDTO;
 import com.foxminded.university.model.dtos.users.TeacherDTO;
 import com.foxminded.university.model.entity.Course;
@@ -10,16 +12,17 @@ import com.foxminded.university.model.entity.classes.OnlineClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.model.entity.users.User;
-import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.utils.mappers.GroupMapper;
+import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,9 +30,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -38,7 +39,7 @@ import static org.junit.Assert.assertThrows;
 @DataJpaTest
 @ActiveProfiles("h2")
 @ExtendWith(SpringExtension.class)
-@Import(TestConfig.class)
+@ContextConfiguration(classes = TestConfig.class)
 class DefaultUserServiceTest {
 
     @Autowired
@@ -46,6 +47,12 @@ class DefaultUserServiceTest {
 
     @Autowired
     private DefaultUserService userService;
+
+    @Autowired
+    private GroupMapper groupMapper;
+
+    @Autowired
+    private StudyClassMapper studyClassMapper;
 
     private Group groupA;
     private Group groupB;
@@ -166,7 +173,6 @@ class DefaultUserServiceTest {
         StudentDTO studentToSave = StudentDTO.builder()
                 .firstName("Test")
                 .lastName("Test")
-                .groupId(groupA.getId())
                 .build();
 
         userService.saveStudent(studentToSave);
@@ -175,7 +181,6 @@ class DefaultUserServiceTest {
 
         assertEquals(studentToSave.getFirstName(), actualStudent.getFirstName());
         assertEquals(studentToSave.getLastName(), actualStudent.getLastName());
-        assertEquals(groupA, actualStudent.getGroup());
     }
 
     @Test
@@ -183,7 +188,6 @@ class DefaultUserServiceTest {
         TeacherDTO teacherToSave = TeacherDTO.builder()
                 .firstName("Test")
                 .lastName("Test")
-                .studyClassesIds(Set.of(onlineClass.getId(), offlineClass.getId()))
                 .build();
 
         userService.saveTeacher(teacherToSave);
@@ -192,7 +196,6 @@ class DefaultUserServiceTest {
 
         assertEquals(teacherToSave.getFirstName(), actualTeacher.getFirstName());
         assertEquals(teacherToSave.getLastName(), actualTeacher.getLastName());
-        assertThat(actualTeacher.getStudyClasses(), containsInAnyOrder(onlineClass, offlineClass));
     }
 
     @Test
@@ -216,10 +219,10 @@ class DefaultUserServiceTest {
                 .id(userId)
                 .firstName("Test")
                 .lastName("Test")
-                .groupId(groupA.getId())
                 .password(password)
-                .rawPassword(repeatedPassword)
+                .repeatedPassword(repeatedPassword)
                 .username(username)
+                .group(groupMapper.toDto(groupA))
                 .build();
 
         userService.updateStudent(studentToSave);
@@ -235,14 +238,17 @@ class DefaultUserServiceTest {
         User user = userService.findAllUsersWithPagination(0, 4).toList().get(0);
         String userId = user.getId();
 
+        StudyClassDTO onlineClassDTO = studyClassMapper.toDto(onlineClass, onlineClass.getUrl());
+        StudyClassDTO offlineClassDTO = studyClassMapper.toDto(offlineClass, offlineClass.getLocation());
+
         TeacherDTO teacherToSave = TeacherDTO.builder()
                 .id(userId)
                 .firstName("Test")
                 .lastName("Test")
-                .studyClassesIds(Set.of(offlineClass.getId(), onlineClass.getId()))
                 .password(password)
-                .rawPassword(repeatedPassword)
+                .repeatedPassword(repeatedPassword)
                 .username(username)
+                .studyClasses(List.of(onlineClassDTO, offlineClassDTO))
                 .build();
 
         userService.updateTeacher(teacherToSave);

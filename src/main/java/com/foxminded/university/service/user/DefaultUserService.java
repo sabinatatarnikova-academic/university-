@@ -1,17 +1,17 @@
 package com.foxminded.university.service.user;
 
-import com.foxminded.university.model.entity.Group;
+import com.foxminded.university.model.dtos.users.StudentDTO;
+import com.foxminded.university.model.dtos.users.TeacherDTO;
 import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.model.entity.users.User;
-import com.foxminded.university.model.dtos.users.StudentDTO;
-import com.foxminded.university.model.dtos.users.TeacherDTO;
 import com.foxminded.university.repository.StudyClassRepository;
 import com.foxminded.university.repository.UserRepository;
-import com.foxminded.university.service.group.GroupService;
-import com.foxminded.university.utils.ConverterDtoToEntity;
 import com.foxminded.university.utils.UserCredentialGenerator;
+import com.foxminded.university.utils.mappers.GroupMapper;
+import com.foxminded.university.utils.mappers.users.StudentMapper;
+import com.foxminded.university.utils.mappers.users.TeacherMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -20,11 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,69 +30,84 @@ import java.util.Set;
 public class DefaultUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final GroupService groupService;
     private final StudyClassRepository studyClassRepository;
     private final UserCredentialGenerator utils;
-    private final ConverterDtoToEntity converter;
+    private final StudentMapper studentMapper;
+    private final TeacherMapper teacherMapper;
+    private final GroupMapper groupMapper;
 
     @Override
     @Transactional
     public void saveTeacher(TeacherDTO teacher) {
         teacher.setUsername(UserCredentialGenerator.generateUsername(teacher.getFirstName(), teacher.getLastName()));
         String rawPassword = UserCredentialGenerator.generatePassword();
-        teacher.setRawPassword(rawPassword);
+        teacher.setRepeatedPassword(rawPassword);
         teacher.setPassword(utils.encodePassword(rawPassword));
-        List<StudyClass> studyClasses = getStudyClasses(teacher);
-        log.debug("Adding new teacher: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), studyClasses);
-        userRepository.save(converter.convertTeacherDtoToEntity(teacher, studyClasses));
-        log.info("Saved teacher: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), studyClasses);
+        log.debug("Adding new teacher: firstName - {}, lastName - {}", teacher.getFirstName(), teacher.getLastName());
+        userRepository.save(teacherMapper.toEntity(teacher));
+        log.info("Saved teacher: firstName - {}, lastName - {}", teacher.getFirstName(), teacher.getLastName());
     }
 
     @Override
     public void saveStudent(StudentDTO student) {
         student.setUsername(UserCredentialGenerator.generateUsername(student.getFirstName(), student.getLastName()));
         String rawPassword = UserCredentialGenerator.generatePassword();
-        student.setRawPassword(rawPassword);
+        student.setRepeatedPassword(rawPassword);
         student.setPassword(utils.encodePassword(rawPassword));
-        Group group = groupService.findGroupById(student.getGroupId());
-        log.debug("Adding new student: firstName - {}, lastName - {}, group - {}, username - {},rawPassword - {}, password - {}", student.getFirstName(), student.getLastName(), group, student.getUsername(), student.getRawPassword(), student.getPassword());
-        userRepository.save(converter.convertStudentDtoToEntity(student, group));
-        log.info("Saved student: firstName - {}, lastName - {}, group - {}, username - {},rawPassword - {}, password - {}", student.getFirstName(), student.getLastName(), group, student.getUsername(), student.getRawPassword(), student.getPassword());
+        log.debug("Adding new student: firstName - {}, lastName - {}, username - {},rawPassword - {}, password - {}", student.getFirstName(), student.getLastName(), student.getUsername(), student.getRepeatedPassword(), student.getPassword());
+        userRepository.save(studentMapper.toEntity(student));
+        log.info("Saved student: firstName - {}, lastName - {}, username - {},rawPassword - {}, password - {}", student.getFirstName(), student.getLastName(), student.getUsername(), student.getRepeatedPassword(), student.getPassword());
     }
 
     @Override
     public User findUserById(String userId) {
         log.debug("Searching for user with id {}", userId);
         Optional<User> user = userRepository.findById(userId);
-
         if (!user.isPresent()) {
             log.error("User with id {} not found", userId);
             throw new NoSuchElementException();
         }
-
         log.info("Founded the user with id {}", userId);
         return user.get();
     }
 
     @Override
-    public void updateStudent(StudentDTO student) {
-        log.debug("Updating student info: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroupId());
-        student.setRawPassword(student.getPassword());
-        student.setPassword(utils.encodePassword(student.getPassword()));
-        Group group = groupService.findGroupById(student.getGroupId());
-        userRepository.save(converter.convertStudentDtoToEntity(student, group));
-        log.info("Updated student info: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroupId());
+    public void updateStudent(StudentDTO studentDTO) {
+        log.debug("Updating student info: firstName - {}, lastName - {}, group - {}", studentDTO.getFirstName(), studentDTO.getLastName(), studentDTO.getGroup());
+        studentDTO.setRepeatedPassword(studentDTO.getPassword());
+        studentDTO.setPassword(utils.encodePassword(studentDTO.getRepeatedPassword()));
+        Student student = studentMapper.toEntity(studentDTO);
+        userRepository.save(student);
+        log.info("Updated student info: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroup());
     }
 
     @Override
     @Transactional
-    public void updateTeacher(TeacherDTO teacher) {
-        teacher.setRawPassword(teacher.getRawPassword());
-        teacher.setPassword(utils.encodePassword(teacher.getPassword()));
-        List<StudyClass> studyClasses = getStudyClasses(teacher);
-        log.debug("Updating teacher info: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), studyClasses);
-        userRepository.save(converter.convertTeacherDtoToEntity(teacher, studyClasses));
-        log.info("Updated teacher info: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), studyClasses);
+    public void updateTeacher(TeacherDTO teacherDTO) {
+        teacherDTO.setRepeatedPassword(teacherDTO.getRepeatedPassword());
+        teacherDTO.setPassword(utils.encodePassword(teacherDTO.getRepeatedPassword()));
+        log.debug("Updating teacher info: firstName - {}, lastName - {}, classes - {}", teacherDTO.getFirstName(), teacherDTO.getLastName(), teacherDTO.getStudyClasses());
+        Teacher teacher = teacherMapper.toEntity(teacherDTO);
+        teacher.setStudyClasses(
+                teacherDTO.getStudyClasses().stream()
+                        .map(studyClassDTO -> assignTeacherToClass(teacher.getId(), studyClassDTO.getId()))
+                        .collect(Collectors.toList())
+        );
+        userRepository.save(teacher);
+        log.info("Updated teacher info: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), teacherDTO.getStudyClasses());
+    }
+
+    private StudyClass assignTeacherToClass(String teacherId, String classId) {
+        Optional<StudyClass> studyClassOptional = studyClassRepository.findById(classId);
+        User teacher = findUserById(teacherId);
+        if (!studyClassOptional.isPresent()) {
+            log.error("StudyClass with id {} not found", classId);
+            throw new NoSuchElementException();
+        }
+        StudyClass studyClass = studyClassOptional.get();
+        studyClass.setTeacher((Teacher) teacher);
+        studyClassRepository.save(studyClass);
+        return studyClass;
     }
 
     @Override
@@ -128,19 +141,5 @@ public class DefaultUserService implements UserService {
         Page<Teacher> allTeachers = userRepository.findAllTeachers(pageable);
         log.info("Found all teachers");
         return allTeachers;
-    }
-
-    private List<StudyClass> getStudyClasses(TeacherDTO teacher) {
-        Set<String> studyClassesIds = teacher.getStudyClassesIds();
-        List<StudyClass> studyClasses = new ArrayList<>();
-        if (!(teacher.getStudyClassesIds() == null)){
-            studyClassesIds.forEach(string -> {
-                Optional <StudyClass> studyClass = studyClassRepository.findById(string);
-                if (studyClass.isPresent()){
-                    studyClasses.add(studyClass.get());
-                }
-            });
-        }
-        return studyClasses;
     }
 }

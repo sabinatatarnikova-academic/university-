@@ -5,6 +5,8 @@ import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
+import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
+import com.foxminded.university.utils.mappers.classes.StudyClassMapperImpl;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
@@ -12,12 +14,17 @@ import org.springframework.context.annotation.Bean;
 public class AdminControllerConfig {
 
     @Bean
-    public AdminController adminController(UserService userService, GroupService groupService, StudyClassService studyClassService, PageUtils pageUtils){
-        return new AdminController(userService, groupService, studyClassService, pageUtils);
+    public AdminController adminController(UserService userService, GroupService groupService, StudyClassService studyClassService, PageUtils pageUtils, StudyClassMapper studyClassMapper) {
+        return new AdminController(userService, groupService, studyClassService, pageUtils, studyClassMapper);
     }
 
     @Bean
     public PageUtils pageUtils(){
         return new PageUtils();
+    }
+
+    @Bean
+    public StudyClassMapper studyClassMapper() {
+        return new StudyClassMapperImpl();
     }
 }

@@ -33,10 +33,10 @@ public class Course {
     private String name;
 
     @OneToMany (mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StudyClass> studyStudyClasses;
+    private List<StudyClass> studyClasses;
 
     public Course(String courseName, List<StudyClass> studyClass) {
         this.name = courseName;
-        this.studyStudyClasses = studyClass;
+        this.studyClasses = studyClass;
     }
 }

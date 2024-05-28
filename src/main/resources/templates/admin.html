@@ -32,7 +32,8 @@
             <td th:text="${user.lastName}"></td>
             <td th:text="${user.getUserType()}"></td>
             <td th:text="${user.getUsername()}"></td>
-            <td th:text="${user.getPassword()}"></td>
+            <td th:text="${user.getRepeatedPassword()}"></td>
+
             <td>
                 <a class="btn btn-primary" th:href="@{/admin/users/edit(id=${user.id})}">Edit</a>
                 <form method="post" style="display:inline-block;" th:action="@{/admin/users/delete/{id}(id=${user.id})}">
@@ -46,10 +47,10 @@
     <div>
         <ul class="pagination">
             <li class="page-item" th:each="i : ${#numbers.sequence(0, usersPage.totalPages - 1)}">
-                <a class="page-link" th:href="@{/admin/users/(page=${i}, size=${usersPage.size})}" th:text="${i + 1}"></a>
+                <a class="page-link" th:href="@{/admin/users(page=${i}, size=${usersPage.size})}"
+                   th:text="${i + 1}"></a>
             </li>
         </ul>
-
     </div>
 </div>
 </body>

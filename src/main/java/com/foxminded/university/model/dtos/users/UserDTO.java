@@ -1,19 +1,18 @@
 package com.foxminded.university.model.dtos.users;
 
-import com.foxminded.university.model.dtos.classes.StudyClassDTO;
+import com.foxminded.university.model.dtos.GroupDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import java.util.Set;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-/*@ToString(exclude = {"studyClasses"})*/
 @Builder
 public class UserDTO {
 
@@ -36,7 +35,7 @@ public class UserDTO {
     @NotBlank(message = "User type is mandatory")
     private String userType;
 
-    private String groupId;
+    private GroupDTO group;
 
-    private Set<String> studyClassesIds;
+    private List<String> studyClassesIds;
 }

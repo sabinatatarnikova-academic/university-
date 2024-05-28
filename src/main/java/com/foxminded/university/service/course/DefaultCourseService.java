@@ -21,9 +21,9 @@ public class DefaultCourseService implements CourseService{
 
     @Override
     public void saveCourse(Course course) {
-        log.debug("Adding new course: course name - {}, classes - {}",course.getName(),course.getStudyStudyClasses());
+        log.debug("Adding new course: course name - {}, classes - {}",course.getName(),course.getStudyClasses());
         courseRepository.save(course);
-        log.info("Saved course with name - {}, classes - {}",course.getName(),course.getStudyStudyClasses());
+        log.info("Saved course with name - {}, classes - {}",course.getName(),course.getStudyClasses());
     }
 
     @Override

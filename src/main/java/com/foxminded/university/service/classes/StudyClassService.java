@@ -1,8 +1,9 @@
 package com.foxminded.university.service.classes;
 
-import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.model.dtos.classes.OfflineClassDTO;
 import com.foxminded.university.model.dtos.classes.OnlineClassDTO;
+import com.foxminded.university.model.dtos.users.TeacherDTO;
+import com.foxminded.university.model.entity.classes.StudyClass;
 
 import java.util.List;
 
@@ -14,13 +15,12 @@ public interface StudyClassService {
 
     StudyClass findClassById(String classId);
 
-    void updateOnlineClass(OnlineClassDTO studyClass);
+    void updateOnlineClass(OnlineClassDTO studyClass, TeacherDTO teacher);
 
-    void updateOfflineClass(OfflineClassDTO studyClass);
+    void updateOfflineClass(OfflineClassDTO studyClass, TeacherDTO teacher);
 
     void deleteClassById(String classId);
 
     List<StudyClass> findAllClassesWithPagination(int pageNumber, int pageSize);
 
-    void assignTeacherToClass(String teacherId, String classId);
 }

@@ -1,17 +1,21 @@
 package com.foxminded.university.service.studyClasses;
 
+import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.model.dtos.classes.OfflineClassDTO;
+import com.foxminded.university.model.dtos.classes.OnlineClassDTO;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
 import com.foxminded.university.model.entity.classes.OfflineClass;
 import com.foxminded.university.model.entity.classes.OnlineClass;
 import com.foxminded.university.model.entity.classes.StudyClass;
-import com.foxminded.university.model.dtos.classes.OfflineClassDTO;
-import com.foxminded.university.model.dtos.classes.OnlineClassDTO;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
-import com.foxminded.university.config.TestConfig;
 import com.foxminded.university.service.classes.DefaultStudyClassService;
+import com.foxminded.university.utils.mappers.CourseMapper;
+import com.foxminded.university.utils.mappers.GroupMapper;
+import com.foxminded.university.utils.mappers.LocationMapper;
+import com.foxminded.university.utils.mappers.users.TeacherMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +47,18 @@ class DefaultStudyClassServiceTest {
     @Autowired
     private DefaultStudyClassService studyClassService;
 
+    @Autowired
+    private GroupMapper groupMapper;
+
+    @Autowired
+    private CourseMapper courseMapper;
+
+    @Autowired
+    private LocationMapper locationMapper;
+
+    @Autowired
+    private TeacherMapper teacherMapper;
+
     private Group groupA;
     private Group groupB;
     private Course math;
@@ -55,6 +71,9 @@ class DefaultStudyClassServiceTest {
     private Location fdu;
     private OnlineClass onlineClass;
     private OfflineClass offlineClass;
+    private String username = "username";
+    private String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
+    private String rawPassword = "password";
 
     @BeforeEach
     @Transactional
@@ -64,10 +83,6 @@ class DefaultStudyClassServiceTest {
         entityManager.getEntityManager().createNativeQuery("DELETE FROM courses").executeUpdate();
         entityManager.getEntityManager().createNativeQuery("DELETE FROM groups").executeUpdate();
         entityManager.getEntityManager().createNativeQuery("DELETE FROM locations").executeUpdate();
-
-        String username = "username";
-        String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
-        String rawPassword = "password";
 
         groupA = Group.builder()
                 .groupName("Group A")
@@ -158,24 +173,12 @@ class DefaultStudyClassServiceTest {
     }
 
     @Test
-    void assignTeacherToClassIfClassIsPresent(){
-        assertEquals(offlineClass.getTeacher(), bob);
-        studyClassService.assignTeacherToClass(alice.getId(), offlineClass.getId());
-        assertEquals(offlineClass.getTeacher(), alice);
-    }
-    @Test
-    void assignTeacherToClassIfClassIsNotPresent(){
-        assertThrows(NoSuchElementException.class, () -> studyClassService.assignTeacherToClass(alice.getId(), "testId"));
-    }
-
-    @Test
     void saveOnlineClass() {
         OnlineClassDTO onlineClassToSave = OnlineClassDTO.builder()
                 .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
                 .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
-                .courseId(math.getId())
-                .teacherId(alice.getId())
-                .groupId(groupA.getId())
+                .group(groupMapper.toDto(groupA))
+                .course(courseMapper.toDto(math))
                 .url("http://example.com")
                 .build();
 
@@ -183,11 +186,10 @@ class DefaultStudyClassServiceTest {
         List<StudyClass> classes = studyClassService.findAllClassesWithPagination(0, 3);
         OnlineClass actual = (OnlineClass) classes.get(2);
         assertEquals(onlineClassToSave.getUrl(), actual.getUrl());
-        assertEquals(math, actual.getCourse());
-        assertEquals(groupA, actual.getGroup());
-        assertEquals(alice, actual.getTeacher());
         assertEquals(onlineClassToSave.getStartTime(), actual.getStartTime());
         assertEquals(onlineClassToSave.getEndTime(), actual.getEndTime());
+        assertEquals(groupA, actual.getGroup());
+        assertEquals(math, actual.getCourse());
     }
 
     @Test
@@ -195,10 +197,9 @@ class DefaultStudyClassServiceTest {
         OfflineClassDTO offlineClassToSave = OfflineClassDTO.builder()
                 .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
                 .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
-                .courseId(physics.getId())
-                .teacherId(bob.getId())
-                .groupId(groupA.getId())
-                .locationId(ics.getId())
+                .group(groupMapper.toDto(groupA))
+                .course(courseMapper.toDto(physics))
+                .location(locationMapper.toDto(ics))
                 .build();
 
         studyClassService.saveOfflineClass(offlineClassToSave);
@@ -207,7 +208,6 @@ class DefaultStudyClassServiceTest {
         assertEquals(ics, actual.getLocation());
         assertEquals(physics, actual.getCourse());
         assertEquals(groupA, actual.getGroup());
-        assertEquals(bob, actual.getTeacher());
         assertEquals(offlineClassToSave.getStartTime(), actual.getStartTime());
         assertEquals(offlineClassToSave.getEndTime(), actual.getEndTime());
     }
@@ -220,7 +220,7 @@ class DefaultStudyClassServiceTest {
     }
 
     @Test
-    void assertThrowsExceptionIfClassIsNotPresent(){
+    void assertThrowsExceptionIfClassIsNotPresent() {
         assertThrows(NoSuchElementException.class, () -> studyClassService.findClassById("testId"));
     }
 
@@ -233,13 +233,13 @@ class DefaultStudyClassServiceTest {
                 .id(classId)
                 .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
                 .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
-                .courseId(physics.getId())
-                .teacherId(bob.getId())
-                .groupId(groupA.getId())
+                .course(courseMapper.toDto(physics))
+                .group(groupMapper.toDto(groupA))
                 .url("http://foxminded.com")
                 .build();
 
-        studyClassService.updateOnlineClass(onlineClassToUpdate);
+
+        studyClassService.updateOnlineClass(onlineClassToUpdate, teacherMapper.toDto(bob));
         List<StudyClass> onlineClass = studyClassService.findAllClassesWithPagination(0, 2);
         OnlineClass actual = (OnlineClass) onlineClass.get(0);
         assertEquals(onlineClassToUpdate.getUrl(), actual.getUrl());
@@ -259,18 +259,17 @@ class DefaultStudyClassServiceTest {
                 .id(classId)
                 .startTime(LocalDateTime.of(2025, 4, 23, 9, 0))
                 .endTime(LocalDateTime.of(2025, 4, 23, 10, 0))
-                .courseId(physics.getId())
-                .teacherId(bob.getId())
-                .groupId(groupA.getId())
-                .locationId(ics.getId())
+                .course(courseMapper.toDto(math))
+                .group(groupMapper.toDto(groupB))
+                .location(locationMapper.toDto(ics))
                 .build();
 
-        studyClassService.updateOfflineClass(offlineClassToSave);
+        studyClassService.updateOfflineClass(offlineClassToSave, teacherMapper.toDto(bob));
         List<StudyClass> studyClasses = studyClassService.findAllClassesWithPagination(0, 3);
         OfflineClass actual = (OfflineClass) studyClasses.get(1);
         assertEquals(ics, actual.getLocation());
-        assertEquals(physics, actual.getCourse());
-        assertEquals(groupA, actual.getGroup());
+        assertEquals(math, actual.getCourse());
+        assertEquals(groupB, actual.getGroup());
         assertEquals(bob, actual.getTeacher());
         assertEquals(offlineClassToSave.getStartTime(), actual.getStartTime());
         assertEquals(offlineClassToSave.getEndTime(), actual.getEndTime());
@@ -288,7 +287,7 @@ class DefaultStudyClassServiceTest {
     @Test
     void findAllClassesWithPagination() {
         List<StudyClass> expectedClasses = Arrays.asList(onlineClass, offlineClass);
-        List<StudyClass> actualClasses = studyClassService.findAllClassesWithPagination(0,2);
+        List<StudyClass> actualClasses = studyClassService.findAllClassesWithPagination(0, 2);
         actualClasses.forEach(studyClass -> studyClass.setId(null));
         assertEquals(expectedClasses, actualClasses);
     }

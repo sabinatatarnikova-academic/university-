@@ -1,19 +1,15 @@
 package com.foxminded.university.service.classes;
 
-import com.foxminded.university.model.entity.Course;
-import com.foxminded.university.model.entity.Group;
-import com.foxminded.university.model.entity.Location;
-import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.model.dtos.classes.OfflineClassDTO;
 import com.foxminded.university.model.dtos.classes.OnlineClassDTO;
-import com.foxminded.university.model.entity.users.Teacher;
-import com.foxminded.university.model.entity.users.User;
+import com.foxminded.university.model.dtos.users.TeacherDTO;
+import com.foxminded.university.model.entity.classes.OfflineClass;
+import com.foxminded.university.model.entity.classes.OnlineClass;
+import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.repository.StudyClassRepository;
-import com.foxminded.university.service.course.CourseService;
-import com.foxminded.university.service.group.GroupService;
-import com.foxminded.university.service.location.LocationService;
-import com.foxminded.university.service.user.UserService;
-import com.foxminded.university.utils.ConverterDtoToEntity;
+import com.foxminded.university.utils.mappers.classes.OfflineClassMapper;
+import com.foxminded.university.utils.mappers.classes.OnlineClassMapper;
+import com.foxminded.university.utils.mappers.users.TeacherMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -31,47 +27,24 @@ import java.util.Optional;
 public class DefaultStudyClassService implements StudyClassService{
 
     private final StudyClassRepository studyClassRepository;
-    private final UserService userService;
-    private final CourseService courseService;
-    private final GroupService groupService;
-    private final LocationService locationService;
-    private final ConverterDtoToEntity converter;
-
-    @Override
-    @Transactional
-    public void assignTeacherToClass(String teacherId, String classId) {
-        Optional<StudyClass> studyClassOptional = studyClassRepository.findById(classId);
-        User teacher = userService.findUserById(teacherId);
-        if (!studyClassOptional.isPresent()) {
-            log.error("StudyClass with id {} not found", classId);
-            throw new NoSuchElementException();
-        }
-        StudyClass studyClass = studyClassOptional.get();
-        studyClass.setTeacher((Teacher) teacher);
-        studyClassRepository.save(studyClass);
-    }
+    private final OfflineClassMapper offlineClassMapper;
+    private final OnlineClassMapper onlineClassMapper;
+    private final TeacherMapper teacherMapper;
 
     @Override
     @Transactional
     public void saveOnlineClass(OnlineClassDTO studyClass) {
-        Course course = courseService.findCourseById(studyClass.getCourseId());
-        Teacher teacher = (Teacher) userService.findUserById(studyClass.getTeacherId());
-        Group group = groupService.findGroupById(studyClass.getGroupId());
-        log.debug("Adding new online class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, url - {}", studyClass.getStartTime(), studyClass.getEndTime(), course, teacher, group, studyClass.getUrl());
-        studyClassRepository.save(converter.convertOnlineClassDtoToEntity(studyClass, course, teacher, group));
-        log.info("Saved online class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, url - {}", studyClass.getStartTime(), studyClass.getEndTime(), course, teacher, group, studyClass.getUrl());
+        log.debug("Adding new online class: startTime - {}, endTime - {}, courses - {}, group - {}, url - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getGroup(), studyClass.getUrl());
+        studyClassRepository.save(onlineClassMapper.toEntity(studyClass));
+        log.info("Saved online class: startTime - {}, endTime - {}, courses - {}, group - {}, url - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getGroup(), studyClass.getUrl());
     }
 
     @Override
     @Transactional
     public void saveOfflineClass(OfflineClassDTO studyClass) {
-        Course course = courseService.findCourseById(studyClass.getCourseId());
-        Teacher teacher = (Teacher) userService.findUserById(studyClass.getTeacherId());
-        Group group = groupService.findGroupById(studyClass.getGroupId());
-        Location location = locationService.findLocationById(studyClass.getLocationId());
-        log.debug("Adding new offline class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(), course, teacher, group, location);
-        studyClassRepository.save(converter.convertOfflineClassDtoToEntity(studyClass, course, teacher, group, location));
-        log.info("Saved offline class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(),  course, teacher, group, location);
+        log.debug("Adding new offline class: startTime - {}, endTime - {}, courses - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getGroup(), studyClass.getLocation());
+        studyClassRepository.save(offlineClassMapper.toEntity(studyClass));
+        log.info("Saved offline class: startTime - {}, endTime - {}, courses - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getGroup(), studyClass.getLocation());
     }
 
     @Override
@@ -88,24 +61,21 @@ public class DefaultStudyClassService implements StudyClassService{
 
     @Override
     @Transactional
-    public void updateOnlineClass(OnlineClassDTO studyClass) {
-        Course course = courseService.findCourseById(studyClass.getCourseId());
-        Teacher teacher = (Teacher) userService.findUserById(studyClass.getTeacherId());
-        Group group = groupService.findGroupById(studyClass.getGroupId());
-        log.debug("Updating new online class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, url - {}", studyClass.getStartTime(), studyClass.getEndTime(), course, teacher, group, studyClass.getUrl());
-        studyClassRepository.save(converter.convertOnlineClassDtoToEntity(studyClass, course, teacher, group));
-        log.info("Updated online class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, url - {}", studyClass.getStartTime(), studyClass.getEndTime(), course, teacher, group, studyClass.getUrl());
+    public void updateOnlineClass(OnlineClassDTO studyClass, TeacherDTO teacher) {
+        log.debug("Updating new online class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, url - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), teacher, studyClass.getGroup(), studyClass.getUrl());
+        OnlineClass onlineClass = onlineClassMapper.toEntity(studyClass);
+        onlineClass.setTeacher(teacherMapper.toEntity(teacher));
+        studyClassRepository.save(onlineClass);
+        log.info("Updated online class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, url - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), teacher, studyClass.getGroup(), studyClass.getUrl());
     }
 
     @Override
-    public void updateOfflineClass(OfflineClassDTO studyClass) {
-        Course course = courseService.findCourseById(studyClass.getCourseId());
-        Teacher teacher = (Teacher) userService.findUserById(studyClass.getTeacherId());
-        Group group = groupService.findGroupById(studyClass.getGroupId());
-        Location location = locationService.findLocationById(studyClass.getLocationId());
-        log.debug("Updating  offline class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(), course, teacher, group, location);
-        studyClassRepository.save(converter.convertOfflineClassDtoToEntity(studyClass, course, teacher, group, location));
-        log.info("Updated offline class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(), course, teacher, group, location);
+    public void updateOfflineClass(OfflineClassDTO studyClass, TeacherDTO teacher) {
+        log.debug("Updating  offline class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), teacher, studyClass.getGroup(), studyClass.getLocation());
+        OfflineClass offlineClass = offlineClassMapper.toEntity(studyClass);
+        offlineClass.setTeacher(teacherMapper.toEntity(teacher));
+        studyClassRepository.save(offlineClass);
+        log.info("Updated offline class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), teacher, studyClass.getGroup(), studyClass.getLocation());
     }
 
     @Override

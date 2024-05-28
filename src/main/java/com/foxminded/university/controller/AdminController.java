@@ -1,14 +1,15 @@
 package com.foxminded.university.controller;
 
-import com.foxminded.university.utils.DefaultPage;
-import com.foxminded.university.utils.PageUtils;
-import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.model.dtos.users.StudentDTO;
 import com.foxminded.university.model.dtos.users.TeacherDTO;
 import com.foxminded.university.model.dtos.users.UserDTO;
+import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
+import com.foxminded.university.utils.DefaultPage;
+import com.foxminded.university.utils.PageUtils;
+import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.stream.Collectors;
+
 @Controller
 @AllArgsConstructor
 @RequestMapping("/admin/users")
@@ -30,6 +33,7 @@ public class AdminController {
     private GroupService groupService;
     private StudyClassService studyClassService;
     private PageUtils pageUtils;
+    private StudyClassMapper studyClassMapper;
 
     @GetMapping
     public String showAllUsersList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
@@ -54,7 +58,6 @@ public class AdminController {
             StudentDTO studentDTO = new StudentDTO();
             studentDTO.setFirstName(user.getFirstName());
             studentDTO.setLastName(user.getLastName());
-            studentDTO.setGroupId(user.getGroupId());
             userService.saveStudent(studentDTO);
         } else if (user.getUserType().equalsIgnoreCase("TEACHER")) {
             TeacherDTO teacherDTO = new TeacherDTO();
@@ -79,7 +82,7 @@ public class AdminController {
                 .build();
         model.addAttribute("user", userDTO);
         model.addAttribute("groups", groupService.findAllGroupsWithPagination(0, Integer.MAX_VALUE));
-        model.addAttribute("studyClasses", studyClassService.findAllClassesWithPagination(0, Integer.MAX_VALUE));
+        model.addAttribute("allStudyClasses", studyClassService.findAllClassesWithPagination(0, Integer.MAX_VALUE));
         return "edit-user";
     }
 
@@ -90,9 +93,9 @@ public class AdminController {
             studentDTO.setId(user.getId());
             studentDTO.setFirstName(user.getFirstName());
             studentDTO.setLastName(user.getLastName());
-            studentDTO.setGroupId(user.getGroupId());
             studentDTO.setUsername(user.getUsername());
-            studentDTO.setPassword(user.getRepeatedPassword());
+            studentDTO.setRepeatedPassword(user.getRepeatedPassword());
+            studentDTO.setGroup(user.getGroup());
             userService.updateStudent(studentDTO);
         } else if (user.getUserType().equalsIgnoreCase("TEACHER")) {
             TeacherDTO teacherDTO = new TeacherDTO();
@@ -100,11 +103,11 @@ public class AdminController {
             teacherDTO.setFirstName(user.getFirstName());
             teacherDTO.setLastName(user.getLastName());
             teacherDTO.setUsername(user.getUsername());
-            teacherDTO.setPassword(user.getRepeatedPassword());
-            teacherDTO.setStudyClassesIds(user.getStudyClassesIds());
-            user.getStudyClassesIds().forEach(string -> {
-                studyClassService.assignTeacherToClass(user.getId(), string);
-            });
+            teacherDTO.setRepeatedPassword(user.getRepeatedPassword());
+            teacherDTO.setStudyClasses(
+                    user.getStudyClassesIds().stream()
+                            .map(id -> studyClassMapper.toDto(studyClassService.findClassById(id)))
+                            .collect(Collectors.toList()));
             userService.updateTeacher(teacherDTO);
         }
         return "redirect:/admin/users";

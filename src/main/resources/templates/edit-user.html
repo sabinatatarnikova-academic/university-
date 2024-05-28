@@ -28,7 +28,7 @@
         </div>
         <div class="mb-3">
             <label class="form-label" for="group">Group (only for students)</label>
-            <select class="form-select" id="group" th:field="*{groupId}">
+            <select class="form-select" id="group" th:field="*{group.id}">
                 <option th:each="group : ${groups}" th:text="${group.getGroupName()}" th:value="${group.id}"></option>
                 <option th:value="null">None (only for teacher)</option>
             </select>
@@ -44,7 +44,7 @@
         <div class="mb-3">
             <label class="form-label" for="studyClasses">Study classes (only for teachers)</label>
             <select class="form-select" id="studyClasses" multiple th:field="*{studyClassesIds}">
-                <option th:each="studyClass : ${studyClasses}"
+                <option th:each="studyClass : ${allStudyClasses}"
                         th:text="${studyClass.course.name + '; Start time:' + studyClass.getStartTime() + '; End time:' + studyClass.getEndTime() + '; Group: ' + studyClass.getGroup().getGroupName()}"
                         th:value="${studyClass.id}"></option>
                 <option th:value="null">None (only for student)</option>

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,5 +15,4 @@ public class GroupDTO {
     private String id;
 
     private String groupName;
-
 }

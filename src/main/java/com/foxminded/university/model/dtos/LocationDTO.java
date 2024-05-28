@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,5 +17,4 @@ public class LocationDTO {
     private String department;
 
     private String classroom;
-
 }

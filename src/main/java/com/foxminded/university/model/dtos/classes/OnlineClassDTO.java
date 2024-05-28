@@ -1,9 +1,12 @@
 package com.foxminded.university.model.dtos.classes;
 
+import com.foxminded.university.model.dtos.CourseDTO;
+import com.foxminded.university.model.dtos.GroupDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -15,8 +18,7 @@ public class OnlineClassDTO {
     private String id;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private String courseId;
-    private String teacherId;
-    private String groupId;
+    private CourseDTO course;
+    private GroupDTO group;
     private String url;
 }

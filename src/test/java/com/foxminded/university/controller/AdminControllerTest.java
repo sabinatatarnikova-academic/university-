@@ -2,6 +2,7 @@ package com.foxminded.university.controller;
 
 import com.foxminded.university.config.AdminControllerConfig;
 import com.foxminded.university.config.TestSecurityConfig;
+import com.foxminded.university.model.dtos.GroupDTO;
 import com.foxminded.university.model.dtos.users.StudentDTO;
 import com.foxminded.university.model.dtos.users.TeacherDTO;
 import com.foxminded.university.model.dtos.users.UserDTO;
@@ -14,6 +15,7 @@ import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.DefaultPage;
 import com.foxminded.university.utils.PageUtils;
+import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -44,6 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({TestSecurityConfig.class, AdminControllerConfig.class})
 class AdminControllerTest {
 
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -58,6 +61,9 @@ class AdminControllerTest {
 
     @MockBean
     private PageUtils pageUtils;
+
+    @MockBean
+    private StudyClassMapper studyClassMapper;
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
@@ -145,11 +151,12 @@ class AdminControllerTest {
                         .username("bob.johnson")
                         .password("password")
                         .repeatedPassword("password")
+                        .group(GroupDTO.builder().id(null).groupName(null).build())
                         .build()))
                 .andExpect(model().attributeExists("groups"))
                 .andExpect(model().attribute("groups", groupService.findAllGroupsWithPagination(0, 10)))
-                .andExpect(model().attributeExists("studyClasses"))
-                .andExpect(model().attribute("studyClasses", studyClassService.findAllClassesWithPagination(0, 10)))
+                .andExpect(model().attributeExists("allStudyClasses"))
+                .andExpect(model().attribute("allStudyClasses", studyClassService.findAllClassesWithPagination(0, 10)))
                 .andExpect(status().isOk())
                 .andExpect(view().name("edit-user"));
     }
@@ -190,8 +197,6 @@ class AdminControllerTest {
                 .andExpect(redirectedUrl("/admin/users"));
 
         verify(userService, times(1)).updateTeacher(any(TeacherDTO.class));
-        verify(studyClassService, times(1)).assignTeacherToClass("2", "1");
-        verify(studyClassService, times(1)).assignTeacherToClass("2", "2");
     }
 
     @Test
