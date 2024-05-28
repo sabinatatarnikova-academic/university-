@@ -10,8 +10,9 @@ import com.foxminded.university.model.dtos.users.TeacherDTO;
 import com.foxminded.university.repository.StudyClassRepository;
 import com.foxminded.university.repository.UserRepository;
 import com.foxminded.university.service.group.GroupService;
-import com.foxminded.university.utils.ConverterDtoToEntity;
 import com.foxminded.university.utils.UserCredentialGenerator;
+import com.foxminded.university.utils.mappers.users.StudentMapper;
+import com.foxminded.university.utils.mappers.users.TeacherMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -33,33 +34,35 @@ public class DefaultUserService implements UserService {
 
     private final UserRepository userRepository;
     private final GroupService groupService;
-    private final StudyClassRepository studyClassRepository;
+    //private final StudyClassRepository studyClassRepository;
     private final UserCredentialGenerator utils;
-    private final ConverterDtoToEntity converter;
+    private final StudentMapper studentMapper;
+    private final TeacherMapper teacherMapper;
 
     @Override
     @Transactional
     public void saveTeacher(TeacherDTO teacher) {
         teacher.setUsername(UserCredentialGenerator.generateUsername(teacher.getFirstName(), teacher.getLastName()));
         String rawPassword = UserCredentialGenerator.generatePassword();
-        teacher.setRawPassword(rawPassword);
+        teacher.setRepeatedPassword(rawPassword);
         teacher.setPassword(utils.encodePassword(rawPassword));
-        List<StudyClass> studyClasses = getStudyClasses(teacher);
-        log.debug("Adding new teacher: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), studyClasses);
-        userRepository.save(converter.convertTeacherDtoToEntity(teacher, studyClasses));
-        log.info("Saved teacher: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), studyClasses);
+        //List<StudyClass> studyClasses = getStudyClasses(teacher);
+       // log.debug("Adding new teacher: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), studyClasses);
+        userRepository.save(teacherMapper.toEntity(teacher));
+        //log.info("Saved teacher: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), studyClasses);
     }
 
     @Override
     public void saveStudent(StudentDTO student) {
         student.setUsername(UserCredentialGenerator.generateUsername(student.getFirstName(), student.getLastName()));
         String rawPassword = UserCredentialGenerator.generatePassword();
-        student.setRawPassword(rawPassword);
+        student.setRepeatedPassword(rawPassword);
         student.setPassword(utils.encodePassword(rawPassword));
-        Group group = groupService.findGroupById(student.getGroupId());
-        log.debug("Adding new student: firstName - {}, lastName - {}, group - {}, username - {},rawPassword - {}, password - {}", student.getFirstName(), student.getLastName(), group, student.getUsername(), student.getRawPassword(), student.getPassword());
-        userRepository.save(converter.convertStudentDtoToEntity(student, group));
-        log.info("Saved student: firstName - {}, lastName - {}, group - {}, username - {},rawPassword - {}, password - {}", student.getFirstName(), student.getLastName(), group, student.getUsername(), student.getRawPassword(), student.getPassword());
+
+        //Group group = groupService.findGroupById(student.getGroupId());
+       // log.debug("Adding new student: firstName - {}, lastName - {}, group - {}, username - {},rawPassword - {}, password - {}", student.getFirstName(), student.getLastName(), group, student.getUsername(), student.getRepeatedPassword(), student.getPassword());
+        userRepository.save(studentMapper.toEntity(student));
+       // log.info("Saved student: firstName - {}, lastName - {}, group - {}, username - {},rawPassword - {}, password - {}", student.getFirstName(), student.getLastName(), group, student.getUsername(), student.getRepeatedPassword(), student.getPassword());
     }
 
     @Override
@@ -78,23 +81,23 @@ public class DefaultUserService implements UserService {
 
     @Override
     public void updateStudent(StudentDTO student) {
-        log.debug("Updating student info: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroupId());
-        student.setRawPassword(student.getPassword());
+       // log.debug("Updating student info: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroupId());
+        student.setRepeatedPassword(student.getPassword());
         student.setPassword(utils.encodePassword(student.getPassword()));
-        Group group = groupService.findGroupById(student.getGroupId());
-        userRepository.save(converter.convertStudentDtoToEntity(student, group));
-        log.info("Updated student info: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroupId());
+        //Group group = groupService.findGroupById(student.getGroupId());
+        userRepository.save(studentMapper.toEntity(student));
+       // log.info("Updated student info: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroupId());
     }
 
     @Override
     @Transactional
     public void updateTeacher(TeacherDTO teacher) {
-        teacher.setRawPassword(teacher.getRawPassword());
+        teacher.setRepeatedPassword(teacher.getRepeatedPassword());
         teacher.setPassword(utils.encodePassword(teacher.getPassword()));
-        List<StudyClass> studyClasses = getStudyClasses(teacher);
-        log.debug("Updating teacher info: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), studyClasses);
-        userRepository.save(converter.convertTeacherDtoToEntity(teacher, studyClasses));
-        log.info("Updated teacher info: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), studyClasses);
+       // List<StudyClass> studyClasses = getStudyClasses(teacher);
+        //log.debug("Updating teacher info: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), studyClasses);
+        userRepository.save(teacherMapper.toEntity(teacher));
+        //log.info("Updated teacher info: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), studyClasses);
     }
 
     @Override
@@ -130,7 +133,8 @@ public class DefaultUserService implements UserService {
         return allTeachers;
     }
 
-    private List<StudyClass> getStudyClasses(TeacherDTO teacher) {
+/*    private List<StudyClass> getStudyClasses(TeacherDTO teacher) {
+
         Set<String> studyClassesIds = teacher.getStudyClassesIds();
         List<StudyClass> studyClasses = new ArrayList<>();
         if (!(teacher.getStudyClassesIds() == null)){
@@ -142,5 +146,5 @@ public class DefaultUserService implements UserService {
             });
         }
         return studyClasses;
-    }
+    }*/
 }

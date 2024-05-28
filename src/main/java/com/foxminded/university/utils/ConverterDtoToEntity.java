@@ -1,3 +1,4 @@
+/*
 package com.foxminded.university.utils;
 
 import com.foxminded.university.model.entity.Course;
@@ -67,3 +68,4 @@ public class ConverterDtoToEntity {
         return teacher;
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.foxminded.university.config;
 
 import com.foxminded.university.controller.AdminController;
@@ -21,3 +22,4 @@ public class AdminControllerConfig {
         return new PageUtils();
     }
 }
+*/

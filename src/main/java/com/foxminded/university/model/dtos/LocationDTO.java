@@ -1,9 +1,12 @@
 package com.foxminded.university.model.dtos;
 
+import com.foxminded.university.model.dtos.classes.OfflineClassDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -17,4 +20,5 @@ public class LocationDTO {
 
     private String classroom;
 
+    private List<OfflineClassDTO> studyClass;
 }

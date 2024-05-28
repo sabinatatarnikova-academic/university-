@@ -15,8 +15,23 @@ import com.foxminded.university.service.location.DefaultLocationService;
 import com.foxminded.university.service.location.LocationService;
 import com.foxminded.university.service.user.DefaultUserService;
 import com.foxminded.university.service.user.UserService;
-import com.foxminded.university.utils.ConverterDtoToEntity;
 import com.foxminded.university.utils.UserCredentialGenerator;
+import com.foxminded.university.utils.mappers.CourseMapper;
+import com.foxminded.university.utils.mappers.CourseMapperImpl;
+import com.foxminded.university.utils.mappers.GroupMapper;
+import com.foxminded.university.utils.mappers.GroupMapperImpl;
+import com.foxminded.university.utils.mappers.LocationMapper;
+import com.foxminded.university.utils.mappers.LocationMapperImpl;
+import com.foxminded.university.utils.mappers.classes.OfflineClassMapper;
+import com.foxminded.university.utils.mappers.classes.OfflineClassMapperImpl;
+import com.foxminded.university.utils.mappers.classes.OnlineClassMapper;
+import com.foxminded.university.utils.mappers.classes.OnlineClassMapperImpl;
+import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
+import com.foxminded.university.utils.mappers.classes.StudyClassMapperImpl;
+import com.foxminded.university.utils.mappers.users.StudentMapper;
+import com.foxminded.university.utils.mappers.users.StudentMapperImpl;
+import com.foxminded.university.utils.mappers.users.TeacherMapper;
+import com.foxminded.university.utils.mappers.users.TeacherMapperImpl;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -41,13 +56,13 @@ public class TestConfig {
     }
 
     @Bean
-    public StudyClassService studyClassService(StudyClassRepository studyClassRepository, UserService userService, CourseService courseService, GroupService groupService, LocationService locationService, ConverterDtoToEntity converterDtoToEntity) {
-        return new DefaultStudyClassService(studyClassRepository, userService, courseService, groupService, locationService, converterDtoToEntity);
+    public StudyClassService studyClassService(StudyClassRepository studyClassRepository, UserService userService, CourseService courseService, GroupService groupService, LocationService locationService, OnlineClassMapper onlineClassMapper, OfflineClassMapper offlineClassMapper) {
+        return new DefaultStudyClassService(studyClassRepository, userService, courseService, groupService, locationService, offlineClassMapper, onlineClassMapper);
     }
 
     @Bean
-    public UserService userService(UserRepository userRepository, GroupService groupService, StudyClassRepository studyClassRepository, UserCredentialGenerator userUtils, ConverterDtoToEntity converter ) {
-        return new DefaultUserService(userRepository, groupService, studyClassRepository, userUtils, converter);
+    public UserService userService(UserRepository userRepository, GroupService groupService,  UserCredentialGenerator userUtils, StudentMapper studentMapper, TeacherMapper teacherMapper) {
+        return new DefaultUserService(userRepository, groupService, userUtils, studentMapper, teacherMapper);
     }
 
     @Bean
@@ -56,9 +71,48 @@ public class TestConfig {
     }
 
     @Bean
+    public StudentMapper studentMapper(){
+        return new StudentMapperImpl();
+    }
+
+    @Bean
+    public TeacherMapper teacherMapper(){
+        return new TeacherMapperImpl();
+    }
+
+    @Bean
+    public OnlineClassMapper onlineClassMapper(){
+        return new OnlineClassMapperImpl();
+    }
+
+    @Bean
+    public OfflineClassMapper offlineClassMapper(){
+        return new OfflineClassMapperImpl();
+    }
+
+    @Bean
+    public StudyClassMapper studyClassMapper(){
+        return new StudyClassMapperImpl();
+    }
+
+    @Bean
+    public CourseMapper courseMapper(){
+        return new CourseMapperImpl();
+    }
+
+    @Bean
+    public GroupMapper groupMapper(){
+        return new GroupMapperImpl();
+    }
+
+    @Bean
+    public LocationMapper locationMapper(){
+        return new LocationMapperImpl();
+    }
+   /* @Bean
     public ConverterDtoToEntity converter (){
         return new ConverterDtoToEntity();
-    }
+    }*/
 
     @Bean
     public PasswordEncoder passwordEncoder() {

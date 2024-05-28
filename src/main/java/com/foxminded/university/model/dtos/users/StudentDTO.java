@@ -1,5 +1,6 @@
 package com.foxminded.university.model.dtos.users;
 
+import com.foxminded.university.model.dtos.GroupDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,6 @@ public class StudentDTO {
     private String lastName;
     private String username;
     private String password;
-    private String rawPassword;
-    private String groupId;
+    private String repeatedPassword;
+    private GroupDTO group;
 }

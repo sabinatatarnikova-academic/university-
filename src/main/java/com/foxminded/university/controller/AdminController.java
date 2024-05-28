@@ -1,3 +1,4 @@
+/*
 package com.foxminded.university.controller;
 
 import com.foxminded.university.utils.DefaultPage;
@@ -116,3 +117,4 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 }
+*/

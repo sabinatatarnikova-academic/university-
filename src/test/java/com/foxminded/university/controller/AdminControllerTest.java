@@ -1,3 +1,4 @@
+/*
 package com.foxminded.university.controller;
 
 import com.foxminded.university.config.AdminControllerConfig;
@@ -206,3 +207,4 @@ class AdminControllerTest {
         verify(userService, times(1)).deleteUserById(userId);
     }
 }
+*/

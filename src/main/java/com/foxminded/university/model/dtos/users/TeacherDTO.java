@@ -1,5 +1,6 @@
 package com.foxminded.university.model.dtos.users;
 
+import com.foxminded.university.model.dtos.classes.StudyClassDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,6 @@ public class TeacherDTO {
     private String lastName;
     private String username;
     private String password;
-    private String rawPassword;
-    private Set<String> studyClassesIds;
+    private String repeatedPassword;
+    private Set<StudyClassDTO> studyClasses;
 }
