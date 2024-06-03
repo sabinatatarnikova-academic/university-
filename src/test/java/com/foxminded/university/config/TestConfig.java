@@ -34,7 +34,6 @@ import com.foxminded.university.utils.mappers.users.TeacherMapper;
 import com.foxminded.university.utils.mappers.users.TeacherMapperImpl;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @TestConfiguration
 public class TestConfig {
@@ -60,13 +59,13 @@ public class TestConfig {
     }
 
     @Bean
-    public UserService userService(UserRepository userRepository, StudyClassRepository studyClassRepository, UserCredentialGenerator userUtils, StudentMapper studentMapper, TeacherMapper teacherMapper, GroupMapper groupMapper) {
-        return new DefaultUserService(userRepository, studyClassRepository, userUtils, studentMapper, teacherMapper, groupMapper);
+    public UserService userService(UserRepository userRepository, StudyClassRepository studyClassRepository, UserCredentialGenerator userUtils, StudentMapper studentMapper, TeacherMapper teacherMapper) {
+        return new DefaultUserService(userRepository, studyClassRepository, userUtils, studentMapper, teacherMapper);
     }
 
     @Bean
-    public UserCredentialGenerator userUtils(PasswordEncoder passwordEncoder) {
-        return new UserCredentialGenerator(passwordEncoder);
+    public UserCredentialGenerator userUtils() {
+        return new UserCredentialGenerator();
     }
 
     @Bean

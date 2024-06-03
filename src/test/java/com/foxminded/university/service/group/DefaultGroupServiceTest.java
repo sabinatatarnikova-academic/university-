@@ -76,14 +76,12 @@ class DefaultGroupServiceTest {
                 .lastName("Smith")
                 .username(username)
                 .password(password)
-                .repeatedPassword(rawPassword)
                 .build();
         Teacher bob = Teacher.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .username(username)
                 .password(password)
-                .repeatedPassword(rawPassword)
                 .build();
         entityManager.persist(alice);
         entityManager.persist(bob);
@@ -94,7 +92,6 @@ class DefaultGroupServiceTest {
                 .lastName("Williams")
                 .username(username)
                 .password(password)
-                .repeatedPassword(rawPassword)
                 .group(groupA)
                 .build();
         Student diana = Student.builder()
@@ -102,7 +99,6 @@ class DefaultGroupServiceTest {
                 .lastName("Brown")
                 .username(username)
                 .password(password)
-                .repeatedPassword(rawPassword)
                 .group(groupB)
                 .build();
         entityManager.persist(charlie);

@@ -13,9 +13,9 @@ public class PageUtils {
         }
     }
 
-    public DefaultPage getValidatedPageParameters(String pageStr, String sizeStr) {
+    public RequestPage getValidatedPageParameters(String pageStr, String sizeStr) {
         int page = parseOrGetDefault(pageStr, 0);
         int size = parseOrGetDefault(sizeStr, 10);
-        return new DefaultPage(page, size);
+        return new RequestPage(page, size);
     }
 }

@@ -32,7 +32,7 @@
             <td th:text="${user.lastName}"></td>
             <td th:text="${user.getUserType()}"></td>
             <td th:text="${user.getUsername()}"></td>
-            <td th:text="${user.getRepeatedPassword()}"></td>
+            <td th:text="${user.getPassword()}"></td>
 
             <td>
                 <a class="btn btn-primary" th:href="@{/admin/users/edit(id=${user.id})}">Edit</a>

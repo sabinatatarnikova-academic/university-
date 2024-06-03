@@ -12,8 +12,7 @@ CREATE TABLE users (
                        user_type VARCHAR(255),
                        group_id     VARCHAR(255) REFERENCES groups (group_id), -- Only relevant for students
                        username     VARCHAR(255),
-                       password     VARCHAR(255),
-                       repeated_password VARCHAR(255)
+                       password     VARCHAR(255)
 );
 
 -- Groups table

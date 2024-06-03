@@ -19,6 +19,5 @@ public class TeacherDTO {
     private String lastName;
     private String username;
     private String password;
-    private String repeatedPassword;
     private List<StudyClassDTO> studyClasses;
 }

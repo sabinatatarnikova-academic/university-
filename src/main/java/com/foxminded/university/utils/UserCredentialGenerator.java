@@ -10,10 +10,7 @@ import java.util.Random;
 @Log4j2
 public class UserCredentialGenerator {
 
-    private final PasswordEncoder passwordEncoder;
-
-    public UserCredentialGenerator(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
+    public UserCredentialGenerator() {
     }
 
     public static String generateUsername(String firstName, String lastName) {
@@ -34,11 +31,5 @@ public class UserCredentialGenerator {
                 .toString();
         log.info("Generated password - {}", generatedPassword);
         return generatedPassword;
-    }
-
-    public String encodePassword(String password) {
-        String encodedPassword = passwordEncoder.encode(password);
-        log.info("Password - {}, encoded password - {}",password, encodedPassword);
-        return encodedPassword;
     }
 }

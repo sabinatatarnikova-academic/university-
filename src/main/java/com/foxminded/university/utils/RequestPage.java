@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class DefaultPage {
+public class RequestPage {
 
     private int pageNumber;
     private int pageSize;

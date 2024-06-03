@@ -68,7 +68,6 @@ class DefaultUserServiceTest {
     private OfflineClass offlineClass;
     private String username = "username";
     private String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
-    private String repeatedPassword = "password";
 
     @BeforeEach
     @Transactional
@@ -78,7 +77,6 @@ class DefaultUserServiceTest {
         entityManager.getEntityManager().createNativeQuery("DELETE FROM courses").executeUpdate();
         entityManager.getEntityManager().createNativeQuery("DELETE FROM groups").executeUpdate();
         entityManager.getEntityManager().createNativeQuery("DELETE FROM locations").executeUpdate();
-
 
         groupA = Group.builder()
                 .groupName("Group A")
@@ -103,14 +101,12 @@ class DefaultUserServiceTest {
                 .lastName("Smith")
                 .username(username)
                 .password(password)
-                .repeatedPassword(repeatedPassword)
                 .build();
         bob = Teacher.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .username(username)
                 .password(password)
-                .repeatedPassword(repeatedPassword)
                 .build();
         alice = entityManager.merge(alice);
         bob = entityManager.merge(bob);
@@ -121,7 +117,6 @@ class DefaultUserServiceTest {
                 .group(groupA)
                 .username(username)
                 .password(password)
-                .repeatedPassword(repeatedPassword)
                 .build();
         diana = Student.builder()
                 .firstName("Diana")
@@ -129,7 +124,6 @@ class DefaultUserServiceTest {
                 .group(groupB)
                 .username(username)
                 .password(password)
-                .repeatedPassword(repeatedPassword)
                 .build();
         charlie = entityManager.merge(charlie);
         diana = entityManager.merge(diana);
@@ -220,7 +214,6 @@ class DefaultUserServiceTest {
                 .firstName("Test")
                 .lastName("Test")
                 .password(password)
-                .repeatedPassword(repeatedPassword)
                 .username(username)
                 .group(groupMapper.toDto(groupA))
                 .build();
@@ -246,7 +239,6 @@ class DefaultUserServiceTest {
                 .firstName("Test")
                 .lastName("Test")
                 .password(password)
-                .repeatedPassword(repeatedPassword)
                 .username(username)
                 .studyClasses(List.of(onlineClassDTO, offlineClassDTO))
                 .build();

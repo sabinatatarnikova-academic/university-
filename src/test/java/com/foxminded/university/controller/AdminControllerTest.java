@@ -3,8 +3,6 @@ package com.foxminded.university.controller;
 import com.foxminded.university.config.AdminControllerConfig;
 import com.foxminded.university.config.TestSecurityConfig;
 import com.foxminded.university.model.dtos.GroupDTO;
-import com.foxminded.university.model.dtos.users.StudentDTO;
-import com.foxminded.university.model.dtos.users.TeacherDTO;
 import com.foxminded.university.model.dtos.users.UserDTO;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.classes.StudyClass;
@@ -13,9 +11,12 @@ import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
-import com.foxminded.university.utils.DefaultPage;
+import com.foxminded.university.utils.RequestPage;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
+import com.foxminded.university.utils.mappers.users.StudentMapper;
+import com.foxminded.university.utils.mappers.users.TeacherMapper;
+import com.foxminded.university.utils.mappers.users.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -46,7 +47,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({TestSecurityConfig.class, AdminControllerConfig.class})
 class AdminControllerTest {
 
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -62,8 +62,17 @@ class AdminControllerTest {
     @MockBean
     private PageUtils pageUtils;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @MockBean
     private StudyClassMapper studyClassMapper;
+
+    @MockBean
+    private TeacherMapper teacherMapper;
+
+    @MockBean
+    private StudentMapper studentMapper;
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
@@ -72,7 +81,7 @@ class AdminControllerTest {
                 .firstName("Bob")
                 .lastName("Johnson")
                 .build()));
-        when(pageUtils.getValidatedPageParameters("0", "10")).thenReturn(DefaultPage.builder().pageNumber(0).pageSize(10).build());
+        when(pageUtils.getValidatedPageParameters("0", "10")).thenReturn(RequestPage.builder().pageNumber(0).pageSize(10).build());
         when(userService.findAllUsersWithPagination(0, 10)).thenReturn(page);
 
         mockMvc.perform(get("/admin/users").param("page", "0").param("size", "10"))
@@ -108,7 +117,7 @@ class AdminControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/users"));
 
-        verify(userService, times(1)).saveStudent(any(StudentDTO.class));
+        verify(userService, times(1)).saveStudent(any());
     }
 
     @Test
@@ -122,7 +131,7 @@ class AdminControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/users"));
 
-        verify(userService, times(1)).saveTeacher(any(TeacherDTO.class));
+        verify(userService, times(1)).saveTeacher(any());
     }
 
     @Test
@@ -136,23 +145,14 @@ class AdminControllerTest {
                 .userType("Student")
                 .username("bob.johnson")
                 .password("password")
-                .repeatedPassword("password")
                 .build();
-
+        UserDTO userDTO = userMapper.toDto(user);
+        userDTO.setGroup(new GroupDTO(null,null));
         when(userService.findUserById(userId)).thenReturn(user);
 
         mockMvc.perform(get("/admin/users/edit").param("id", userId))
                 .andExpect(model().attributeExists("user"))
-                .andExpect(model().attribute("user", UserDTO.builder()
-                        .id(userId)
-                        .firstName("Bob")
-                        .lastName("Johnson")
-                        .userType("Student")
-                        .username("bob.johnson")
-                        .password("password")
-                        .repeatedPassword("password")
-                        .group(GroupDTO.builder().id(null).groupName(null).build())
-                        .build()))
+                .andExpect(model().attribute("user", userDTO))
                 .andExpect(model().attributeExists("groups"))
                 .andExpect(model().attribute("groups", groupService.findAllGroupsWithPagination(0, 10)))
                 .andExpect(model().attributeExists("allStudyClasses"))
@@ -177,7 +177,7 @@ class AdminControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/users"));
 
-        verify(userService, times(1)).updateStudent(any(StudentDTO.class));
+        verify(userService, times(1)).updateStudent(any());
     }
 
     @Test
@@ -196,7 +196,7 @@ class AdminControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/users"));
 
-        verify(userService, times(1)).updateTeacher(any(TeacherDTO.class));
+        verify(userService, times(1)).updateTeacher(any());
     }
 
     @Test

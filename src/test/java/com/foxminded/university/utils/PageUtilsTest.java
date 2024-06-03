@@ -12,7 +12,7 @@ class PageUtilsTest {
     void testGetResultWhenValidCase() {
         int firstExpected = 5;
         int secondExpected = 15;
-        DefaultPage result = pageUtils.getValidatedPageParameters("5", "15");
+        RequestPage result = pageUtils.getValidatedPageParameters("5", "15");
         assertEquals(firstExpected, result.getPageNumber());
         assertEquals(secondExpected, result.getPageSize());
     }
@@ -21,7 +21,7 @@ class PageUtilsTest {
     void testGetResultWhenFullInvalidCase() {
         int firstExpected = 0;
         int secondExpected = 10;
-        DefaultPage result = pageUtils.getValidatedPageParameters("test", "invalid");
+        RequestPage result = pageUtils.getValidatedPageParameters("test", "invalid");
         assertEquals(firstExpected, result.getPageNumber());
         assertEquals(secondExpected, result.getPageSize());
     }
@@ -30,7 +30,7 @@ class PageUtilsTest {
     void testGetResultWhenPageInvalidValue() {
         int firstExpected = 0;
         int secondExpected = 15;
-        DefaultPage result = pageUtils.getValidatedPageParameters("test", "15");
+        RequestPage result = pageUtils.getValidatedPageParameters("test", "15");
         assertEquals(firstExpected, result.getPageNumber());
         assertEquals(secondExpected, result.getPageSize());
     }
@@ -38,7 +38,7 @@ class PageUtilsTest {
     void testGetResultWhenSizeInvalidValue() {
         int firstExpected = 4;
         int secondExpected = 10;
-        DefaultPage result = pageUtils.getValidatedPageParameters("4", "invalid");
+        RequestPage result = pageUtils.getValidatedPageParameters("4", "invalid");
         assertEquals(firstExpected, result.getPageNumber());
         assertEquals(secondExpected, result.getPageSize());
     }

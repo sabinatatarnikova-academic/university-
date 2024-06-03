@@ -30,8 +30,6 @@ public class UserDTO {
 
     private String password;
 
-    private String repeatedPassword;
-
     @NotBlank(message = "User type is mandatory")
     private String userType;
 

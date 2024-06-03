@@ -75,14 +75,12 @@ class DefaultLocationServiceTest {
                 .lastName("Smith")
                 .username(username)
                 .password(password)
-                .repeatedPassword(rawPassword)
                 .build();
         Teacher bob = Teacher.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .username(username)
                 .password(password)
-                .repeatedPassword(rawPassword)
                 .build();
         entityManager.persist(alice);
         entityManager.persist(bob);
@@ -94,7 +92,6 @@ class DefaultLocationServiceTest {
                 .group(groupA)
                 .username(username)
                 .password(password)
-                .repeatedPassword(rawPassword)
                 .build();
         Student diana = Student.builder()
                 .firstName("Diana")
@@ -102,7 +99,6 @@ class DefaultLocationServiceTest {
                 .group(groupB)
                 .username(username)
                 .password(password)
-                .repeatedPassword(rawPassword)
                 .build();
         entityManager.persist(charlie);
         entityManager.persist(diana);

@@ -1,5 +1,6 @@
 package com.foxminded.university.controller;
 
+import com.foxminded.university.model.dtos.classes.StudyClassDTO;
 import com.foxminded.university.model.dtos.users.StudentDTO;
 import com.foxminded.university.model.dtos.users.TeacherDTO;
 import com.foxminded.university.model.dtos.users.UserDTO;
@@ -7,9 +8,12 @@ import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
-import com.foxminded.university.utils.DefaultPage;
+import com.foxminded.university.utils.RequestPage;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
+import com.foxminded.university.utils.mappers.users.StudentMapper;
+import com.foxminded.university.utils.mappers.users.TeacherMapper;
+import com.foxminded.university.utils.mappers.users.UserMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
@@ -34,10 +39,13 @@ public class AdminController {
     private StudyClassService studyClassService;
     private PageUtils pageUtils;
     private StudyClassMapper studyClassMapper;
+    private TeacherMapper teacherMapper;
+    private StudentMapper studentMapper;
+    private UserMapper userMapper;
 
     @GetMapping
     public String showAllUsersList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
-        DefaultPage validatedParams = pageUtils.getValidatedPageParameters(pageStr, sizeStr);
+        RequestPage validatedParams = pageUtils.getValidatedPageParameters(pageStr, sizeStr);
         int page = validatedParams.getPageNumber();
         int size = validatedParams.getPageSize();
         Page<User> usersPage = userService.findAllUsersWithPagination(page, size);
@@ -55,14 +63,10 @@ public class AdminController {
     @PostMapping("/new")
     public String addUser(@ModelAttribute UserDTO user) {
         if (user.getUserType().equalsIgnoreCase("STUDENT")) {
-            StudentDTO studentDTO = new StudentDTO();
-            studentDTO.setFirstName(user.getFirstName());
-            studentDTO.setLastName(user.getLastName());
+            StudentDTO studentDTO = studentMapper.toDto(user);
             userService.saveStudent(studentDTO);
         } else if (user.getUserType().equalsIgnoreCase("TEACHER")) {
-            TeacherDTO teacherDTO = new TeacherDTO();
-            teacherDTO.setFirstName(user.getFirstName());
-            teacherDTO.setLastName(user.getLastName());
+            TeacherDTO teacherDTO = teacherMapper.toDto(user);
             userService.saveTeacher(teacherDTO);
         }
         return "redirect:/admin/users";
@@ -71,15 +75,7 @@ public class AdminController {
     @GetMapping("/edit")
     public String showEditUserForm(@RequestParam String id, Model model) {
         User user = userService.findUserById(id);
-        UserDTO userDTO = UserDTO.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .userType(user.getUserType())
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .repeatedPassword(user.getRepeatedPassword())
-                .build();
+        UserDTO userDTO = userMapper.toDto(user);
         model.addAttribute("user", userDTO);
         model.addAttribute("groups", groupService.findAllGroupsWithPagination(0, Integer.MAX_VALUE));
         model.addAttribute("allStudyClasses", studyClassService.findAllClassesWithPagination(0, Integer.MAX_VALUE));
@@ -89,25 +85,13 @@ public class AdminController {
     @PostMapping("/edit")
     public String editUser(@ModelAttribute UserDTO user) {
         if (user.getUserType().equalsIgnoreCase("STUDENT")) {
-            StudentDTO studentDTO = new StudentDTO();
-            studentDTO.setId(user.getId());
-            studentDTO.setFirstName(user.getFirstName());
-            studentDTO.setLastName(user.getLastName());
-            studentDTO.setUsername(user.getUsername());
-            studentDTO.setRepeatedPassword(user.getRepeatedPassword());
-            studentDTO.setGroup(user.getGroup());
+           StudentDTO studentDTO = studentMapper.toDto(user);
             userService.updateStudent(studentDTO);
         } else if (user.getUserType().equalsIgnoreCase("TEACHER")) {
-            TeacherDTO teacherDTO = new TeacherDTO();
-            teacherDTO.setId(user.getId());
-            teacherDTO.setFirstName(user.getFirstName());
-            teacherDTO.setLastName(user.getLastName());
-            teacherDTO.setUsername(user.getUsername());
-            teacherDTO.setRepeatedPassword(user.getRepeatedPassword());
-            teacherDTO.setStudyClasses(
-                    user.getStudyClassesIds().stream()
-                            .map(id -> studyClassMapper.toDto(studyClassService.findClassById(id)))
-                            .collect(Collectors.toList()));
+            List<StudyClassDTO> studyClassDTOs = user.getStudyClassesIds().stream()
+                    .map(id -> studyClassMapper.toDto(studyClassService.findClassById(id)))
+                    .collect(Collectors.toList());
+            TeacherDTO teacherDTO = teacherMapper.toDto(user, studyClassDTOs);
             userService.updateTeacher(teacherDTO);
         }
         return "redirect:/admin/users";

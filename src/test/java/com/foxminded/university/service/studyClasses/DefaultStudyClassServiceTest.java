@@ -107,14 +107,12 @@ class DefaultStudyClassServiceTest {
                 .lastName("Smith")
                 .username(username)
                 .password(password)
-                .repeatedPassword(rawPassword)
                 .build();
         bob = Teacher.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .username(username)
                 .password(password)
-                .repeatedPassword(rawPassword)
                 .build();
         alice = entityManager.merge(alice);
         bob = entityManager.merge(bob);
@@ -125,7 +123,6 @@ class DefaultStudyClassServiceTest {
                 .group(groupA)
                 .username(username)
                 .password(password)
-                .repeatedPassword(rawPassword)
                 .build();
         diana = Student.builder()
                 .firstName("Diana")
@@ -133,7 +130,6 @@ class DefaultStudyClassServiceTest {
                 .group(groupB)
                 .username(username)
                 .password(password)
-                .repeatedPassword(rawPassword)
                 .build();
         charlie = entityManager.merge(charlie);
         diana = entityManager.merge(diana);

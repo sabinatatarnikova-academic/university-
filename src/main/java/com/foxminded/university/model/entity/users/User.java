@@ -44,7 +44,4 @@ public class User {
 
     @Column(name = "password", nullable = false)
     private String password;
-
-    @Column(name = "repeated_password")
-    private String repeatedPassword;
 }

@@ -17,6 +17,5 @@ public class StudentDTO {
     private String lastName;
     private String username;
     private String password;
-    private String repeatedPassword;
     private GroupDTO group;
 }
