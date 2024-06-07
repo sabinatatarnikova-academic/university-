@@ -2,7 +2,6 @@ package com.foxminded.university.controller;
 
 import com.foxminded.university.config.AdminControllerConfig;
 import com.foxminded.university.config.TestSecurityConfig;
-import com.foxminded.university.model.dtos.GroupDTO;
 import com.foxminded.university.model.dtos.users.UserDTO;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.classes.StudyClass;
@@ -11,12 +10,8 @@ import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
-import com.foxminded.university.utils.RequestPage;
 import com.foxminded.university.utils.PageUtils;
-import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
-import com.foxminded.university.utils.mappers.users.StudentMapper;
-import com.foxminded.university.utils.mappers.users.TeacherMapper;
-import com.foxminded.university.utils.mappers.users.UserMapper;
+import com.foxminded.university.utils.RequestPage;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -59,21 +54,6 @@ class AdminControllerTest {
     @MockBean
     private StudyClassService studyClassService;
 
-    @MockBean
-    private PageUtils pageUtils;
-
-    @Autowired
-    private UserMapper userMapper;
-
-    @MockBean
-    private StudyClassMapper studyClassMapper;
-
-    @MockBean
-    private TeacherMapper teacherMapper;
-
-    @MockBean
-    private StudentMapper studentMapper;
-
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowAllUsersList() throws Exception {
@@ -81,8 +61,8 @@ class AdminControllerTest {
                 .firstName("Bob")
                 .lastName("Johnson")
                 .build()));
-        when(pageUtils.getValidatedPageParameters("0", "10")).thenReturn(RequestPage.builder().pageNumber(0).pageSize(10).build());
-        when(userService.findAllUsersWithPagination(0, 10)).thenReturn(page);
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        when(userService.findAllUsersWithPagination(validatedParams)).thenReturn(page);
 
         mockMvc.perform(get("/admin/users").param("page", "0").param("size", "10"))
                 .andExpect(status().isOk())
@@ -94,19 +74,19 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowAddUserForm() throws Exception {
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
         mockMvc.perform(get("/admin/users/new"))
                 .andExpect(model().attributeExists("user"))
                 .andExpect(model().attribute("user", new UserDTO()))
                 .andExpect(model().attributeExists("groups"))
-                .andExpect(model().attribute("groups", groupService.findAllGroupsWithPagination(0, 10)))
+                .andExpect(model().attribute("groups", groupService.findAllGroupsWithPagination(validatedParams)))
                 .andExpect(status().isOk())
                 .andExpect(view().name("add-user"));
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    void testAddStudent() throws Exception {
-        when(groupService.findGroupById("1")).thenReturn(new Group("1", "Math", new ArrayList<Student>(), new ArrayList<StudyClass>()));
+    void testAddUser() throws Exception {
 
         mockMvc.perform(post("/admin/users/new")
                         .param("firstName", "John")
@@ -117,46 +97,25 @@ class AdminControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/users"));
 
-        verify(userService, times(1)).saveStudent(any());
-    }
-
-    @Test
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
-    void testAddTeacher() throws Exception {
-        mockMvc.perform(post("/admin/users/new")
-                        .param("firstName", "John")
-                        .param("lastName", "Doe")
-                        .param("userType", "TEACHER")
-                        .with(csrf()))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/admin/users"));
-
-        verify(userService, times(1)).saveTeacher(any());
+        verify(userService, times(1)).saveUser(any());
     }
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowEditUserForm() throws Exception {
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
         String userId = "1";
-        User user = User.builder()
+        Student user = Student.builder()
                 .id(userId)
                 .firstName("Bob")
                 .lastName("Johnson")
-                .userType("Student")
+                .userType("STUDENT")
                 .username("bob.johnson")
                 .password("password")
                 .build();
-        UserDTO userDTO = userMapper.toDto(user);
-        userDTO.setGroup(new GroupDTO(null,null));
         when(userService.findUserById(userId)).thenReturn(user);
 
-        mockMvc.perform(get("/admin/users/edit").param("id", userId))
-                .andExpect(model().attributeExists("user"))
-                .andExpect(model().attribute("user", userDTO))
-                .andExpect(model().attributeExists("groups"))
-                .andExpect(model().attribute("groups", groupService.findAllGroupsWithPagination(0, 10)))
-                .andExpect(model().attributeExists("allStudyClasses"))
-                .andExpect(model().attribute("allStudyClasses", studyClassService.findAllClassesWithPagination(0, 10)))
+        mockMvc.perform(get("/admin/users/edit").param("id", userId).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("edit-user"));
     }

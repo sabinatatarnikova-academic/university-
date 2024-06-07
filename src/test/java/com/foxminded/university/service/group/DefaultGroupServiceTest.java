@@ -1,5 +1,6 @@
 package com.foxminded.university.service.group;
 
+import com.foxminded.university.config.TestConfig;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
@@ -7,7 +8,8 @@ import com.foxminded.university.model.entity.classes.OfflineClass;
 import com.foxminded.university.model.entity.classes.OnlineClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
-import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.utils.PageUtils;
+import com.foxminded.university.utils.RequestPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,7 +52,6 @@ class DefaultGroupServiceTest {
 
         String username = "username";
         String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
-        String rawPassword = "password";
 
         Group groupA = Group.builder()
                 .groupName("Group A")
@@ -213,7 +214,8 @@ class DefaultGroupServiceTest {
                 .build();
 
         List<Group> groups = Arrays.asList(groupA, groupB);
-        List<Group> groupsActual = groupService.findAllGroupsWithPagination(0, 2);
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(Integer.MAX_VALUE));
+        List<Group> groupsActual = groupService.findAllGroupsWithPagination(validatedParams);
         groupsActual.forEach(course -> course.setId(null));
         assertThat(groupsActual, is(groups));
     }

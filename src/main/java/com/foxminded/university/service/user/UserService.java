@@ -1,30 +1,29 @@
 package com.foxminded.university.service.user;
 
-import com.foxminded.university.model.dtos.users.StudentDTO;
-import com.foxminded.university.model.dtos.users.TeacherDTO;
+import com.foxminded.university.model.dtos.users.UserDTO;
+import com.foxminded.university.model.dtos.users.UserFormDTO;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.model.entity.users.User;
+import com.foxminded.university.utils.RequestPage;
 import org.springframework.data.domain.Page;
 
 
 public interface UserService {
 
-    void saveStudent(StudentDTO studentDTO);
+    void saveUser(UserDTO userDTO);
 
-    void saveTeacher(TeacherDTO teacherDTO);
+    <U extends User> U findUserById(String userId);
 
-    User findUserById(String userId);
+    void updateStudent(UserFormDTO userFormDTO);
 
-    void updateStudent(StudentDTO studentDTO);
-
-    void updateTeacher(TeacherDTO teacherDTO);
+    void updateTeacher(UserFormDTO userFormDTO);
 
     void deleteUserById(String userId);
 
-    Page<User> findAllUsersWithPagination(int pageNumber, int pageSize);
+    Page<User> findAllUsersWithPagination(RequestPage requestPage);
 
-    Page<Student> findAllStudentsWithPagination(int pageNumber, int pageSize);
+    Page<Student> findAllStudentsWithPagination(RequestPage requestPage);
 
-    Page<Teacher> findAllTeachersWithPagination(int pageNumber, int pageSize);
+    Page<Teacher> findAllTeachersWithPagination(RequestPage requestPage);
 }

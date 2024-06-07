@@ -2,18 +2,17 @@ package com.foxminded.university.model.dtos.classes;
 
 import com.foxminded.university.model.dtos.CourseDTO;
 import com.foxminded.university.model.dtos.GroupDTO;
-import com.foxminded.university.model.dtos.LocationDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 public class StudyClassDTO {
 
     private String id;
@@ -21,6 +20,4 @@ public class StudyClassDTO {
     private LocalDateTime endTime;
     private CourseDTO course;
     private GroupDTO group;
-    private LocationDTO location;
-    private String url;
 }

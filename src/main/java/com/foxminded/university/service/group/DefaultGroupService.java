@@ -2,6 +2,7 @@ package com.foxminded.university.service.group;
 
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.repository.GroupRepository;
+import com.foxminded.university.utils.RequestPage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -65,7 +66,9 @@ public class DefaultGroupService implements GroupService {
     }
 
     @Override
-    public List<Group> findAllGroupsWithPagination(int pageNumber, int pageSize) {
+    public List<Group> findAllGroupsWithPagination(RequestPage pageRequest) {
+        int pageNumber = pageRequest.getPageNumber();
+        int pageSize = pageRequest.getPageSize();
         log.debug("Searching for group with page size {} and pageSize {}", pageNumber, pageSize);
         Page<Group> pageResult = groupRepository.findAll(PageRequest.of(pageNumber, pageSize));
         log.info("Found {} groups", pageResult.getTotalPages());

@@ -1,29 +1,33 @@
 package com.foxminded.university.model.dtos.users;
 
-import jakarta.validation.constraints.NotBlank;
+import com.foxminded.university.model.dtos.GroupDTO;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
-public class UserDTO {
+@Builder
+public class UserFormDTO {
 
     private String id;
 
-    @NotBlank(message = "First name is mandatory")
     private String firstName;
 
-    @NotBlank(message = "Last name is mandatory")
     private String lastName;
 
     private String username;
 
     private String password;
 
-    @NotBlank(message = "User type is mandatory")
     private String userType;
+
+    private GroupDTO group;
+
+    private List<String> studyClassesIds;
 }
+

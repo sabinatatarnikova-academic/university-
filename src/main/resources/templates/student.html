@@ -23,7 +23,7 @@
             <td th:text="${student.id}"></td>
             <td th:text="${student.firstName}"></td>
             <td th:text="${student.lastName}"></td>
-            <td th:text="${student.group.getGroupName()}"></td>
+            <td th:text="${student.group != null ? student.group.groupName : 'No Group'}"></td>
         </tr>
         </tbody>
     </table>

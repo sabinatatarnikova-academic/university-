@@ -4,6 +4,8 @@ import com.foxminded.university.config.TestControllerConfig;
 import com.foxminded.university.config.TestSecurityConfig;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.service.user.UserService;
+import com.foxminded.university.utils.PageUtils;
+import com.foxminded.university.utils.RequestPage;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -31,13 +33,15 @@ class TeacherControllerTest {
     @MockBean
     private UserService userService;
 
+
     @Test
     void testShowTeacherList() throws Exception {
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
         Page<Teacher> page = new PageImpl<>(Collections.singletonList(Teacher.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .build()));
-        when(userService.findAllTeachersWithPagination(0, 10)).thenReturn(page);
+        when(userService.findAllTeachersWithPagination(validatedParams)).thenReturn(page);
 
         mockMvc.perform(get("/teacher").param("page", "0").param("size", "10"))
                 .andExpect(status().isOk())

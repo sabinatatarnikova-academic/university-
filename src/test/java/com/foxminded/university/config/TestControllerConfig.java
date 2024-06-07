@@ -3,7 +3,6 @@ package com.foxminded.university.config;
 import com.foxminded.university.controller.StudentController;
 import com.foxminded.university.controller.TeacherController;
 import com.foxminded.university.service.user.UserService;
-import com.foxminded.university.utils.PageUtils;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
@@ -11,17 +10,12 @@ import org.springframework.context.annotation.Bean;
 public class TestControllerConfig {
 
     @Bean
-    public TeacherController teacherController(UserService userService, PageUtils pageUtils){
-        return new TeacherController(userService, pageUtils);
+    public TeacherController teacherController(UserService userService) {
+        return new TeacherController(userService);
     }
 
     @Bean
-    public StudentController studentController(UserService userService, PageUtils pageUtils){
-        return new StudentController(userService, pageUtils);
-    }
-
-    @Bean
-    public PageUtils pageUtils(){
-        return new PageUtils();
+    public StudentController studentController(UserService userService) {
+        return new StudentController(userService);
     }
 }

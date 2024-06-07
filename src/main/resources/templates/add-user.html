@@ -25,13 +25,14 @@
                 <option th:value="STUDENT">Student</option>
             </select>
         </div>
-        <!--<div class="mb-3">
-            <label class="form-label" for="group">Group (only for students)</label>
-            <select class="form-select" id="group" th:field="*{groupId}">
-                <option th:each="group : ${groups}" th:text="${group.getGroupName()}" th:value="${group.id}"></option>
-                <option th:value="null">None (only for teacher)</option>
-            </select>
-        </div>-->
+        <div class="mb-3">
+            <label class="form-label" for="username">Username</label>
+            <input class="form-control" id="username" th:field="*{username}" type="text">
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-control" id="password" th:field="*{password}" type="text">
+        </div>
         <button class="btn btn-success" type="submit">Add User</button>
     </form>
 </div>

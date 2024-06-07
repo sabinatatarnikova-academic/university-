@@ -1,5 +1,6 @@
 package com.foxminded.university.service.course;
 
+import com.foxminded.university.config.TestConfig;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
@@ -7,16 +8,15 @@ import com.foxminded.university.model.entity.classes.OfflineClass;
 import com.foxminded.university.model.entity.classes.OnlineClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
-import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.utils.PageUtils;
+import com.foxminded.university.utils.RequestPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -29,7 +29,6 @@ import static org.junit.Assert.assertThrows;
 
 @DataJpaTest
 @ActiveProfiles("h2")
-@ExtendWith(SpringExtension.class)
 @Import(TestConfig.class)
 class DefaultCourseServiceTest {
 
@@ -38,6 +37,7 @@ class DefaultCourseServiceTest {
 
     @Autowired
     private DefaultCourseService courseService;
+
 
     @BeforeEach
     public void init() {
@@ -49,7 +49,6 @@ class DefaultCourseServiceTest {
 
         String username = "username";
         String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
-        String rawPassword = "password";
 
         Group groupA = Group.builder()
                 .groupName("Group A")
@@ -59,7 +58,6 @@ class DefaultCourseServiceTest {
                 .build();
         entityManager.persist(groupA);
         entityManager.persist(groupB);
-
 
         Course math = Course.builder()
                 .name("Mathematics")
@@ -84,7 +82,6 @@ class DefaultCourseServiceTest {
                 .build();
         entityManager.persist(alice);
         entityManager.persist(bob);
-
 
         Student charlie = Student.builder()
                 .firstName("Charlie")
@@ -210,7 +207,8 @@ class DefaultCourseServiceTest {
                 .build();
 
         List<Course> courses = Arrays.asList(courseA, courseB);
-        List<Course> coursesActual = courseService.findAllCoursesWithPagination(0, 2);
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
+        List<Course> coursesActual = courseService.findAllCoursesWithPagination(validatedParams);
         coursesActual.forEach(course -> course.setId(null));
         assertThat(coursesActual, is(courses));
     }

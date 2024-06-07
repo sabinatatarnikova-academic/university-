@@ -26,7 +26,7 @@
                 <option th:value="STUDENT">Student</option>
             </select>
         </div>
-        <div class="mb-3">
+        <div class="mb-3" th:if="${user.userType} == 'STUDENT'">
             <label class="form-label" for="group">Group (only for students)</label>
             <select class="form-select" id="group" th:field="*{group.id}">
                 <option th:each="group : ${groups}" th:text="${group.getGroupName()}" th:value="${group.id}"></option>
@@ -41,7 +41,7 @@
             <label class="form-label" for="password">Password</label>
             <input class="form-control" id="password" th:field="*{password}" type="text">
         </div>
-        <div class="mb-3">
+        <div class="mb-3" th:if="${user.userType} == 'TEACHER'">
             <label class="form-label" for="studyClasses">Study classes (only for teachers)</label>
             <select class="form-select" id="studyClasses" multiple th:field="*{studyClassesIds}">
                 <option th:each="studyClass : ${allStudyClasses}"

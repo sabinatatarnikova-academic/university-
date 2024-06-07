@@ -2,20 +2,17 @@ package com.foxminded.university.model.dtos.users;
 
 import com.foxminded.university.model.dtos.GroupDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class StudentDTO {
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class StudentDTO extends UserDTO {
 
-    private String id;
-    private String firstName;
-    private String lastName;
-    private String username;
-    private String password;
     private GroupDTO group;
 }

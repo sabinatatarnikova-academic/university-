@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class Student extends User{
+public class Student extends User {
 
     @ManyToOne
     @JoinColumn(name = "group_id")

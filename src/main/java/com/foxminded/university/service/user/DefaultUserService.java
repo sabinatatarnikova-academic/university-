@@ -1,16 +1,18 @@
 package com.foxminded.university.service.user;
 
-import com.foxminded.university.model.dtos.users.StudentDTO;
-import com.foxminded.university.model.dtos.users.TeacherDTO;
+import com.foxminded.university.model.dtos.users.UserDTO;
+import com.foxminded.university.model.dtos.users.UserFormDTO;
 import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.repository.StudyClassRepository;
 import com.foxminded.university.repository.UserRepository;
-import com.foxminded.university.utils.UserCredentialGenerator;
+import com.foxminded.university.utils.RequestPage;
+import com.foxminded.university.utils.UserCredentialUtils;
 import com.foxminded.university.utils.mappers.users.StudentMapper;
 import com.foxminded.university.utils.mappers.users.TeacherMapper;
+import com.foxminded.university.utils.mappers.users.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -30,29 +32,17 @@ public class DefaultUserService implements UserService {
 
     private final UserRepository userRepository;
     private final StudyClassRepository studyClassRepository;
-    private final UserCredentialGenerator utils;
     private final StudentMapper studentMapper;
     private final TeacherMapper teacherMapper;
+    private final UserMapper userMapper;
+    private final UserCredentialUtils userUtils;
 
     @Override
-    @Transactional
-    public void saveTeacher(TeacherDTO teacher) {
-        teacher.setUsername(UserCredentialGenerator.generateUsername(teacher.getFirstName(), teacher.getLastName()));
-        String rawPassword = UserCredentialGenerator.generatePassword();
-        teacher.setPassword(rawPassword);
-        log.debug("Adding new teacher: firstName - {}, lastName - {}", teacher.getFirstName(), teacher.getLastName());
-        userRepository.save(teacherMapper.toEntity(teacher));
-        log.info("Saved teacher: firstName - {}, lastName - {}", teacher.getFirstName(), teacher.getLastName());
-    }
-
-    @Override
-    public void saveStudent(StudentDTO student) {
-        student.setUsername(UserCredentialGenerator.generateUsername(student.getFirstName(), student.getLastName()));
-        String rawPassword = UserCredentialGenerator.generatePassword();
-        student.setPassword(rawPassword);
-        log.debug("Adding new student: firstName - {}, lastName - {}, username - {}, password - {}", student.getFirstName(), student.getLastName(), student.getUsername(), student.getPassword());
-        userRepository.save(studentMapper.toEntity(student));
-        log.info("Saved student: firstName - {}, lastName - {}, username - {}, password - {}", student.getFirstName(), student.getLastName(), student.getUsername(), student.getPassword());
+    public void saveUser(UserDTO userDTO) {
+        userDTO.setPassword(userUtils.encodePassword(userDTO.getPassword()));
+        log.debug("Adding new user: firstName - {}, lastName - {}, type - {}", userDTO.getFirstName(), userDTO.getLastName(), userDTO.getUserType());
+        userRepository.save(userMapper.toEntity(userDTO));
+        log.debug("Saved user: firstName - {}, lastName - {}, type - {}", userDTO.getFirstName(), userDTO.getLastName(), userDTO.getUserType());
     }
 
     @Override
@@ -68,27 +58,28 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public void updateStudent(StudentDTO studentDTO) {
-        log.debug("Updating student info: firstName - {}, lastName - {}, group - {}", studentDTO.getFirstName(), studentDTO.getLastName(), studentDTO.getGroup());
-        studentDTO.setPassword(studentDTO.getPassword());
-        Student student = studentMapper.toEntity(studentDTO);
+    @Transactional
+    public void updateStudent(UserFormDTO userFormDTO) {
+        userFormDTO.setPassword(userUtils.encodePassword(userFormDTO.getPassword()));
+        log.debug("Updating student info: firstName - {}, lastName - {}", userFormDTO.getFirstName(), userFormDTO.getLastName());
+        Student student = studentMapper.toEntity(userFormDTO);
         userRepository.save(student);
         log.info("Updated student info: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroup());
     }
 
     @Override
     @Transactional
-    public void updateTeacher(TeacherDTO teacherDTO) {
-        teacherDTO.setPassword(teacherDTO.getPassword());
-        log.debug("Updating teacher info: firstName - {}, lastName - {}, classes - {}", teacherDTO.getFirstName(), teacherDTO.getLastName(), teacherDTO.getStudyClasses());
-        Teacher teacher = teacherMapper.toEntity(teacherDTO);
+    public void updateTeacher(UserFormDTO userFormDTO) {
+        userFormDTO.setPassword(userUtils.encodePassword(userFormDTO.getPassword()));
+        log.debug("Updating teacher info: firstName - {}, lastName - {}", userFormDTO.getFirstName(), userFormDTO.getLastName()/*, teacherDTO.getStudyClasses()*/);
+        Teacher teacher = teacherMapper.toEntity(userFormDTO);
         teacher.setStudyClasses(
-                teacherDTO.getStudyClasses().stream()
-                        .map(studyClassDTO -> assignTeacherToClass(teacher.getId(), studyClassDTO.getId()))
+                userFormDTO.getStudyClassesIds().stream()
+                        .map(studyClassId -> assignTeacherToClass(teacher.getId(), studyClassId))
                         .collect(Collectors.toList())
         );
         userRepository.save(teacher);
-        log.info("Updated teacher info: firstName - {}, lastName - {}, classes - {}", teacher.getFirstName(), teacher.getLastName(), teacherDTO.getStudyClasses());
+        log.info("Updated teacher info: firstName - {}, lastName - {}", teacher.getFirstName(), teacher.getLastName()/*, teacherDTO.getStudyClasses()*/);
     }
 
     private StudyClass assignTeacherToClass(String teacherId, String classId) {
@@ -112,7 +103,9 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public Page<User> findAllUsersWithPagination(int pageNumber, int pageSize) {
+    public Page<User> findAllUsersWithPagination(RequestPage requestPage) {
+        int pageNumber = requestPage.getPageNumber();
+        int pageSize = requestPage.getPageSize();
         log.debug("Searching for users with page size {} and pageSize {}", pageNumber, pageSize);
         Page<User> pageResult = userRepository.findAll(PageRequest.of(pageNumber, pageSize));
         log.info("Found {} users", pageResult.getTotalPages());
@@ -120,7 +113,9 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public Page<Student> findAllStudentsWithPagination(int pageNumber, int pageSize) {
+    public Page<Student> findAllStudentsWithPagination(RequestPage pageRequest) {
+        int pageNumber = pageRequest.getPageNumber();
+        int pageSize = pageRequest.getPageSize();
         log.debug("Searching for all students");
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Student> allStudents = userRepository.findAllStudents(pageable);
@@ -129,7 +124,9 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public Page<Teacher> findAllTeachersWithPagination(int pageNumber, int pageSize) {
+    public Page<Teacher> findAllTeachersWithPagination(RequestPage pageRequest) {
+        int pageNumber = pageRequest.getPageNumber();
+        int pageSize = pageRequest.getPageSize();
         log.debug("Searching for all teachers");
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Teacher> allTeachers = userRepository.findAllTeachers(pageable);

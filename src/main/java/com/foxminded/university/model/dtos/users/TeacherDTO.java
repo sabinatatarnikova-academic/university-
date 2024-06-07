@@ -1,23 +1,19 @@
 package com.foxminded.university.model.dtos.users;
 
-import com.foxminded.university.model.dtos.classes.StudyClassDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class TeacherDTO {
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class TeacherDTO extends UserDTO {
 
-    private String id;
-    private String firstName;
-    private String lastName;
-    private String username;
-    private String password;
-    private List<StudyClassDTO> studyClasses;
+    private List<String> studyClassesIds;
 }

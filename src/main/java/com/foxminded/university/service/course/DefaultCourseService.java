@@ -2,6 +2,7 @@ package com.foxminded.university.service.course;
 
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.repository.CourseRepository;
+import com.foxminded.university.utils.RequestPage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -65,7 +66,9 @@ public class DefaultCourseService implements CourseService{
     }
 
     @Override
-    public List<Course> findAllCoursesWithPagination(int pageNumber, int pageSize) {
+    public List<Course> findAllCoursesWithPagination(RequestPage pageRequest) {
+        int pageNumber = pageRequest.getPageNumber();
+        int pageSize = pageRequest.getPageSize();
         log.debug("Searching for course with page size {} and pageSize {}", pageNumber, pageSize);
         Page<Course> pageResult = courseRepository.findAll(PageRequest.of(pageNumber, pageSize));
         log.info("Found {} courses", pageResult.getTotalPages());

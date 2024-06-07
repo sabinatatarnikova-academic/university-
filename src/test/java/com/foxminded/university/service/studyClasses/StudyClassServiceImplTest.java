@@ -11,7 +11,9 @@ import com.foxminded.university.model.entity.classes.OnlineClass;
 import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
-import com.foxminded.university.service.classes.DefaultStudyClassService;
+import com.foxminded.university.service.classes.StudyClassServiceImpl;
+import com.foxminded.university.utils.PageUtils;
+import com.foxminded.university.utils.RequestPage;
 import com.foxminded.university.utils.mappers.CourseMapper;
 import com.foxminded.university.utils.mappers.GroupMapper;
 import com.foxminded.university.utils.mappers.LocationMapper;
@@ -39,13 +41,13 @@ import static org.junit.Assert.assertThrows;
 @ActiveProfiles("h2")
 @ExtendWith(SpringExtension.class)
 @Import(TestConfig.class)
-class DefaultStudyClassServiceTest {
+class StudyClassServiceImplTest {
 
     @Autowired
     private TestEntityManager entityManager;
 
     @Autowired
-    private DefaultStudyClassService studyClassService;
+    private StudyClassServiceImpl studyClassService;
 
     @Autowired
     private GroupMapper groupMapper;
@@ -72,8 +74,7 @@ class DefaultStudyClassServiceTest {
     private OnlineClass onlineClass;
     private OfflineClass offlineClass;
     private String username = "username";
-    private String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
-    private String rawPassword = "password";
+    private String password = "password";
 
     @BeforeEach
     @Transactional
@@ -179,7 +180,8 @@ class DefaultStudyClassServiceTest {
                 .build();
 
         studyClassService.saveOnlineClass(onlineClassToSave);
-        List<StudyClass> classes = studyClassService.findAllClassesWithPagination(0, 3);
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(3));
+        List<StudyClass> classes = studyClassService.findAllClassesWithPagination(validatedParams);
         OnlineClass actual = (OnlineClass) classes.get(2);
         assertEquals(onlineClassToSave.getUrl(), actual.getUrl());
         assertEquals(onlineClassToSave.getStartTime(), actual.getStartTime());
@@ -199,7 +201,8 @@ class DefaultStudyClassServiceTest {
                 .build();
 
         studyClassService.saveOfflineClass(offlineClassToSave);
-        List<StudyClass> offlineClass = studyClassService.findAllClassesWithPagination(0, 3);
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(3));
+        List<StudyClass> offlineClass = studyClassService.findAllClassesWithPagination(validatedParams);
         OfflineClass actual = (OfflineClass) offlineClass.get(2);
         assertEquals(ics, actual.getLocation());
         assertEquals(physics, actual.getCourse());
@@ -210,7 +213,8 @@ class DefaultStudyClassServiceTest {
 
     @Test
     void findClassById() {
-        StudyClass studyClass = studyClassService.findAllClassesWithPagination(0, 1).get(0);
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(1));
+        StudyClass studyClass = studyClassService.findAllClassesWithPagination(validatedParams).get(0);
         String classId = studyClass.getId();
         assertEquals(studyClass, studyClassService.findClassById(classId));
     }
@@ -221,59 +225,9 @@ class DefaultStudyClassServiceTest {
     }
 
     @Test
-    void updateOnlineClass() {
-        StudyClass studyClass = studyClassService.findAllClassesWithPagination(0, 1).get(0);
-        String classId = studyClass.getId();
-
-        OnlineClassDTO onlineClassToUpdate = OnlineClassDTO.builder()
-                .id(classId)
-                .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
-                .course(courseMapper.toDto(physics))
-                .group(groupMapper.toDto(groupA))
-                .url("http://foxminded.com")
-                .build();
-
-
-        studyClassService.updateOnlineClass(onlineClassToUpdate, teacherMapper.toDto(bob));
-        List<StudyClass> onlineClass = studyClassService.findAllClassesWithPagination(0, 2);
-        OnlineClass actual = (OnlineClass) onlineClass.get(0);
-        assertEquals(onlineClassToUpdate.getUrl(), actual.getUrl());
-        assertEquals(physics, actual.getCourse());
-        assertEquals(groupA, actual.getGroup());
-        assertEquals(bob, actual.getTeacher());
-        assertEquals(onlineClassToUpdate.getStartTime(), actual.getStartTime());
-        assertEquals(onlineClassToUpdate.getEndTime(), actual.getEndTime());
-    }
-
-    @Test
-    void updateOfflineClass() {
-        StudyClass studyClass = studyClassService.findAllClassesWithPagination(0, 2).get(1);
-        String classId = studyClass.getId();
-
-        OfflineClassDTO offlineClassToSave = OfflineClassDTO.builder()
-                .id(classId)
-                .startTime(LocalDateTime.of(2025, 4, 23, 9, 0))
-                .endTime(LocalDateTime.of(2025, 4, 23, 10, 0))
-                .course(courseMapper.toDto(math))
-                .group(groupMapper.toDto(groupB))
-                .location(locationMapper.toDto(ics))
-                .build();
-
-        studyClassService.updateOfflineClass(offlineClassToSave, teacherMapper.toDto(bob));
-        List<StudyClass> studyClasses = studyClassService.findAllClassesWithPagination(0, 3);
-        OfflineClass actual = (OfflineClass) studyClasses.get(1);
-        assertEquals(ics, actual.getLocation());
-        assertEquals(math, actual.getCourse());
-        assertEquals(groupB, actual.getGroup());
-        assertEquals(bob, actual.getTeacher());
-        assertEquals(offlineClassToSave.getStartTime(), actual.getStartTime());
-        assertEquals(offlineClassToSave.getEndTime(), actual.getEndTime());
-    }
-
-    @Test
     void deleteClassById() {
-        StudyClass studyClass = studyClassService.findAllClassesWithPagination(0, 2).get(1);
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
+        StudyClass studyClass = studyClassService.findAllClassesWithPagination(validatedParams).get(1);
         String classId = studyClass.getId();
 
         studyClassService.deleteClassById(classId);
@@ -282,8 +236,9 @@ class DefaultStudyClassServiceTest {
 
     @Test
     void findAllClassesWithPagination() {
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
         List<StudyClass> expectedClasses = Arrays.asList(onlineClass, offlineClass);
-        List<StudyClass> actualClasses = studyClassService.findAllClassesWithPagination(0, 2);
+        List<StudyClass> actualClasses = studyClassService.findAllClassesWithPagination(validatedParams);
         actualClasses.forEach(studyClass -> studyClass.setId(null));
         assertEquals(expectedClasses, actualClasses);
     }

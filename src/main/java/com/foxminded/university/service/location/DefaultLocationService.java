@@ -2,6 +2,7 @@ package com.foxminded.university.service.location;
 
 import com.foxminded.university.model.entity.Location;
 import com.foxminded.university.repository.LocationRepository;
+import com.foxminded.university.utils.RequestPage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -62,7 +63,9 @@ public class DefaultLocationService implements LocationService {
     }
 
     @Override
-    public List<Location> findAllLocationsWithPagination(int pageNumber, int pageSize) {
+    public List<Location> findAllLocationsWithPagination(RequestPage pageRequest) {
+        int pageNumber = pageRequest.getPageNumber();
+        int pageSize = pageRequest.getPageSize();
         log.debug("Searching for location with page size {} and pageSize {}", pageNumber, pageSize);
         Page<Location> pageResult = locationRepository.findAll(PageRequest.of(pageNumber, pageSize));
         log.info("Found {} locations", pageResult.getTotalPages());

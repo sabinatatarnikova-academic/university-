@@ -1,24 +1,17 @@
 package com.foxminded.university.model.dtos.classes;
 
-import com.foxminded.university.model.dtos.CourseDTO;
-import com.foxminded.university.model.dtos.GroupDTO;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class OnlineClassDTO {
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class OnlineClassDTO extends StudyClassDTO {
 
-    private String id;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private CourseDTO course;
-    private GroupDTO group;
     private String url;
 }

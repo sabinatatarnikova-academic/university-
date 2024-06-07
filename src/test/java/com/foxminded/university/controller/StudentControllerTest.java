@@ -5,6 +5,8 @@ import com.foxminded.university.config.TestSecurityConfig;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.service.user.UserService;
+import com.foxminded.university.utils.PageUtils;
+import com.foxminded.university.utils.RequestPage;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -34,6 +36,7 @@ class StudentControllerTest {
 
     @Test
     void testShowStudentList() throws Exception {
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
         Group groupA = Group.builder()
                 .groupName("Group A")
                 .build();
@@ -42,7 +45,7 @@ class StudentControllerTest {
                 .lastName("Williams")
                 .group(groupA)
                 .build()));
-        when(userService.findAllStudentsWithPagination(0, 10)).thenReturn(page);
+        when(userService.findAllStudentsWithPagination(validatedParams)).thenReturn(page);
 
         mockMvc.perform(get("/student").param("page", "0").param("size", "10"))
                 .andExpect(status().isOk())

@@ -14,7 +14,6 @@ public class TestSecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.anyRequest().permitAll()
                 );
-
         return http.build();
     }
 }
