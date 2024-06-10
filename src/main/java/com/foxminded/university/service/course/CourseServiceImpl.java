@@ -16,20 +16,18 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class DefaultCourseService implements CourseService{
+public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
 
     @Override
     public void saveCourse(Course course) {
-        log.debug("Adding new course: course name - {}, classes - {}",course.getName(),course.getStudyClasses());
         courseRepository.save(course);
         log.info("Saved course with name - {}, classes - {}",course.getName(),course.getStudyClasses());
     }
 
     @Override
     public Course findCourseById(String courseId) {
-        log.debug("Searching for course with id {}", courseId);
         Optional <Course> course = courseRepository.findById(courseId);
         if (!course.isPresent()) {
             log.error("Course with id {} not found", courseId);
@@ -41,7 +39,6 @@ public class DefaultCourseService implements CourseService{
 
     @Override
     public Course findCourseByName(String courseName) {
-        log.debug("Searching for course with name {}", courseName);
         Optional <Course> course = courseRepository.findCourseByName(courseName);
         if (!course.isPresent()) {
             log.error("Course with id {} not found", courseName);
@@ -53,14 +50,12 @@ public class DefaultCourseService implements CourseService{
 
     @Override
     public void updateCourse(Course course) {
-        log.debug("Updating course with id {} and name {}", course.getId(), course.getName());
         courseRepository.save(course);
         log.info("Updated course with id - {}, name - {}", course.getId(), course.getName());
     }
 
     @Override
     public void deleteCourseById(String courseId) {
-        log.debug("Deleting course with id {}", courseId);
         courseRepository.deleteById(courseId);
         log.info("Deleted course with id - {}", courseId);
     }
@@ -69,7 +64,6 @@ public class DefaultCourseService implements CourseService{
     public List<Course> findAllCoursesWithPagination(RequestPage pageRequest) {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
-        log.debug("Searching for course with page size {} and pageSize {}", pageNumber, pageSize);
         Page<Course> pageResult = courseRepository.findAll(PageRequest.of(pageNumber, pageSize));
         log.info("Found {} courses", pageResult.getTotalPages());
         return pageResult.toList();

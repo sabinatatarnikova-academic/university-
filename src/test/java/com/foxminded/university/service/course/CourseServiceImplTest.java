@@ -1,4 +1,4 @@
-package com.foxminded.university.service.location;
+package com.foxminded.university.service.course;
 
 import com.foxminded.university.config.TestConfig;
 import com.foxminded.university.model.entity.Course;
@@ -12,13 +12,11 @@ import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -31,15 +29,15 @@ import static org.junit.Assert.assertThrows;
 
 @DataJpaTest
 @ActiveProfiles("h2")
-@ExtendWith(SpringExtension.class)
 @Import(TestConfig.class)
-class DefaultLocationServiceTest {
+class CourseServiceImplTest {
 
     @Autowired
     private TestEntityManager entityManager;
 
     @Autowired
-    private DefaultLocationService locationService;
+    private CourseServiceImpl courseService;
+
 
     @BeforeEach
     public void init() {
@@ -60,7 +58,6 @@ class DefaultLocationServiceTest {
                 .build();
         entityManager.persist(groupA);
         entityManager.persist(groupB);
-
 
         Course math = Course.builder()
                 .name("Mathematics")
@@ -86,7 +83,6 @@ class DefaultLocationServiceTest {
         entityManager.persist(alice);
         entityManager.persist(bob);
 
-
         Student charlie = Student.builder()
                 .firstName("Charlie")
                 .lastName("Williams")
@@ -105,11 +101,11 @@ class DefaultLocationServiceTest {
         entityManager.persist(diana);
 
         Location science = Location.builder()
-                .department("ICS")
+                .department("Science")
                 .classroom("101")
                 .build();
         Location arts = Location.builder()
-                .department("FDU")
+                .department("Arts")
                 .classroom("102")
                 .build();
         entityManager.persist(science);
@@ -138,83 +134,82 @@ class DefaultLocationServiceTest {
     }
 
     @Test
-    void saveLocation() {
-        Location locationToSave = Location.builder()
-                .department("FCR")
-                .classroom("123")
+    void saveCourse() {
+        Course groupToSave = Course.builder()
+                .name("Mugiwaras")
                 .build();
 
-        locationService.saveLocation(locationToSave);
-        Location location = locationService.findLocationByDepartmentAndClassroom("FCR", "123");
-        location.setId(null);
-        assertThat(locationToSave, is(location));
+        courseService.saveCourse(groupToSave);
+        Course course = courseService.findCourseByName("Mugiwaras");
+        course.setId(null);
+        assertThat(groupToSave, is(course));
     }
 
     @Test
-    void findLocationById() {
-        Location locationByName = locationService.findLocationByDepartmentAndClassroom("ICS","101");
-        String locationId = locationByName.getId();
-        Location location = locationService.findLocationById(locationId);
-        location.setId(null);
-        Location locationA = Location.builder()
-                .department("ICS")
-                .classroom("101")
+    void findCourseById() {
+        Course courseByName = courseService.findCourseByName("Mathematics");
+        String courseId = courseByName.getId();
+        Course course = courseService.findCourseById(courseId);
+        course.setId(null);
+        Course courseA = Course.builder()
+                .name("Mathematics")
                 .build();
-        assertThat(location, is(locationA));
+        assertThat(course, is(courseA));
     }
 
     @Test
-    void assertThrowsExceptionIfLocationIsNotPresent(){
-        assertThrows(NoSuchElementException.class, () -> locationService.findLocationById("testId"));
+    void assertThrowsExceptionIfCourseIsNotPresent(){
+        assertThrows(NoSuchElementException.class, () -> courseService.findCourseById("testId"));
     }
 
     @Test
-    void findLocationByDepartmentAndClassroom() {
-        Location location = locationService.findLocationByDepartmentAndClassroom("ICS", "101");
-        location.setId(null);
-        Location locationA = Location.builder()
-                .department("ICS")
-                .classroom("101")
+    void findCourseByName() {
+        Course course = courseService.findCourseByName("Mathematics");
+        course.setId(null);
+        Course courseA = Course.builder()
+                .name("Mathematics")
                 .build();
-        assertThat(location, is(locationA));
+        assertThat(course, is(courseA));
     }
 
     @Test
-    void updateLocation() {
-        Location location = locationService.findLocationByDepartmentAndClassroom("ICS", "101");
-        String locationId = location.getId();
-        Location locationToUpdate = Location.builder()
-                .id(locationId)
-                .department("Update name")
-                .classroom("222")
-                .build();
-        locationService.updateLocation(locationToUpdate);
-        Location updatedLocation = locationService.findLocationByDepartmentAndClassroom("Update name", "222");
-        assertThat(locationToUpdate, is(updatedLocation));
+    void assertThrowsExceptionIfCourseIsNotPresentByName(){
+        assertThrows(NoSuchElementException.class, () -> courseService.findCourseByName("test"));
     }
 
     @Test
-    void deleteLocationById() {
-        String locationId = locationService.findLocationByDepartmentAndClassroom("ICS", "101").getId();
-        locationService.deleteLocationById(locationId);
-        assertThrows(NoSuchElementException.class, () -> locationService.findLocationById(locationId));
+    void updateCourse() {
+        Course course = courseService.findCourseByName("Mathematics");
+        String courseId = course.getId();
+        Course courseToUpdate = Course.builder()
+                .id(courseId)
+                .name("Update name")
+                .build();
+        courseService.updateCourse(courseToUpdate);
+        Course updatedCourse = courseService.findCourseByName("Update name");
+        assertThat(courseToUpdate, is(updatedCourse));
     }
 
     @Test
-    void findAllLocationsWithPagination() {
-        Location locationA = Location.builder()
-                .department("ICS")
-                .classroom("101")
+    void deleteCourseById() {
+        String courseId = courseService.findCourseByName("Mathematics").getId();
+        courseService.deleteCourseById(courseId);
+        assertThrows(NoSuchElementException.class, () -> courseService.findCourseById(courseId));
+    }
+
+    @Test
+    void findAllCoursesWithPagination() {
+        Course courseA = Course.builder()
+                .name("Mathematics")
                 .build();
-        Location locationB = Location.builder()
-                .department("FDU")
-                .classroom("102")
+        Course courseB = Course.builder()
+                .name("Physics")
                 .build();
 
-        List<Location> locations = Arrays.asList(locationA, locationB);
+        List<Course> courses = Arrays.asList(courseA, courseB);
         RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
-        List<Location> locationsActual = locationService.findAllLocationsWithPagination(validatedParams);
-        locationsActual.forEach(course -> course.setId(null));
-        assertThat(locationsActual, is(locations));
+        List<Course> coursesActual = courseService.findAllCoursesWithPagination(validatedParams);
+        coursesActual.forEach(course -> course.setId(null));
+        assertThat(coursesActual, is(courses));
     }
 }

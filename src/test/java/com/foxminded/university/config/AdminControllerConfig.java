@@ -4,9 +4,7 @@ import com.foxminded.university.controller.AdminController;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
-import com.foxminded.university.utils.UserCredentialUtils;
-import com.foxminded.university.utils.mappers.users.StudentMapper;
-import com.foxminded.university.utils.mappers.users.TeacherMapper;
+import com.foxminded.university.utils.mappers.users.UserMapper;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
@@ -22,11 +20,8 @@ public class AdminControllerConfig {
     @MockBean
     public PasswordEncoder passwordEncoder;
 
-    @MockBean
-    public UserCredentialUtils userCredentialUtils;
-
     @Bean
-    public AdminController adminController(UserService userService, GroupService groupService, StudyClassService studyClassService, TeacherMapper teacherMapper, StudentMapper studentMapper) {
-        return new AdminController(userService, groupService, studyClassService, teacherMapper, studentMapper);
+    public AdminController adminController(UserService userService, GroupService groupService, StudyClassService studyClassService, UserMapper userMapper) {
+        return new AdminController(userService, groupService, studyClassService, userMapper);
     }
 }

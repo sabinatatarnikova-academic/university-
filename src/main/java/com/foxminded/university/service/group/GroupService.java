@@ -18,4 +18,6 @@ public interface GroupService {
     void deleteGroupById(String groupId);
 
     List<Group> findAllGroupsWithPagination(RequestPage pageRequest);
+
+    List<Group> findAllGroups();
 }

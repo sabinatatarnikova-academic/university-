@@ -2,8 +2,8 @@ package com.foxminded.university.controller;
 
 import com.foxminded.university.config.TestControllerConfig;
 import com.foxminded.university.config.TestSecurityConfig;
+import com.foxminded.university.model.dtos.users.StudentDTO;
 import com.foxminded.university.model.entity.Group;
-import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
@@ -40,10 +40,9 @@ class StudentControllerTest {
         Group groupA = Group.builder()
                 .groupName("Group A")
                 .build();
-        Page<Student> page = new PageImpl<>(Collections.singletonList(Student.builder()
+        Page<StudentDTO> page = new PageImpl<>(Collections.singletonList(StudentDTO.builder()
                 .firstName("Charlie")
                 .lastName("Williams")
-                .group(groupA)
                 .build()));
         when(userService.findAllStudentsWithPagination(validatedParams)).thenReturn(page);
 

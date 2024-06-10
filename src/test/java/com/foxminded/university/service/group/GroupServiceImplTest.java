@@ -1,4 +1,4 @@
-package com.foxminded.university.service.course;
+package com.foxminded.university.service.group;
 
 import com.foxminded.university.config.TestConfig;
 import com.foxminded.university.model.entity.Course;
@@ -12,13 +12,16 @@ import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -29,15 +32,15 @@ import static org.junit.Assert.assertThrows;
 
 @DataJpaTest
 @ActiveProfiles("h2")
+@ExtendWith(SpringExtension.class)
 @Import(TestConfig.class)
-class DefaultCourseServiceTest {
+class GroupServiceImplTest {
 
     @Autowired
     private TestEntityManager entityManager;
 
     @Autowired
-    private DefaultCourseService courseService;
-
+    private GroupServiceImpl groupService;
 
     @BeforeEach
     public void init() {
@@ -58,6 +61,7 @@ class DefaultCourseServiceTest {
                 .build();
         entityManager.persist(groupA);
         entityManager.persist(groupB);
+
 
         Course math = Course.builder()
                 .name("Mathematics")
@@ -83,19 +87,20 @@ class DefaultCourseServiceTest {
         entityManager.persist(alice);
         entityManager.persist(bob);
 
+
         Student charlie = Student.builder()
                 .firstName("Charlie")
                 .lastName("Williams")
-                .group(groupA)
                 .username(username)
                 .password(password)
+                .group(groupA)
                 .build();
         Student diana = Student.builder()
                 .firstName("Diana")
                 .lastName("Brown")
-                .group(groupB)
                 .username(username)
                 .password(password)
+                .group(groupB)
                 .build();
         entityManager.persist(charlie);
         entityManager.persist(diana);
@@ -134,82 +139,99 @@ class DefaultCourseServiceTest {
     }
 
     @Test
-    void saveCourse() {
-        Course groupToSave = Course.builder()
-                .name("Mugiwaras")
+    void testSaveGroup() {
+        Group groupToSave = Group.builder()
+                .groupName("Mugiwaras")
                 .build();
 
-        courseService.saveCourse(groupToSave);
-        Course course = courseService.findCourseByName("Mugiwaras");
-        course.setId(null);
-        assertThat(groupToSave, is(course));
+        groupService.saveGroup(groupToSave);
+        Group group = groupService.findGroupByName("Mugiwaras");
+        group.setId(null);
+        assertThat(groupToSave, is(group));
     }
 
     @Test
-    void findCourseById() {
-        Course courseByName = courseService.findCourseByName("Mathematics");
-        String courseId = courseByName.getId();
-        Course course = courseService.findCourseById(courseId);
-        course.setId(null);
-        Course courseA = Course.builder()
-                .name("Mathematics")
+    void findGroupById() {
+        Group groupByName = groupService.findGroupByName("Group A");
+        String groupId = groupByName.getId();
+        Group group = groupService.findGroupById(groupId);
+        group.setId(null);
+        Group groupA = Group.builder()
+                .groupName("Group A")
                 .build();
-        assertThat(course, is(courseA));
+        assertThat(group, is(groupA));
     }
 
     @Test
-    void assertThrowsExceptionIfCourseIsNotPresent(){
-        assertThrows(NoSuchElementException.class, () -> courseService.findCourseById("testId"));
+    void assertThrowsExceptionIfGroupIsNotPresent(){
+        assertThrows(NoSuchElementException.class, () -> groupService.findGroupById("testId"));
     }
 
     @Test
-    void findCourseByName() {
-        Course course = courseService.findCourseByName("Mathematics");
-        course.setId(null);
-        Course courseA = Course.builder()
-                .name("Mathematics")
+    void findGroupByName() {
+        Group group = groupService.findGroupByName("Group A");
+        group.setId(null);
+        Group groupA = Group.builder()
+                .groupName("Group A")
                 .build();
-        assertThat(course, is(courseA));
+        assertThat(group, is(groupA));
     }
 
     @Test
-    void assertThrowsExceptionIfCourseIsNotPresentByName(){
-        assertThrows(NoSuchElementException.class, () -> courseService.findCourseByName("test"));
+    void assertThrowsExceptionIfGroupIsNotPresentByName(){
+        assertThrows(NoSuchElementException.class, () -> groupService.findGroupByName("test"));
     }
 
     @Test
-    void updateCourse() {
-        Course course = courseService.findCourseByName("Mathematics");
-        String courseId = course.getId();
-        Course courseToUpdate = Course.builder()
-                .id(courseId)
-                .name("Update name")
+    void updateGroup() {
+        Group group = groupService.findGroupByName("Group A");
+        String groupId = group.getId();
+        Group groupToUpdate = Group.builder()
+                .id(groupId)
+                .groupName("Update name")
+                .students(new ArrayList<>())
+                .studyClasses(new ArrayList<>())
                 .build();
-        courseService.updateCourse(courseToUpdate);
-        Course updatedCourse = courseService.findCourseByName("Update name");
-        assertThat(courseToUpdate, is(updatedCourse));
+        groupService.updateGroup(groupToUpdate);
+        Group updatedGroup = groupService.findGroupByName("Update name");
+        assertThat(groupToUpdate, is(updatedGroup));
     }
 
     @Test
-    void deleteCourseById() {
-        String courseId = courseService.findCourseByName("Mathematics").getId();
-        courseService.deleteCourseById(courseId);
-        assertThrows(NoSuchElementException.class, () -> courseService.findCourseById(courseId));
+    void deleteGroupById() {
+        String groupId = groupService.findGroupByName("Group A").getId();
+        groupService.deleteGroupById(groupId);
+        assertThrows(NoSuchElementException.class, () -> groupService.findGroupById(groupId));
     }
 
     @Test
-    void findAllCoursesWithPagination() {
-        Course courseA = Course.builder()
-                .name("Mathematics")
+    void findAllGroupsWithPagination() {
+        Group groupA = Group.builder()
+                .groupName("Group A")
                 .build();
-        Course courseB = Course.builder()
-                .name("Physics")
+        Group groupB = Group.builder()
+                .groupName("Group B")
                 .build();
 
-        List<Course> courses = Arrays.asList(courseA, courseB);
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
-        List<Course> coursesActual = courseService.findAllCoursesWithPagination(validatedParams);
-        coursesActual.forEach(course -> course.setId(null));
-        assertThat(coursesActual, is(courses));
+        List<Group> groups = Arrays.asList(groupA, groupB);
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(Integer.MAX_VALUE));
+        List<Group> groupsActual = groupService.findAllGroupsWithPagination(validatedParams);
+        groupsActual.forEach(course -> course.setId(null));
+        assertThat(groupsActual, is(groups));
+    }
+
+    @Test
+    void findAllGroups() {
+        Group groupA = Group.builder()
+                .groupName("Group A")
+                .build();
+        Group groupB = Group.builder()
+                .groupName("Group B")
+                .build();
+
+        List<Group> groups = Arrays.asList(groupA, groupB);
+        List<Group> groupsActual = groupService.findAllGroups();
+        groupsActual.forEach(course -> course.setId(null));
+        assertThat(groupsActual, is(groups));
     }
 }

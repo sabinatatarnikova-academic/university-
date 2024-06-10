@@ -22,4 +22,6 @@ public interface StudyClassService {
     void deleteClassById(String classId);
 
     List<StudyClass> findAllClassesWithPagination(RequestPage pageRequest);
+
+    List<StudyClass> findAllClasses();
 }

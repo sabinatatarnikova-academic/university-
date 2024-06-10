@@ -26,12 +26,7 @@
             <td>
                 <ul>
                     <li th:each="studyClass : ${teacher.getStudyClasses()}">
-                     <span th:if="${studyClass.class.simpleName == 'OnlineClass'}"
-                        th:text="${'Online: ' + studyClass.course.name + ' - ' + studyClass.startTime + ' to ' + studyClass.endTime + ', URL: ' + studyClass.url}">
-                        </span>
-                        <span th:if="${studyClass.class.simpleName == 'OfflineClass'}"
-                              th:text="${'Offline: ' + studyClass.course.name + ' - ' + studyClass.startTime + ' to ' + studyClass.endTime + ', Location: ' + studyClass.location.department + ' ' + studyClass.location.classroom}">
-                        </span>
+                        <span th:text="${studyClass.course.name + ' - ' + studyClass.startTime + ' to ' + studyClass.endTime}"></span>
                     </li>
                 </ul>
             </td>

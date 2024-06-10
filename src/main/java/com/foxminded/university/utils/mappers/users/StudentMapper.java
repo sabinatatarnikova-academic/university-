@@ -1,6 +1,7 @@
 package com.foxminded.university.utils.mappers.users;
 
 import com.foxminded.university.model.dtos.users.StudentDTO;
+import com.foxminded.university.model.dtos.users.UserDTO;
 import com.foxminded.university.model.dtos.users.UserFormDTO;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.utils.mappers.GroupMapper;
@@ -18,4 +19,6 @@ public interface StudentMapper {
 
     @InheritInverseConfiguration
     Student toEntity(UserFormDTO studentDTO);
+
+    Student toEntity(UserDTO userDTO);
 }

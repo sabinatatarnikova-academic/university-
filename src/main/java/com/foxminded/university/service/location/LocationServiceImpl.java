@@ -16,21 +16,18 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class DefaultLocationService implements LocationService {
+public class LocationServiceImpl implements LocationService {
 
     private final LocationRepository locationRepository;
 
     @Override
     public void saveLocation(Location location) {
-        log.debug("Adding new location: department - {}, classroom - {}, classes - {}", location.getDepartment(), location.getClassroom(), location.getStudyClass());
-
         locationRepository.save(location);
         log.info("Saved location: department - {}, classroom - {}, classes - {}", location.getDepartment(), location.getClassroom(), location.getStudyClass());
     }
 
     @Override
     public Location findLocationById(String locationId) {
-        log.debug("Searching for location with id {}", locationId);
         Optional<Location> location = locationRepository.findById(locationId);
         if (!location.isPresent()) {
             log.error("Location with id {} not found", locationId);
@@ -42,7 +39,6 @@ public class DefaultLocationService implements LocationService {
 
     @Override
     public Location findLocationByDepartmentAndClassroom(String department, String classroom) {
-        log.debug("Searching for location with department - {} and classroom - {}", department, classroom);
         Location location = locationRepository.findLocationByDepartmentAndClassroom(department, classroom).get();
         log.info("Founded the location with department - {} and classroom - {}", department, classroom);
         return location;
@@ -50,14 +46,12 @@ public class DefaultLocationService implements LocationService {
 
     @Override
     public void updateLocation(Location location) {
-        log.debug("Updating location with id {}, department - {}, classroom - {}, classes - {}", location.getId(),location.getDepartment(), location.getClassroom(), location.getStudyClass());
         locationRepository.save(location);
         log.info("Updated location with id {}, department - {}, classroom - {}, classes - {}", location.getId(),location.getDepartment(), location.getClassroom(), location.getStudyClass());
     }
 
     @Override
     public void deleteLocationById(String locationId) {
-        log.debug("Deleting location with id {}", locationId);
         locationRepository.deleteById(locationId);
         log.info("Deleted location with id - {}", locationId);
     }
@@ -66,7 +60,6 @@ public class DefaultLocationService implements LocationService {
     public List<Location> findAllLocationsWithPagination(RequestPage pageRequest) {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
-        log.debug("Searching for location with page size {} and pageSize {}", pageNumber, pageSize);
         Page<Location> pageResult = locationRepository.findAll(PageRequest.of(pageNumber, pageSize));
         log.info("Found {} locations", pageResult.getTotalPages());
         return pageResult.toList();

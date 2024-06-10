@@ -43,7 +43,7 @@
         </div>
         <div class="mb-3" th:if="${user.userType} == 'TEACHER'">
             <label class="form-label" for="studyClasses">Study classes (only for teachers)</label>
-            <select class="form-select" id="studyClasses" multiple th:field="*{studyClassesIds}">
+            <select class="form-select" id="studyClasses" multiple th:field="*{studyClasses}">
                 <option th:each="studyClass : ${allStudyClasses}"
                         th:text="${studyClass.course.name + '; Start time:' + studyClass.getStartTime() + '; End time:' + studyClass.getEndTime() + '; Group: ' + studyClass.getGroup().getGroupName()}"
                         th:value="${studyClass.id}"></option>

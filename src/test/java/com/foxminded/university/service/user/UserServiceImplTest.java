@@ -1,7 +1,10 @@
 package com.foxminded.university.service.user;
 
 import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.model.dtos.GroupDTO;
 import com.foxminded.university.model.dtos.classes.StudyClassDTO;
+import com.foxminded.university.model.dtos.users.StudentDTO;
+import com.foxminded.university.model.dtos.users.TeacherDTO;
 import com.foxminded.university.model.dtos.users.UserDTO;
 import com.foxminded.university.model.dtos.users.UserFormDTO;
 import com.foxminded.university.model.entity.Course;
@@ -11,11 +14,12 @@ import com.foxminded.university.model.entity.classes.OfflineClass;
 import com.foxminded.university.model.entity.classes.OnlineClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
-import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
 import com.foxminded.university.utils.mappers.GroupMapper;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
+import com.foxminded.university.utils.mappers.users.StudentMapper;
+import com.foxminded.university.utils.mappers.users.TeacherMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,19 +46,25 @@ import static org.junit.Assert.assertThrows;
 @ActiveProfiles("h2")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = TestConfig.class)
-class DefaultUserServiceTest {
+class UserServiceImplTest {
 
     @Autowired
     private TestEntityManager entityManager;
 
     @Autowired
-    private DefaultUserService userService;
+    private UserServiceImpl userService;
 
     @Autowired
     private GroupMapper groupMapper;
 
     @Autowired
     private StudyClassMapper studyClassMapper;
+
+    @Autowired
+    private StudentMapper studentMapper;
+
+    @Autowired
+    private TeacherMapper teacherMapper;
 
     private Group groupA;
     private Group groupB;
@@ -176,8 +186,8 @@ class DefaultUserServiceTest {
 
         userService.saveUser(userToSave);
         RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(5));
-        List<User> users = userService.findAllUsersWithPagination(validatedParams).toList();
-        User actualUser = users.get(4);
+        List<UserDTO> users = userService.findAllUsersWithPagination(validatedParams).toList();
+        UserDTO actualUser = users.get(4);
 
         assertEquals(userToSave.getFirstName(), actualUser.getFirstName());
         assertEquals(userToSave.getLastName(), actualUser.getLastName());
@@ -188,9 +198,9 @@ class DefaultUserServiceTest {
     @Test
     void findUserById() {
         RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
-        User user = userService.findAllUsersWithPagination(validatedParams).toList().get(3);
+        UserDTO user = userService.findAllUsersWithPagination(validatedParams).toList().get(3);
         String userId = user.getId();
-        assertEquals(user, userService.findUserById(userId));
+        assertEquals(user, studentMapper.toDto((Student) userService.findUserById(userId)));
     }
 
     @Test
@@ -201,7 +211,7 @@ class DefaultUserServiceTest {
     @Test
     void updateStudent() {
         RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
-        User user = userService.findAllUsersWithPagination(validatedParams).toList().get(3);
+        UserDTO user = userService.findAllUsersWithPagination(validatedParams).toList().get(3);
         String userId = user.getId();
 
         UserFormDTO studentToSave = UserFormDTO.builder()
@@ -224,7 +234,7 @@ class DefaultUserServiceTest {
     @Test
     void updateTeacher() {
         RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
-        User user = userService.findAllUsersWithPagination(validatedParams).toList().get(0);
+        UserDTO user = userService.findAllUsersWithPagination(validatedParams).toList().get(0);
         String userId = user.getId();
 
         StudyClassDTO onlineClassDTO = studyClassMapper.toDto(onlineClass);
@@ -236,7 +246,7 @@ class DefaultUserServiceTest {
                 .lastName("Test")
                 .password(password)
                 .username(username)
-                .studyClassesIds(List.of(onlineClassDTO.getId(), offlineClassDTO.getId()))
+                .studyClasses(List.of(onlineClassDTO.getId(), offlineClassDTO.getId()))
                 .build();
 
         userService.updateTeacher(teacherToSave);
@@ -250,7 +260,7 @@ class DefaultUserServiceTest {
     @Test
     void deleteUserById() {
         RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
-        User user = userService.findAllUsersWithPagination(validatedParams).toList().get(0);
+        UserDTO user = userService.findAllUsersWithPagination(validatedParams).toList().get(0);
         String userId = user.getId();
 
         userService.deleteUserById(userId);
@@ -259,29 +269,86 @@ class DefaultUserServiceTest {
 
     @Test
     void findAllUsersWithPagination() {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(3));
-        List<User> expectedUsers = Arrays.asList(alice, bob, charlie);
-        Page<User> actualUsers = userService.findAllUsersWithPagination(validatedParams);
-        actualUsers.forEach(user -> user.setId(null));
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
+        TeacherDTO aliceDTO = TeacherDTO.builder()
+                .firstName("Alice")
+                .lastName("Smith")
+                .username(username)
+                .password(password)
+                .build();
+        TeacherDTO bobDTO = TeacherDTO.builder()
+                .firstName("Bob")
+                .lastName("Johnson")
+                .username(username)
+                .password(password)
+                .build();
+        List<UserDTO> expectedUsers = Arrays.asList(aliceDTO, bobDTO);
+        List<UserDTO> actualUsers = userService.findAllUsersWithPagination(validatedParams).toList().subList(0, 2);
+        actualUsers.forEach(user -> {
+            user.setId(null);
+        });
 
-        assertEquals(expectedUsers, actualUsers.stream().toList());
+        assertEquals(expectedUsers, actualUsers);
     }
     @Test
     void findAllStudents() {
         RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
-        List<Student> expectedStudents = Arrays.asList(charlie, diana);
-        Page<Student> actualStudents = userService.findAllStudentsWithPagination(validatedParams);
-        actualStudents.forEach(user -> user.setId(null));
+
+        StudentDTO charlieDTO = StudentDTO.builder()
+                .firstName("Charlie")
+                .lastName("Williams")
+                .group(GroupDTO.builder().groupName("Group A").build())
+                .username(username)
+                .password(password)
+                .build();
+        StudentDTO dianaDTO = StudentDTO.builder()
+                .firstName("Diana")
+                .lastName("Brown")
+                .group(GroupDTO.builder().groupName("Group B").build())
+                .username(username)
+                .password(password)
+                .build();
+
+        List<StudentDTO> expectedStudents = Arrays.asList(charlieDTO, dianaDTO);
+        Page<StudentDTO> actualStudents = userService.findAllStudentsWithPagination(validatedParams);
+        actualStudents.forEach(user -> {
+            user.setId(null);
+            user.getGroup().setId(null);
+        });
 
         assertEquals(expectedStudents, actualStudents.toList());
     }
     @Test
     void findAllTeachers() {
         RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
-        List<Teacher> expectedTeachers = Arrays.asList(alice, bob);
-        Page<Teacher> actualTeachers = userService.findAllTeachersWithPagination(validatedParams);
-        actualTeachers.forEach(user -> user.setId(null));
+
+        TeacherDTO aliceDTO = TeacherDTO.builder()
+                .firstName("Alice")
+                .lastName("Smith")
+                .username(username)
+                .password(password)
+                .build();
+        TeacherDTO bobDTO = TeacherDTO.builder()
+                .firstName("Bob")
+                .lastName("Johnson")
+                .username(username)
+                .password(password)
+                .build();
+
+        List<TeacherDTO> expectedTeachers = Arrays.asList(aliceDTO, bobDTO);
+        Page<TeacherDTO> actualTeachers = userService.findAllTeachersWithPagination(validatedParams);
+        actualTeachers.forEach(user -> {
+            user.setId(null);
+        });
 
         assertEquals(expectedTeachers, actualTeachers.toList());
+    }
+
+    @Test
+    void getUser() {
+        alice.setUserType("TEACHER");
+        charlie.setUserType("STUDENT");
+        assertEquals(teacherMapper.toDto(alice), userService.getUser(alice));
+        assertEquals(studentMapper.toDto(charlie), userService.getUser(charlie));
     }
 }

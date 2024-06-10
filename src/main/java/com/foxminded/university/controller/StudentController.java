@@ -1,6 +1,6 @@
 package com.foxminded.university.controller;
 
-import com.foxminded.university.model.entity.users.Student;
+import com.foxminded.university.model.dtos.users.StudentDTO;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
@@ -22,7 +22,7 @@ public class StudentController {
     @GetMapping()
     public String showStudentsList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
         RequestPage validatedParams = PageUtils.createPage(pageStr, sizeStr);
-        Page<Student> studentPage = userService.findAllStudentsWithPagination(validatedParams);
+        Page<StudentDTO> studentPage = userService.findAllStudentsWithPagination(validatedParams);
         model.addAttribute("studentPage", studentPage);
         return "student";
     }

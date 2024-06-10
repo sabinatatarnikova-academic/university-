@@ -6,7 +6,6 @@ import com.foxminded.university.model.dtos.users.UserDTO;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
-import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
@@ -57,7 +56,7 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowAllUsersList() throws Exception {
-        Page<User> page = new PageImpl<>(Collections.singletonList(User.builder()
+        Page<UserDTO> page = new PageImpl<>(Collections.singletonList(UserDTO.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .build()));
@@ -74,12 +73,9 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowAddUserForm() throws Exception {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
         mockMvc.perform(get("/admin/users/new"))
                 .andExpect(model().attributeExists("user"))
                 .andExpect(model().attribute("user", new UserDTO()))
-                .andExpect(model().attributeExists("groups"))
-                .andExpect(model().attribute("groups", groupService.findAllGroupsWithPagination(validatedParams)))
                 .andExpect(status().isOk())
                 .andExpect(view().name("add-user"));
     }
@@ -136,7 +132,7 @@ class AdminControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/users"));
 
-        verify(userService, times(1)).updateStudent(any());
+        verify(userService, times(1)).updateUser(any());
     }
 
     @Test
@@ -155,7 +151,7 @@ class AdminControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/users"));
 
-        verify(userService, times(1)).updateTeacher(any());
+        verify(userService, times(1)).updateUser(any());
     }
 
     @Test

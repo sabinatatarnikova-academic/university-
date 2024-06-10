@@ -1,8 +1,11 @@
 package com.foxminded.university.service.studyClasses;
 
 import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.model.dtos.CourseDTO;
+import com.foxminded.university.model.dtos.GroupDTO;
 import com.foxminded.university.model.dtos.classes.OfflineClassDTO;
 import com.foxminded.university.model.dtos.classes.OnlineClassDTO;
+import com.foxminded.university.model.dtos.users.TeacherDTO;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
@@ -34,6 +37,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
@@ -212,6 +217,45 @@ class StudyClassServiceImplTest {
     }
 
     @Test
+    void updateStudyClass() {
+        String studyClassId = studyClassService.findAllClasses().getFirst().getId();
+        String courseId = studyClassService.findAllClasses().get(1).getCourse().getId();
+        String groupId = studyClassService.findAllClasses().get(1).getGroup().getId();
+
+        TeacherDTO teacherDTO = TeacherDTO.builder()
+                .firstName("Bob")
+                .lastName("Johnson")
+                .username(username)
+                .password(password)
+                .build();
+
+        OnlineClassDTO onlineClassDTO = OnlineClassDTO.builder()
+                .id(studyClassId)
+                .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
+                .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
+                .course(CourseDTO.builder()
+                        .id(courseId)
+                        .name("Physics")
+                        .build())
+                .group(GroupDTO.builder()
+                        .id(groupId)
+                        .groupName("Group B")
+                        .build())
+                .url("http://test.com")
+                .build();
+
+        studyClassService.updateStudyClass(onlineClassDTO, teacherDTO);
+
+        OnlineClass studyClass = (OnlineClass) studyClassService.findClassById(studyClassId);
+        assertThat(onlineClassDTO.getId(), is(studyClass.getId()));
+        assertThat(onlineClassDTO.getStartTime(), is(studyClass.getStartTime()));
+        assertThat(onlineClassDTO.getEndTime(), is(studyClass.getEndTime()));
+        assertThat(onlineClassDTO.getCourse().getId(), is(studyClass.getCourse().getId()));
+        assertThat(onlineClassDTO.getGroup().getId(), is(studyClass.getGroup().getId()));
+        assertThat(onlineClassDTO.getUrl(), is(studyClass.getUrl()));
+    }
+
+    @Test
     void findClassById() {
         RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(1));
         StudyClass studyClass = studyClassService.findAllClassesWithPagination(validatedParams).get(0);
@@ -239,6 +283,14 @@ class StudyClassServiceImplTest {
         RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
         List<StudyClass> expectedClasses = Arrays.asList(onlineClass, offlineClass);
         List<StudyClass> actualClasses = studyClassService.findAllClassesWithPagination(validatedParams);
+        actualClasses.forEach(studyClass -> studyClass.setId(null));
+        assertEquals(expectedClasses, actualClasses);
+    }
+
+    @Test
+    void findAllClasses() {
+        List<StudyClass> expectedClasses = Arrays.asList(onlineClass, offlineClass);
+        List<StudyClass> actualClasses = studyClassService.findAllClasses();
         actualClasses.forEach(studyClass -> studyClass.setId(null));
         assertEquals(expectedClasses, actualClasses);
     }

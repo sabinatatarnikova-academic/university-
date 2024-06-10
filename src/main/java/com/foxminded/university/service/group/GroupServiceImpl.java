@@ -16,20 +16,18 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class DefaultGroupService implements GroupService {
+public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
 
     @Override
     public void saveGroup(Group group) {
-        log.debug("Adding new group: group name - {}, classes - {}",group.getGroupName(), group.getStudyClasses());
         groupRepository.save(group);
         log.info("Saved group with name - {}, classes - {}", group.getGroupName(), group.getStudyClasses());
     }
 
     @Override
     public Group findGroupById(String groupId) {
-        log.debug("Searching for group with id {}", groupId);
         Optional <Group> group = groupRepository.findById(groupId);
         if (!group.isPresent()) {
             log.error("Course with id {} not found", groupId);
@@ -41,7 +39,6 @@ public class DefaultGroupService implements GroupService {
 
     @Override
     public Group findGroupByName(String groupName) {
-        log.debug("Searching for group with name {}", groupName);
         Optional <Group> group = groupRepository.findGroupByGroupName(groupName);
         if (!group.isPresent()) {
             log.error("Course with name {} not found", groupName);
@@ -53,14 +50,12 @@ public class DefaultGroupService implements GroupService {
 
     @Override
     public void updateGroup(Group group) {
-        log.debug("Updating group with id {} and name {}", group.getId(), group.getGroupName());
         groupRepository.save(group);
         log.info("Updated group with id - {}, name - {}", group.getId(), group.getGroupName());
     }
 
     @Override
     public void deleteGroupById(String groupId) {
-        log.debug("Deleting group with id {}", groupId);
         groupRepository.deleteById(groupId);
         log.info("Deleted group with id - {}", groupId);
     }
@@ -69,9 +64,17 @@ public class DefaultGroupService implements GroupService {
     public List<Group> findAllGroupsWithPagination(RequestPage pageRequest) {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
-        log.debug("Searching for group with page size {} and pageSize {}", pageNumber, pageSize);
         Page<Group> pageResult = groupRepository.findAll(PageRequest.of(pageNumber, pageSize));
         log.info("Found {} groups", pageResult.getTotalPages());
         return pageResult.toList();
     }
+
+    @Override
+    public List<Group> findAllGroups() {
+        List<Group> groups = groupRepository.findAll();
+        log.info("Found {} groups", groups.size());
+        return groups;
+    }
+
+
 }

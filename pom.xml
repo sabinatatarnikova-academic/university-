@@ -214,9 +214,9 @@
                         <exclude>**/model/**</exclude>
                         <exclude>**/DemoApplication.class/**</exclude>
                         <exclude>**/DataSourceConfig.class/**</exclude>
-                        <exclude>**/DefaultPage.class/**</exclude>
                         <exclude>**/SecurityConfig.class/**</exclude>
                         <exclude>**/CustomUserDetailsService.class/**</exclude>
+                        <exclude>**/RequestPage.class/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>

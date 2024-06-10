@@ -1,9 +1,9 @@
 package com.foxminded.university.service.user;
 
+import com.foxminded.university.model.dtos.users.StudentDTO;
+import com.foxminded.university.model.dtos.users.TeacherDTO;
 import com.foxminded.university.model.dtos.users.UserDTO;
 import com.foxminded.university.model.dtos.users.UserFormDTO;
-import com.foxminded.university.model.entity.users.Student;
-import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.utils.RequestPage;
 import org.springframework.data.domain.Page;
@@ -21,9 +21,13 @@ public interface UserService {
 
     void deleteUserById(String userId);
 
-    Page<User> findAllUsersWithPagination(RequestPage requestPage);
+    Page<UserDTO> findAllUsersWithPagination(RequestPage requestPage);
 
-    Page<Student> findAllStudentsWithPagination(RequestPage requestPage);
+    Page<StudentDTO> findAllStudentsWithPagination(RequestPage requestPage);
 
-    Page<Teacher> findAllTeachersWithPagination(RequestPage requestPage);
+    Page<TeacherDTO> findAllTeachersWithPagination(RequestPage requestPage);
+
+    Object getUser(User user);
+
+    void updateUser(UserFormDTO userFormDTO);
 }

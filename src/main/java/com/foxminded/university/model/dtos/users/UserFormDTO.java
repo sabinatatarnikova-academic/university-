@@ -28,6 +28,6 @@ public class UserFormDTO {
 
     private GroupDTO group;
 
-    private List<String> studyClassesIds;
+    private List<String> studyClasses;
 }
 

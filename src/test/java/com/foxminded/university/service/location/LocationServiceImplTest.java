@@ -1,4 +1,4 @@
-package com.foxminded.university.service.group;
+package com.foxminded.university.service.location;
 
 import com.foxminded.university.config.TestConfig;
 import com.foxminded.university.model.entity.Course;
@@ -21,7 +21,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -34,13 +33,13 @@ import static org.junit.Assert.assertThrows;
 @ActiveProfiles("h2")
 @ExtendWith(SpringExtension.class)
 @Import(TestConfig.class)
-class DefaultGroupServiceTest {
+class LocationServiceImplTest {
 
     @Autowired
     private TestEntityManager entityManager;
 
     @Autowired
-    private DefaultGroupService groupService;
+    private LocationServiceImpl locationService;
 
     @BeforeEach
     public void init() {
@@ -91,26 +90,26 @@ class DefaultGroupServiceTest {
         Student charlie = Student.builder()
                 .firstName("Charlie")
                 .lastName("Williams")
+                .group(groupA)
                 .username(username)
                 .password(password)
-                .group(groupA)
                 .build();
         Student diana = Student.builder()
                 .firstName("Diana")
                 .lastName("Brown")
+                .group(groupB)
                 .username(username)
                 .password(password)
-                .group(groupB)
                 .build();
         entityManager.persist(charlie);
         entityManager.persist(diana);
 
         Location science = Location.builder()
-                .department("Science")
+                .department("ICS")
                 .classroom("101")
                 .build();
         Location arts = Location.builder()
-                .department("Arts")
+                .department("FDU")
                 .classroom("102")
                 .build();
         entityManager.persist(science);
@@ -139,84 +138,83 @@ class DefaultGroupServiceTest {
     }
 
     @Test
-    void testSaveGroup() {
-        Group groupToSave = Group.builder()
-                .groupName("Mugiwaras")
+    void saveLocation() {
+        Location locationToSave = Location.builder()
+                .department("FCR")
+                .classroom("123")
                 .build();
 
-        groupService.saveGroup(groupToSave);
-        Group group = groupService.findGroupByName("Mugiwaras");
-        group.setId(null);
-        assertThat(groupToSave, is(group));
+        locationService.saveLocation(locationToSave);
+        Location location = locationService.findLocationByDepartmentAndClassroom("FCR", "123");
+        location.setId(null);
+        assertThat(locationToSave, is(location));
     }
 
     @Test
-    void findGroupById() {
-        Group groupByName = groupService.findGroupByName("Group A");
-        String groupId = groupByName.getId();
-        Group group = groupService.findGroupById(groupId);
-        group.setId(null);
-        Group groupA = Group.builder()
-                .groupName("Group A")
+    void findLocationById() {
+        Location locationByName = locationService.findLocationByDepartmentAndClassroom("ICS","101");
+        String locationId = locationByName.getId();
+        Location location = locationService.findLocationById(locationId);
+        location.setId(null);
+        Location locationA = Location.builder()
+                .department("ICS")
+                .classroom("101")
                 .build();
-        assertThat(group, is(groupA));
+        assertThat(location, is(locationA));
     }
 
     @Test
-    void assertThrowsExceptionIfGroupIsNotPresent(){
-        assertThrows(NoSuchElementException.class, () -> groupService.findGroupById("testId"));
+    void assertThrowsExceptionIfLocationIsNotPresent(){
+        assertThrows(NoSuchElementException.class, () -> locationService.findLocationById("testId"));
     }
 
     @Test
-    void findGroupByName() {
-        Group group = groupService.findGroupByName("Group A");
-        group.setId(null);
-        Group groupA = Group.builder()
-                .groupName("Group A")
+    void findLocationByDepartmentAndClassroom() {
+        Location location = locationService.findLocationByDepartmentAndClassroom("ICS", "101");
+        location.setId(null);
+        Location locationA = Location.builder()
+                .department("ICS")
+                .classroom("101")
                 .build();
-        assertThat(group, is(groupA));
+        assertThat(location, is(locationA));
     }
 
     @Test
-    void assertThrowsExceptionIfGroupIsNotPresentByName(){
-        assertThrows(NoSuchElementException.class, () -> groupService.findGroupByName("test"));
-    }
-
-    @Test
-    void updateGroup() {
-        Group group = groupService.findGroupByName("Group A");
-        String groupId = group.getId();
-        Group groupToUpdate = Group.builder()
-                .id(groupId)
-                .groupName("Update name")
-                .students(new ArrayList<>())
-                .studyClasses(new ArrayList<>())
+    void updateLocation() {
+        Location location = locationService.findLocationByDepartmentAndClassroom("ICS", "101");
+        String locationId = location.getId();
+        Location locationToUpdate = Location.builder()
+                .id(locationId)
+                .department("Update name")
+                .classroom("222")
                 .build();
-        groupService.updateGroup(groupToUpdate);
-        Group updatedGroup = groupService.findGroupByName("Update name");
-        assertThat(groupToUpdate, is(updatedGroup));
+        locationService.updateLocation(locationToUpdate);
+        Location updatedLocation = locationService.findLocationByDepartmentAndClassroom("Update name", "222");
+        assertThat(locationToUpdate, is(updatedLocation));
     }
 
     @Test
-    void deleteGroupById() {
-        String groupId = groupService.findGroupByName("Group A").getId();
-        groupService.deleteGroupById(groupId);
-        assertThrows(NoSuchElementException.class, () -> groupService.findGroupById(groupId));
+    void deleteLocationById() {
+        String locationId = locationService.findLocationByDepartmentAndClassroom("ICS", "101").getId();
+        locationService.deleteLocationById(locationId);
+        assertThrows(NoSuchElementException.class, () -> locationService.findLocationById(locationId));
     }
 
     @Test
-    void findAllGroupsWithPagination() {
-        Group groupA = Group.builder()
-                .groupName("Group A")
+    void findAllLocationsWithPagination() {
+        Location locationA = Location.builder()
+                .department("ICS")
+                .classroom("101")
                 .build();
-        Group groupB = Group.builder()
-                .groupName("Group B")
+        Location locationB = Location.builder()
+                .department("FDU")
+                .classroom("102")
                 .build();
 
-        List<Group> groups = Arrays.asList(groupA, groupB);
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(Integer.MAX_VALUE));
-        List<Group> groupsActual = groupService.findAllGroupsWithPagination(validatedParams);
-        groupsActual.forEach(course -> course.setId(null));
-        assertThat(groupsActual, is(groups));
+        List<Location> locations = Arrays.asList(locationA, locationB);
+        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
+        List<Location> locationsActual = locationService.findAllLocationsWithPagination(validatedParams);
+        locationsActual.forEach(course -> course.setId(null));
+        assertThat(locationsActual, is(locations));
     }
 }

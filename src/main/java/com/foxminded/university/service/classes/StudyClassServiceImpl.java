@@ -36,7 +36,6 @@ public class StudyClassServiceImpl implements StudyClassService {
     @Override
     @Transactional
     public void saveOnlineClass(OnlineClassDTO studyClass) {
-        log.debug("Adding new online class: startTime - {}, endTime - {}, courses - {}, group - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getGroup());
         studyClassRepository.save(onlineClassMapper.toEntity(studyClass));
         log.info("Saved online class: startTime - {}, endTime - {}, courses - {}, group - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getGroup());
     }
@@ -44,14 +43,12 @@ public class StudyClassServiceImpl implements StudyClassService {
     @Override
     @Transactional
     public void saveOfflineClass(OfflineClassDTO studyClass) {
-        log.debug("Adding new offline class: startTime - {}, endTime - {}, courses - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getGroup(), studyClass.getLocation());
         studyClassRepository.save(offlineClassMapper.toEntity(studyClass));
         log.info("Saved offline class: startTime - {}, endTime - {}, courses - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getGroup(), studyClass.getLocation());
     }
 
     @Override
     public StudyClass findClassById(String classId) {
-        log.debug("Searching for class with id {}", classId);
         Optional<StudyClass> studyClass = studyClassRepository.findById(classId);
         if (!studyClass.isPresent()) {
             log.error("StudyClass with id {} not found", classId);
@@ -63,8 +60,7 @@ public class StudyClassServiceImpl implements StudyClassService {
 
     @Override
     public void updateStudyClass(StudyClassDTO studyClassDTO, TeacherDTO teacher) {
-        log.debug("Updating new study class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}", studyClassDTO.getStartTime(), studyClassDTO.getEndTime(), studyClassDTO.getCourse(), teacher, studyClassDTO.getGroup());
-        StudyClass studyClass = studyClassMapper.fromStudyClassDtoToEntity(studyClassDTO);
+        StudyClass studyClass = studyClassMapper.toEntity(studyClassDTO);
         studyClass.setTeacher(teacherMapper.toEntity(teacher));
         studyClassRepository.save(studyClass);
         log.info("Updated study class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}", studyClassDTO.getStartTime(), studyClassDTO.getEndTime(), studyClassDTO.getCourse(), teacher, studyClassDTO.getGroup());
@@ -72,7 +68,6 @@ public class StudyClassServiceImpl implements StudyClassService {
 
     @Override
     public void deleteClassById(String classId) {
-        log.debug("Deleting class with id {}", classId);
         studyClassRepository.deleteById(classId);
         log.info("Deleted class with id - {}", classId);
     }
@@ -81,9 +76,15 @@ public class StudyClassServiceImpl implements StudyClassService {
     public List<StudyClass> findAllClassesWithPagination(RequestPage pageRequest) {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
-        log.debug("Searching for class with page size {} and pageSize {}", pageNumber, pageSize);
         Page<StudyClass> pageResult = studyClassRepository.findAll(PageRequest.of(pageNumber, pageSize));
-        log.info("Found {} classs", pageResult.getTotalPages());
+        log.info("Found {} classes", pageResult.getTotalPages());
         return pageResult.toList();
+    }
+
+    @Override
+    public List<StudyClass> findAllClasses() {
+        List<StudyClass> studyClasses = studyClassRepository.findAll();
+        log.info("Found {} classes", studyClasses.size());
+        return studyClasses;
     }
 }

@@ -1,5 +1,6 @@
 package com.foxminded.university.model.dtos.users;
 
+import com.foxminded.university.model.dtos.classes.StudyClassDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,5 +16,5 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class TeacherDTO extends UserDTO {
 
-    private List<String> studyClassesIds;
+    private List<StudyClassDTO> studyClasses;
 }
