@@ -23,7 +23,6 @@ public interface UserMapper {
     UserDTO toDto (User user);
 
     @InheritInverseConfiguration
-    //User toEntity (UserDTO userDTO);
 
     @BeanMapping(builder = @Builder(disableBuilder = true))
     @SubclassMapping(source = TeacherDTO.class, target = Teacher.class)

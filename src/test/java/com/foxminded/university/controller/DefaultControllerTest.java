@@ -24,4 +24,11 @@ class DefaultControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("index"));
     }
+
+    @Test
+    void testShowLoginPage() throws Exception{
+        mockMvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("login"));
+    }
 }

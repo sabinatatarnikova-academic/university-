@@ -33,20 +33,19 @@ class TeacherControllerTest {
     @MockBean
     private UserService userService;
 
-
     @Test
     void testShowTeacherList() throws Exception {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
-        Page<TeacherDTO> page = new PageImpl<>(Collections.singletonList(TeacherDTO.builder()
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        Page<TeacherDTO> pageDtoImpl = new PageImpl<>(Collections.singletonList(TeacherDTO.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .build()));
-        when(userService.findAllTeachersWithPagination(validatedParams)).thenReturn(page);
+        when(userService.findAllTeachersWithPagination(page)).thenReturn(pageDtoImpl);
 
-        mockMvc.perform(get("/teacher").param("page", "0").param("size", "10"))
+        mockMvc.perform(get("/teacher").param("pageDtoImpl", "0").param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("teacher"))
                 .andExpect(model().attributeExists("teacherPage"))
-                .andExpect(model().attribute("teacherPage", page));
+                .andExpect(model().attribute("teacherPage", pageDtoImpl));
     }
 }

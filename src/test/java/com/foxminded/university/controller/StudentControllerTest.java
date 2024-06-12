@@ -36,20 +36,20 @@ class StudentControllerTest {
 
     @Test
     void testShowStudentList() throws Exception {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
         Group groupA = Group.builder()
                 .groupName("Group A")
                 .build();
-        Page<StudentDTO> page = new PageImpl<>(Collections.singletonList(StudentDTO.builder()
+        Page<StudentDTO> pageDtoImpl = new PageImpl<>(Collections.singletonList(StudentDTO.builder()
                 .firstName("Charlie")
                 .lastName("Williams")
                 .build()));
-        when(userService.findAllStudentsWithPagination(validatedParams)).thenReturn(page);
+        when(userService.findAllStudentsWithPagination(page)).thenReturn(pageDtoImpl);
 
-        mockMvc.perform(get("/student").param("page", "0").param("size", "10"))
+        mockMvc.perform(get("/student").param("pageDtoImpl", "0").param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("student"))
                 .andExpect(model().attributeExists("studentPage"))
-                .andExpect(model().attribute("studentPage", page));
+                .andExpect(model().attribute("studentPage", pageDtoImpl));
     }
 }

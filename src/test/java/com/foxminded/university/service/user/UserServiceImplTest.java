@@ -185,8 +185,8 @@ class UserServiceImplTest {
                 .build();
 
         userService.saveUser(userToSave);
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(5));
-        List<UserDTO> users = userService.findAllUsersWithPagination(validatedParams).toList();
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(5));
+        List<UserDTO> users = userService.findAllUsersWithPagination(page).toList();
         UserDTO actualUser = users.get(4);
 
         assertEquals(userToSave.getFirstName(), actualUser.getFirstName());
@@ -197,8 +197,8 @@ class UserServiceImplTest {
 
     @Test
     void findUserById() {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
-        UserDTO user = userService.findAllUsersWithPagination(validatedParams).toList().get(3);
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
+        UserDTO user = userService.findAllUsersWithPagination(page).toList().get(3);
         String userId = user.getId();
         assertEquals(user, studentMapper.toDto((Student) userService.findUserById(userId)));
     }
@@ -210,8 +210,8 @@ class UserServiceImplTest {
 
     @Test
     void updateStudent() {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
-        UserDTO user = userService.findAllUsersWithPagination(validatedParams).toList().get(3);
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
+        UserDTO user = userService.findAllUsersWithPagination(page).toList().get(3);
         String userId = user.getId();
 
         UserFormDTO studentToSave = UserFormDTO.builder()
@@ -233,8 +233,8 @@ class UserServiceImplTest {
 
     @Test
     void updateTeacher() {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
-        UserDTO user = userService.findAllUsersWithPagination(validatedParams).toList().get(0);
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
+        UserDTO user = userService.findAllUsersWithPagination(page).toList().get(0);
         String userId = user.getId();
 
         StudyClassDTO onlineClassDTO = studyClassMapper.toDto(onlineClass);
@@ -259,8 +259,8 @@ class UserServiceImplTest {
 
     @Test
     void deleteUserById() {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
-        UserDTO user = userService.findAllUsersWithPagination(validatedParams).toList().get(0);
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
+        UserDTO user = userService.findAllUsersWithPagination(page).toList().get(0);
         String userId = user.getId();
 
         userService.deleteUserById(userId);
@@ -269,7 +269,7 @@ class UserServiceImplTest {
 
     @Test
     void findAllUsersWithPagination() {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
         TeacherDTO aliceDTO = TeacherDTO.builder()
                 .firstName("Alice")
                 .lastName("Smith")
@@ -283,7 +283,7 @@ class UserServiceImplTest {
                 .password(password)
                 .build();
         List<UserDTO> expectedUsers = Arrays.asList(aliceDTO, bobDTO);
-        List<UserDTO> actualUsers = userService.findAllUsersWithPagination(validatedParams).toList().subList(0, 2);
+        List<UserDTO> actualUsers = userService.findAllUsersWithPagination(page).toList().subList(0, 2);
         actualUsers.forEach(user -> {
             user.setId(null);
         });
@@ -292,7 +292,7 @@ class UserServiceImplTest {
     }
     @Test
     void findAllStudents() {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
 
         StudentDTO charlieDTO = StudentDTO.builder()
                 .firstName("Charlie")
@@ -310,7 +310,7 @@ class UserServiceImplTest {
                 .build();
 
         List<StudentDTO> expectedStudents = Arrays.asList(charlieDTO, dianaDTO);
-        Page<StudentDTO> actualStudents = userService.findAllStudentsWithPagination(validatedParams);
+        Page<StudentDTO> actualStudents = userService.findAllStudentsWithPagination(page);
         actualStudents.forEach(user -> {
             user.setId(null);
             user.getGroup().setId(null);
@@ -320,7 +320,7 @@ class UserServiceImplTest {
     }
     @Test
     void findAllTeachers() {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
 
         TeacherDTO aliceDTO = TeacherDTO.builder()
                 .firstName("Alice")
@@ -336,7 +336,7 @@ class UserServiceImplTest {
                 .build();
 
         List<TeacherDTO> expectedTeachers = Arrays.asList(aliceDTO, bobDTO);
-        Page<TeacherDTO> actualTeachers = userService.findAllTeachersWithPagination(validatedParams);
+        Page<TeacherDTO> actualTeachers = userService.findAllTeachersWithPagination(page);
         actualTeachers.forEach(user -> {
             user.setId(null);
         });

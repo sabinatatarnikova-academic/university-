@@ -214,8 +214,8 @@ class GroupServiceImplTest {
                 .build();
 
         List<Group> groups = Arrays.asList(groupA, groupB);
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(Integer.MAX_VALUE));
-        List<Group> groupsActual = groupService.findAllGroupsWithPagination(validatedParams);
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(Integer.MAX_VALUE));
+        List<Group> groupsActual = groupService.findAllGroupsWithPagination(page);
         groupsActual.forEach(course -> course.setId(null));
         assertThat(groupsActual, is(groups));
     }

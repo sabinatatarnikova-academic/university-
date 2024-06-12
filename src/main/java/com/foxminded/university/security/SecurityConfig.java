@@ -30,7 +30,11 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
-                .formLogin(withDefaults());
+                .formLogin((form -> form
+                        .loginPage("/login")
+                        .permitAll()
+                        .defaultSuccessUrl("/", true)
+                        .failureUrl("/login?error=true")));
 
         return http.build();
     }

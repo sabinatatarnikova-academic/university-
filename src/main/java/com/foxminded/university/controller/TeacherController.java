@@ -21,8 +21,8 @@ public class TeacherController {
 
     @GetMapping()
     public String showTeachersList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
-        RequestPage validatedParams = PageUtils.createPage(pageStr, sizeStr);
-        Page<TeacherDTO> teacherPage = userService.findAllTeachersWithPagination(validatedParams);
+        RequestPage page = PageUtils.createPage(pageStr, sizeStr);
+        Page<TeacherDTO> teacherPage = userService.findAllTeachersWithPagination(page);
         model.addAttribute("teacherPage", teacherPage);
         return "teacher";
     }

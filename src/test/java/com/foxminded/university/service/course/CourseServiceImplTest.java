@@ -207,8 +207,8 @@ class CourseServiceImplTest {
                 .build();
 
         List<Course> courses = Arrays.asList(courseA, courseB);
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
-        List<Course> coursesActual = courseService.findAllCoursesWithPagination(validatedParams);
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
+        List<Course> coursesActual = courseService.findAllCoursesWithPagination(page);
         coursesActual.forEach(course -> course.setId(null));
         assertThat(coursesActual, is(courses));
     }

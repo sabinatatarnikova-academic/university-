@@ -56,12 +56,12 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowAllUsersList() throws Exception {
-        Page<UserDTO> page = new PageImpl<>(Collections.singletonList(UserDTO.builder()
+        Page<UserDTO> pageDtoImpl = new PageImpl<>(Collections.singletonList(UserDTO.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .build()));
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
-        when(userService.findAllUsersWithPagination(validatedParams)).thenReturn(page);
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        when(userService.findAllUsersWithPagination(page)).thenReturn(pageDtoImpl);
 
         mockMvc.perform(get("/admin/users").param("page", "0").param("size", "10"))
                 .andExpect(status().isOk())
@@ -99,7 +99,7 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowEditUserForm() throws Exception {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
         String userId = "1";
         Student user = Student.builder()
                 .id(userId)

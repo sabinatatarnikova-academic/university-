@@ -185,8 +185,8 @@ class StudyClassServiceImplTest {
                 .build();
 
         studyClassService.saveOnlineClass(onlineClassToSave);
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(3));
-        List<StudyClass> classes = studyClassService.findAllClassesWithPagination(validatedParams);
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(3));
+        List<StudyClass> classes = studyClassService.findAllClassesWithPagination(page);
         OnlineClass actual = (OnlineClass) classes.get(2);
         assertEquals(onlineClassToSave.getUrl(), actual.getUrl());
         assertEquals(onlineClassToSave.getStartTime(), actual.getStartTime());
@@ -206,8 +206,8 @@ class StudyClassServiceImplTest {
                 .build();
 
         studyClassService.saveOfflineClass(offlineClassToSave);
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(3));
-        List<StudyClass> offlineClass = studyClassService.findAllClassesWithPagination(validatedParams);
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(3));
+        List<StudyClass> offlineClass = studyClassService.findAllClassesWithPagination(page);
         OfflineClass actual = (OfflineClass) offlineClass.get(2);
         assertEquals(ics, actual.getLocation());
         assertEquals(physics, actual.getCourse());
@@ -257,8 +257,8 @@ class StudyClassServiceImplTest {
 
     @Test
     void findClassById() {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(1));
-        StudyClass studyClass = studyClassService.findAllClassesWithPagination(validatedParams).get(0);
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(1));
+        StudyClass studyClass = studyClassService.findAllClassesWithPagination(page).get(0);
         String classId = studyClass.getId();
         assertEquals(studyClass, studyClassService.findClassById(classId));
     }
@@ -270,8 +270,8 @@ class StudyClassServiceImplTest {
 
     @Test
     void deleteClassById() {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
-        StudyClass studyClass = studyClassService.findAllClassesWithPagination(validatedParams).get(1);
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
+        StudyClass studyClass = studyClassService.findAllClassesWithPagination(page).get(1);
         String classId = studyClass.getId();
 
         studyClassService.deleteClassById(classId);
@@ -280,9 +280,9 @@ class StudyClassServiceImplTest {
 
     @Test
     void findAllClassesWithPagination() {
-        RequestPage validatedParams = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
         List<StudyClass> expectedClasses = Arrays.asList(onlineClass, offlineClass);
-        List<StudyClass> actualClasses = studyClassService.findAllClassesWithPagination(validatedParams);
+        List<StudyClass> actualClasses = studyClassService.findAllClassesWithPagination(page);
         actualClasses.forEach(studyClass -> studyClass.setId(null));
         assertEquals(expectedClasses, actualClasses);
     }

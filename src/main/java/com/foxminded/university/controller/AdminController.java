@@ -33,8 +33,8 @@ public class AdminController {
 
     @GetMapping
     public String showAllUsersList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
-        RequestPage validatedParams = PageUtils.createPage(pageStr, sizeStr);
-        Page<UserDTO> usersPage = userService.findAllUsersWithPagination(validatedParams);
+        RequestPage page = PageUtils.createPage(pageStr, sizeStr);
+        Page<UserDTO> usersPage = userService.findAllUsersWithPagination(page);
         model.addAttribute("usersPage", usersPage);
         return "admin";
     }
