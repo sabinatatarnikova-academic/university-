@@ -1,24 +1,33 @@
 package com.foxminded.university.service.user;
 
-import com.foxminded.university.model.users.User;
-import com.foxminded.university.model.users.dtos.StudentDTO;
-import com.foxminded.university.model.users.dtos.TeacherDTO;
+import com.foxminded.university.model.dtos.users.StudentDTO;
+import com.foxminded.university.model.dtos.users.TeacherDTO;
+import com.foxminded.university.model.dtos.users.UserDTO;
+import com.foxminded.university.model.dtos.users.UserFormDTO;
+import com.foxminded.university.model.entity.users.User;
+import com.foxminded.university.utils.RequestPage;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
 
 public interface UserService {
 
-    void saveStudent(StudentDTO studentDTO);
+    void saveUser(UserDTO userDTO);
 
-    void saveTeacher(TeacherDTO teacherDTO);
+    <U extends User> U findUserById(String userId);
 
-    User findUserById(String userId);
+    void updateStudent(UserFormDTO userFormDTO);
 
-    void updateStudent(StudentDTO studentDTO);
-
-    void updateTeacher(TeacherDTO teacherDTO);
+    void updateTeacher(UserFormDTO userFormDTO);
 
     void deleteUserById(String userId);
 
-    List<User> findAllUsersWithPagination(int pageNumber, int pageSize);
+    Page<UserDTO> findAllUsersWithPagination(RequestPage requestPage);
+
+    Page<StudentDTO> findAllStudentsWithPagination(RequestPage requestPage);
+
+    Page<TeacherDTO> findAllTeachersWithPagination(RequestPage requestPage);
+
+    Object getUser(User user);
+
+    void updateUser(UserFormDTO userFormDTO);
 }

@@ -1,10 +1,12 @@
 package com.foxminded.university.service.course;
 
-import com.foxminded.university.model.Course;
+import com.foxminded.university.model.entity.Course;
+import com.foxminded.university.utils.RequestPage;
 
 import java.util.List;
 
 public interface CourseService {
+
     void saveCourse(Course course);
 
     Course findCourseById(String courseId);
@@ -15,5 +17,5 @@ public interface CourseService {
 
     void deleteCourseById(String courseId);
 
-    List<Course> findAllCoursesWithPagination(int pageNumber, int pageSize);
+    List<Course> findAllCoursesWithPagination(RequestPage pageRequest);
 }

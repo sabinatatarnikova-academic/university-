@@ -1,6 +1,7 @@
 package com.foxminded.university.service.location;
 
-import com.foxminded.university.model.Location;
+import com.foxminded.university.model.entity.Location;
+import com.foxminded.university.utils.RequestPage;
 
 import java.util.List;
 
@@ -16,5 +17,5 @@ public interface LocationService {
 
     void deleteLocationById(String locationId);
 
-    List<Location> findAllLocationsWithPagination(int pageNumber, int pageSize);
+    List<Location> findAllLocationsWithPagination(RequestPage pageRequest);
 }

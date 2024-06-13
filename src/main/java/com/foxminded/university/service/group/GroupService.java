@@ -1,10 +1,12 @@
 package com.foxminded.university.service.group;
 
-import com.foxminded.university.model.Group;
+import com.foxminded.university.model.entity.Group;
+import com.foxminded.university.utils.RequestPage;
 
 import java.util.List;
 
 public interface GroupService {
+
     void saveGroup(Group group);
 
     Group findGroupById(String groupId);
@@ -15,5 +17,7 @@ public interface GroupService {
 
     void deleteGroupById(String groupId);
 
-    List<Group> findAllGroupsWithPagination(int pageNumber, int pageSize);
+    List<Group> findAllGroupsWithPagination(RequestPage pageRequest);
+
+    List<Group> findAllGroups();
 }

@@ -1,9 +1,20 @@
 spring:
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
   datasource:
     url: jdbc:postgresql://localhost:5432/university
     username: university_user
     password: password
     driver-class-name: org.postgresql.Driver
+  application:
+    name: Bootstrap Spring Boot
+  thymeleaf:
+    cache: false
+    enabled: true
+    prefix: classpath:/templates/
+    suffix: .html
   jpa:
     database-platform:
       - profile: "postgres"
@@ -11,9 +22,13 @@ spring:
       - profile: "default"
         value: "org.hibernate.dialect.H2Dialect"
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     show-sql: true
   flyway:
     baseline-on-migrate: true
     enabled: true
     locations: classpath:db/migration
+app:
+  pagination:
+    default-page: 0
+    default-size: 10
