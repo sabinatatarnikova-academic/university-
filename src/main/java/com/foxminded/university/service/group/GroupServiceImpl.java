@@ -23,7 +23,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void saveGroup(Group group) {
         groupRepository.save(group);
-        log.info("Saved group with name - {}, classes - {}", group.getGroupName(), group.getStudyClasses());
+        log.info("Saved group with name - {}, classes - {}", group.getName(), group.getStudyClasses());
     }
 
     @Override
@@ -39,7 +39,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group findGroupByName(String groupName) {
-        Optional <Group> group = groupRepository.findGroupByGroupName(groupName);
+        Optional<Group> group = groupRepository.findGroupByName(groupName);
         if (!group.isPresent()) {
             log.error("Course with name {} not found", groupName);
             throw new NoSuchElementException();
@@ -51,7 +51,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void updateGroup(Group group) {
         groupRepository.save(group);
-        log.info("Updated group with id - {}, name - {}", group.getId(), group.getGroupName());
+        log.info("Updated group with id - {}, name - {}", group.getId(), group.getName());
     }
 
     @Override
@@ -75,6 +75,4 @@ public class GroupServiceImpl implements GroupService {
         log.info("Found {} groups", groups.size());
         return groups;
     }
-
-
 }

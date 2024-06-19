@@ -23,17 +23,20 @@
             <td th:text="${student.id}"></td>
             <td th:text="${student.firstName}"></td>
             <td th:text="${student.lastName}"></td>
-            <td th:text="${student.group != null ? student.group.groupName : 'No Group'}"></td>
+            <td th:text="${student.group != null ? student.group.getName : 'No Group'}"></td>
         </tr>
         </tbody>
     </table>
     <div>
         <ul>
             <li class="page-item" th:each="i : ${#numbers.sequence(0, studentPage.totalPages - 1)}">
-                <a class="page-link" th:href="@{/student(page=${i}, size=${studentPage.size})}" th:text="${i + 1}"></a>
+                <a class="page-link" th:href="@{/templates/student(page=${i}, size=${studentPage.size})}"
+                   th:text="${i + 1}"></a>
             </li>
         </ul>
     </div>
 </div>
+
+<a class="btn btn-primary" href="student/courses">COURSES</a>
 </body>
 </html>

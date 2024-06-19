@@ -1,6 +1,6 @@
 package com.foxminded.university.service.user;
 
-import com.foxminded.university.model.dtos.users.UserFormDTO;
+import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.repository.StudyClassRepository;
@@ -48,7 +48,7 @@ public class UserServiceImlMockTest {
 
     @Test
     void testUpdateUser() {
-        UserFormDTO student = UserFormDTO.builder()
+        UserFormRequest student = UserFormRequest.builder()
                 .firstName("Police")
                 .lastName("Smith")
                 .userType("STUDENT")
@@ -57,10 +57,10 @@ public class UserServiceImlMockTest {
         Student studentToReturn = Student.builder()
                 .firstName("Police")
                 .lastName("Smith")
-                .group(Group.builder().groupName("group").build())
+                .group(Group.builder().name("group").build())
                 .build();
 
-        when(studentMapper.toEntity(any(UserFormDTO.class))).thenReturn(studentToReturn);
+        when(studentMapper.toEntity(any(UserFormRequest.class))).thenReturn(studentToReturn);
         userService.updateUser(student);
 
         verify(userService, times(1)).updateStudent(student);

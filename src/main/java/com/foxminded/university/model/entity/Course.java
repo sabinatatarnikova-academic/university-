@@ -32,7 +32,7 @@ public class Course {
     @Column(name = "course_name")
     private String name;
 
-    @OneToMany (mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "course", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<StudyClass> studyClasses;
 
     public Course(String courseName, List<StudyClass> studyClass) {

@@ -29,7 +29,7 @@
         <div class="mb-3" th:if="${user.userType} == 'STUDENT'">
             <label class="form-label" for="group">Group (only for students)</label>
             <select class="form-select" id="group" th:field="*{group.id}">
-                <option th:each="group : ${groups}" th:text="${group.getGroupName()}" th:value="${group.id}"></option>
+                <option th:each="group : ${groups}" th:text="${group.getName()}" th:value="${group.id}"></option>
                 <option th:value="null">None (only for teacher)</option>
             </select>
         </div>
@@ -45,7 +45,7 @@
             <label class="form-label" for="studyClasses">Study classes (only for teachers)</label>
             <select class="form-select" id="studyClasses" multiple th:field="*{studyClasses}">
                 <option th:each="studyClass : ${allStudyClasses}"
-                        th:text="${studyClass.course.name + '; Start time:' + studyClass.getStartTime() + '; End time:' + studyClass.getEndTime() + '; Group: ' + studyClass.getGroup().getGroupName()}"
+                        th:text="${studyClass.classType + ': ' + studyClass.courseName + '; Start time:' + studyClass.getStartTime() + '; End time:' + studyClass.getEndTime() + '; Group: ' + studyClass.groupName}"
                         th:value="${studyClass.id}"></option>
                 <option th:value="null">None (only for student)</option>
             </select>

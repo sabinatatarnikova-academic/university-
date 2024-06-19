@@ -1,5 +1,6 @@
 package com.foxminded.university.service.location;
 
+import com.foxminded.university.model.dtos.request.LocationDTO;
 import com.foxminded.university.model.entity.Location;
 import com.foxminded.university.utils.RequestPage;
 
@@ -18,4 +19,6 @@ public interface LocationService {
     void deleteLocationById(String locationId);
 
     List<Location> findAllLocationsWithPagination(RequestPage pageRequest);
+
+    List<LocationDTO> findAllLocations();
 }

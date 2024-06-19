@@ -1,6 +1,6 @@
 package com.foxminded.university.utils.mappers;
 
-import com.foxminded.university.model.dtos.LocationDTO;
+import com.foxminded.university.model.dtos.request.LocationDTO;
 import com.foxminded.university.model.entity.Location;
 import com.foxminded.university.utils.mappers.classes.OfflineClassMapper;
 import org.mapstruct.InheritInverseConfiguration;

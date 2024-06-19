@@ -1,6 +1,6 @@
-package com.foxminded.university.model.dtos.classes;
+package com.foxminded.university.model.dtos.response.classes;
 
-import com.foxminded.university.model.dtos.LocationDTO;
+import com.foxminded.university.model.dtos.request.LocationDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class OfflineClassDTO extends StudyClassDTO {
+public class OfflineClassResponse extends StudyClassResponse {
 
     private LocationDTO location;
 }

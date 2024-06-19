@@ -54,10 +54,10 @@ class GroupServiceImplTest {
         String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
 
         Group groupA = Group.builder()
-                .groupName("Group A")
+                .name("Group A")
                 .build();
         Group groupB = Group.builder()
-                .groupName("Group B")
+                .name("Group B")
                 .build();
         entityManager.persist(groupA);
         entityManager.persist(groupB);
@@ -141,7 +141,7 @@ class GroupServiceImplTest {
     @Test
     void testSaveGroup() {
         Group groupToSave = Group.builder()
-                .groupName("Mugiwaras")
+                .name("Mugiwaras")
                 .build();
 
         groupService.saveGroup(groupToSave);
@@ -157,7 +157,7 @@ class GroupServiceImplTest {
         Group group = groupService.findGroupById(groupId);
         group.setId(null);
         Group groupA = Group.builder()
-                .groupName("Group A")
+                .name("Group A")
                 .build();
         assertThat(group, is(groupA));
     }
@@ -172,7 +172,7 @@ class GroupServiceImplTest {
         Group group = groupService.findGroupByName("Group A");
         group.setId(null);
         Group groupA = Group.builder()
-                .groupName("Group A")
+                .name("Group A")
                 .build();
         assertThat(group, is(groupA));
     }
@@ -188,7 +188,7 @@ class GroupServiceImplTest {
         String groupId = group.getId();
         Group groupToUpdate = Group.builder()
                 .id(groupId)
-                .groupName("Update name")
+                .name("Update name")
                 .students(new ArrayList<>())
                 .studyClasses(new ArrayList<>())
                 .build();
@@ -207,10 +207,10 @@ class GroupServiceImplTest {
     @Test
     void findAllGroupsWithPagination() {
         Group groupA = Group.builder()
-                .groupName("Group A")
+                .name("Group A")
                 .build();
         Group groupB = Group.builder()
-                .groupName("Group B")
+                .name("Group B")
                 .build();
 
         List<Group> groups = Arrays.asList(groupA, groupB);
@@ -223,10 +223,10 @@ class GroupServiceImplTest {
     @Test
     void findAllGroups() {
         Group groupA = Group.builder()
-                .groupName("Group A")
+                .name("Group A")
                 .build();
         Group groupB = Group.builder()
-                .groupName("Group B")
+                .name("Group B")
                 .build();
 
         List<Group> groups = Arrays.asList(groupA, groupB);

@@ -1,4 +1,4 @@
-package com.foxminded.university.model.dtos;
+package com.foxminded.university.model.dtos.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +12,5 @@ import lombok.NoArgsConstructor;
 public class GroupDTO {
 
     private String id;
-
-    private String groupName;
+    private String name;
 }

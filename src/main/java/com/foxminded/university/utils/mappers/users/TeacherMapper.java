@@ -1,8 +1,8 @@
 package com.foxminded.university.utils.mappers.users;
 
-import com.foxminded.university.model.dtos.users.TeacherDTO;
-import com.foxminded.university.model.dtos.users.UserDTO;
-import com.foxminded.university.model.dtos.users.UserFormDTO;
+import com.foxminded.university.model.dtos.request.users.UserFormRequest;
+import com.foxminded.university.model.dtos.response.users.TeacherResponse;
+import com.foxminded.university.model.dtos.response.users.UserResponse;
 import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
@@ -20,17 +20,17 @@ import java.util.stream.Collectors;
 public interface TeacherMapper {
 
     @Mapping(target = "studyClasses", source = "studyClasses")
-    TeacherDTO toDto (Teacher teacher);
+    TeacherResponse toDto(Teacher teacher);
 
-    TeacherDTO toDto (UserDTO userDTO);
+    TeacherResponse toDto(UserResponse userResponse);
 
     @InheritInverseConfiguration
-    Teacher toEntity (TeacherDTO teacherDTO);
+    Teacher toEntity(TeacherResponse teacherResponse);
 
-    Teacher toEntity(UserDTO userDTO);
+    Teacher toEntity(UserResponse userResponse);
 
     @Mapping(target = "studyClasses", source = "studyClasses", qualifiedByName = "mapStudyClasses")
-    Teacher toEntity(UserFormDTO teacherDTO);
+    Teacher toEntity(UserFormRequest teacherDTO);
 
     @Named("mapStudyClasses")
     default List<StudyClass> mapStudyClasses(List<String> studyClassIds) {

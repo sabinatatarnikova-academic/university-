@@ -1,26 +1,37 @@
 package com.foxminded.university.service.classes;
 
-import com.foxminded.university.model.dtos.classes.OfflineClassDTO;
-import com.foxminded.university.model.dtos.classes.OnlineClassDTO;
-import com.foxminded.university.model.dtos.classes.StudyClassDTO;
-import com.foxminded.university.model.dtos.users.TeacherDTO;
+import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
+import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
+import com.foxminded.university.model.entity.Course;
+import com.foxminded.university.model.entity.Group;
+import com.foxminded.university.model.entity.Location;
+import com.foxminded.university.model.entity.classes.OfflineClass;
+import com.foxminded.university.model.entity.classes.OnlineClass;
 import com.foxminded.university.model.entity.classes.StudyClass;
+import com.foxminded.university.model.entity.users.Teacher;
+import com.foxminded.university.model.entity.users.User;
+import com.foxminded.university.repository.CourseRepository;
 import com.foxminded.university.repository.StudyClassRepository;
+import com.foxminded.university.service.group.GroupService;
+import com.foxminded.university.service.location.LocationService;
+import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.RequestPage;
 import com.foxminded.university.utils.mappers.classes.OfflineClassMapper;
 import com.foxminded.university.utils.mappers.classes.OnlineClassMapper;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
-import com.foxminded.university.utils.mappers.users.TeacherMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,20 +42,20 @@ public class StudyClassServiceImpl implements StudyClassService {
     private final OfflineClassMapper offlineClassMapper;
     private final OnlineClassMapper onlineClassMapper;
     private final StudyClassMapper studyClassMapper;
-    private final TeacherMapper teacherMapper;
+    private final GroupService groupService;
+    private final UserService userService;
+    private final LocationService locationService;
+    private final CourseRepository courseRepository;
 
     @Override
-    @Transactional
-    public void saveOnlineClass(OnlineClassDTO studyClass) {
-        studyClassRepository.save(onlineClassMapper.toEntity(studyClass));
-        log.info("Saved online class: startTime - {}, endTime - {}, courses - {}, group - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getGroup());
-    }
-
-    @Override
-    @Transactional
-    public void saveOfflineClass(OfflineClassDTO studyClass) {
-        studyClassRepository.save(offlineClassMapper.toEntity(studyClass));
-        log.info("Saved offline class: startTime - {}, endTime - {}, courses - {}, group - {}, location - {}", studyClass.getStartTime(), studyClass.getEndTime(), studyClass.getCourse(), studyClass.getGroup(), studyClass.getLocation());
+    public void saveStudyClass(StudyClassResponse studyClassResponse) {
+        if (studyClassResponse.getClassType().equals("ONLINE")) {
+            OnlineClass onlineClass = onlineClassMapper.toEntity(studyClassResponse);
+            studyClassRepository.save(onlineClass);
+        } else {
+            OfflineClass offlineClass = offlineClassMapper.toEntity(studyClassResponse);
+            studyClassRepository.save(offlineClass);
+        }
     }
 
     @Override
@@ -59,11 +70,36 @@ public class StudyClassServiceImpl implements StudyClassService {
     }
 
     @Override
-    public void updateStudyClass(StudyClassDTO studyClassDTO, TeacherDTO teacher) {
-        StudyClass studyClass = studyClassMapper.toEntity(studyClassDTO);
-        studyClass.setTeacher(teacherMapper.toEntity(teacher));
+    @Transactional
+    public void updateStudyClass(StudyClassRequest studyClassRequest) {
+        StudyClass studyClass = findClassById(studyClassRequest.getId());
+        studyClass.setStartTime(studyClassRequest.getStartTime());
+        studyClass.setEndTime(studyClassRequest.getEndTime());
+        User teacher = userService.findUserById(studyClassRequest.getTeacherId());
+        studyClass.setTeacher((Teacher) teacher);
+        Optional<Course> course = courseRepository.findById(studyClassRequest.getCourseId());
+        if (course.isPresent()) {
+            studyClass.setCourse(course.get());
+        } else {
+            log.warn("Course not found");
+        }
+        Group group = groupService.findGroupById(studyClassRequest.getGroupId());
+        studyClass.setGroup(group);
+
+        if (studyClass instanceof OnlineClass) {
+            ((OnlineClass) studyClass).setUrl(studyClassRequest.getUrl());
+        } else {
+            Location location = locationService.findLocationById(studyClassRequest.getLocation());
+            ((OfflineClass) studyClass).setLocation(location);
+        }
         studyClassRepository.save(studyClass);
-        log.info("Updated study class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}", studyClassDTO.getStartTime(), studyClassDTO.getEndTime(), studyClassDTO.getCourse(), teacher, studyClassDTO.getGroup());
+        log.info("Updated study class: startTime - {}, endTime - {}, courses - {}, teacher - {}, group - {}", studyClass.getStartTime(), studyClass.getEndTime(), course.get().getName(), teacher.getId(), group.getName());
+    }
+
+    @Override
+    public void updateStudyClass(StudyClass studyClass) {
+        studyClassRepository.save(studyClass);
+        log.info("Updated study class: id - {}", studyClass.getId());
     }
 
     @Override
@@ -73,18 +109,21 @@ public class StudyClassServiceImpl implements StudyClassService {
     }
 
     @Override
-    public List<StudyClass> findAllClassesWithPagination(RequestPage pageRequest) {
+    public Page<StudyClassResponse> findAllClassesWithPagination(RequestPage pageRequest) {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
-        Page<StudyClass> pageResult = studyClassRepository.findAll(PageRequest.of(pageNumber, pageSize));
-        log.info("Found {} classes", pageResult.getTotalPages());
-        return pageResult.toList();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        List<StudyClass> studyClasses = studyClassRepository.findAll();
+        List<StudyClassResponse> studyClassResponses = studyClasses.stream().map(studyClassMapper::toDto).collect(Collectors.toList());
+        log.info("Found {} classes", studyClassResponses.size());
+        return new PageImpl<>(studyClassResponses, pageable, studyClassResponses.size());
     }
 
     @Override
-    public List<StudyClass> findAllClasses() {
+    public List<StudyClassResponse> findAllClasses() {
         List<StudyClass> studyClasses = studyClassRepository.findAll();
         log.info("Found {} classes", studyClasses.size());
-        return studyClasses;
+        List<StudyClassResponse> studyClassResponses = studyClasses.stream().map(studyClassMapper::toDto).collect(Collectors.toList());
+        return studyClassResponses;
     }
 }
