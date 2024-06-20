@@ -46,7 +46,7 @@ public class AdminController {
     private LocationService locationService;
 
     @GetMapping()
-    public String usersCoursesDecision() {
+    public String showUserCoursesClassesButtons() {
         return "admin/admin";
     }
 
