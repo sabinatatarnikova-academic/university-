@@ -9,4 +9,6 @@ import org.springframework.context.annotation.ComponentScan;
         "com.foxminded.university.utils",
         "com.foxminded.university.security"
 })
-public class TestConfig {}
+public class TestConfig {
+
+}

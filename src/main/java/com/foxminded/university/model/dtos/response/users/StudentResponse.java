@@ -1,6 +1,6 @@
-package com.foxminded.university.model.dtos.users;
+package com.foxminded.university.model.dtos.response.users;
 
-import com.foxminded.university.model.dtos.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class StudentDTO extends UserDTO {
+public class StudentResponse extends UserResponse {
 
     private GroupDTO group;
 }

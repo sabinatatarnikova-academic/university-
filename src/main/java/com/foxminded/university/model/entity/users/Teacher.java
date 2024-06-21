@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
@@ -16,12 +17,13 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @DiscriminatorValue("TEACHER")
+@ToString(exclude = {"studyClasses"})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
 public class Teacher extends User {
 
-    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "teacher", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<StudyClass> studyClasses;
 }

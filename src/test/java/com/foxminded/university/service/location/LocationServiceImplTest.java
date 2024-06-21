@@ -53,10 +53,10 @@ class LocationServiceImplTest {
         String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
 
         Group groupA = Group.builder()
-                .groupName("Group A")
+                .name("Group A")
                 .build();
         Group groupB = Group.builder()
-                .groupName("Group B")
+                .name("Group B")
                 .build();
         entityManager.persist(groupA);
         entityManager.persist(groupB);

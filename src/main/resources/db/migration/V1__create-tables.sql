@@ -10,7 +10,7 @@ CREATE TABLE users (
                        first_name VARCHAR(50),
                        last_name VARCHAR(50),
                        user_type VARCHAR(255),
-                       group_id     VARCHAR(255) REFERENCES groups (group_id), -- Only relevant for students
+                       group_id VARCHAR(255) REFERENCES groups (group_id) ON DELETE SET NULL, -- Only relevant for students
                        username     VARCHAR(255),
                        password     VARCHAR(255)
 );
@@ -26,9 +26,9 @@ CREATE TABLE classes (
                          class_id VARCHAR(255) PRIMARY KEY,
                          start_time TIMESTAMP,
                          end_time TIMESTAMP,
-                         course_id VARCHAR(255) REFERENCES courses (course_id),
-                         user_id VARCHAR(255) REFERENCES users (user_id),
-                         group_id VARCHAR(255) REFERENCES groups (group_id),
+                         course_id VARCHAR(255) REFERENCES courses (course_id) ON DELETE SET NULL,
+                         user_id   VARCHAR(255) REFERENCES users (user_id) ON DELETE SET NULL,
+                         group_id  VARCHAR(255) REFERENCES groups (group_id) ON DELETE SET NULL,
                          class_type VARCHAR(255),
                          url VARCHAR(255), -- Only relevant for online classes
                          location_id VARCHAR(255) -- Only relevant for offline classes
@@ -45,19 +45,19 @@ CREATE TABLE locations (
 ALTER TABLE classes
     ADD CONSTRAINT fk_course
         FOREIGN KEY (course_id)
-            REFERENCES courses (course_id);
+            REFERENCES courses (course_id) ON DELETE SET NULL;
 
 ALTER TABLE classes
     ADD CONSTRAINT fk_user
         FOREIGN KEY (user_id)
-            REFERENCES users (user_id);
+            REFERENCES users (user_id) ON DELETE SET NULL;
 
 ALTER TABLE classes
     ADD CONSTRAINT fk_group
         FOREIGN KEY (group_id)
-            REFERENCES groups (group_id);
+            REFERENCES groups (group_id) ON DELETE SET NULL;
 
 ALTER TABLE classes
     ADD CONSTRAINT fk_location
         FOREIGN KEY (location_id)
-            REFERENCES locations (location_id);
+            REFERENCES locations (location_id) ON DELETE SET NULL;

@@ -35,7 +35,7 @@ public class Location {
     @Column(name = "classroom", length = 50)
     private String classroom;
 
-    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "location", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<OfflineClass> studyClass;
 
     public Location(String department, String classroom, List<OfflineClass> classes) {

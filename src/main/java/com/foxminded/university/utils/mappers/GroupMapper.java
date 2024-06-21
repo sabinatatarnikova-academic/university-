@@ -1,6 +1,6 @@
 package com.foxminded.university.utils.mappers;
 
-import com.foxminded.university.model.dtos.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupDTO;
 import com.foxminded.university.model.entity.Group;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;

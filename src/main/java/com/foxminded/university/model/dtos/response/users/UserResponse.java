@@ -1,4 +1,4 @@
-package com.foxminded.university.model.dtos.users;
+package com.foxminded.university.model.dtos.response.users;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class UserDTO {
+public class UserResponse {
 
     private String id;
 

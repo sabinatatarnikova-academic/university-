@@ -25,8 +25,8 @@
             <td th:text="${teacher.lastName}"></td>
             <td>
                 <ul>
-                    <li th:each="studyClass : ${teacher.getStudyClasses()}">
-                        <span th:text="${studyClass.course.name + ' - ' + studyClass.startTime + ' to ' + studyClass.endTime}"></span>
+                    <li th:each="studyClass : ${teacher.studyClasses}">
+                        <span th:text="${studyClass.classType + ': '+ studyClass.courseName + ' - ' + studyClass.startTime + ' to ' + studyClass.endTime + ' ' + studyClass.groupName + ' '}"></span>
                     </li>
                 </ul>
             </td>
@@ -36,10 +36,12 @@
     <div>
         <ul>
             <li class="page-item" th:each="i : ${#numbers.sequence(0, teacherPage.totalPages - 1)}">
-                <a class="page-link" th:href="@{/teacher(page=${i}, size=${teacherPage.size})}" th:text="${i + 1}"></a>
+                <a class="page-link" th:href="@{/templates/teacher(page=${i}, size=${teacherPage.size})}"
+                   th:text="${i + 1}"></a>
             </li>
         </ul>
     </div>
+    <a class="btn btn-primary" href="teacher/courses">COURSES</a>
 </div>
 </body>
 </html>

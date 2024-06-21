@@ -33,16 +33,16 @@ public class Group {
     private String id;
 
     @Column(name = "group_name")
-    private String groupName;
+    private String name;
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Student> students;
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<StudyClass> studyClasses;
 
-    public Group(String groupName, List<Student> students, List<StudyClass> classes) {
-        this.groupName = groupName;
+    public Group(String name, List<Student> students, List<StudyClass> classes) {
+        this.name = name;
         this.students = students;
         this.studyClasses = classes;
     }

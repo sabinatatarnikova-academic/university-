@@ -1,6 +1,6 @@
-package com.foxminded.university.model.dtos.users;
+package com.foxminded.university.model.dtos.request.users;
 
-import com.foxminded.university.model.dtos.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,22 +12,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserFormDTO {
+public class UserFormRequest {
 
     private String id;
-
     private String firstName;
-
     private String lastName;
-
     private String username;
-
     private String password;
-
     private String userType;
-
     private GroupDTO group;
-
     private List<String> studyClasses;
 }
 
