@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("student")
 public class StudentController {
 
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping()
     public String showStudentsList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {

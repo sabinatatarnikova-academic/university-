@@ -1,9 +1,11 @@
 package com.foxminded.university.controller;
 
 import com.foxminded.university.model.dtos.request.CourseRequest;
+import com.foxminded.university.model.dtos.request.classes.CreateStudyClassRequest;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.users.UserResponse;
 import com.foxminded.university.model.entity.Course;
@@ -36,14 +38,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private UserService userService;
-    private UserMapper userMapper;
-    private GroupService groupService;
-    private StudyClassService studyClassService;
-    private StudyClassMapper studyClassMapper;
-    private CourseService courseService;
-    private CourseMapper courseMapper;
-    private LocationService locationService;
+    private final UserService userService;
+    private final UserMapper userMapper;
+    private final GroupService groupService;
+    private final StudyClassService studyClassService;
+    private final StudyClassMapper studyClassMapper;
+    private final CourseService courseService;
+    private final CourseMapper courseMapper;
+    private final LocationService locationService;
 
     @GetMapping()
     public String usersCoursesDecision() {
@@ -141,12 +143,12 @@ public class AdminController {
 
     @GetMapping("/classes/new")
     public String showAddStudyClassForm(Model model) {
-        model.addAttribute("class", new StudyClassRequest());
+        model.addAttribute("class", new CreateStudyClassRequest());
         return "admin/studyClass/add_class";
     }
 
     @PostMapping("/classes/new")
-    public String addClass(@ModelAttribute StudyClassResponse studyClass) {
+    public String addClass(@ModelAttribute CreateStudyClassResponse studyClass) {
         studyClassService.saveStudyClass(studyClass);
         return "redirect:/admin/classes";
     }

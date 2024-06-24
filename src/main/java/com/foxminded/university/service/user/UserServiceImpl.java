@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
             Teacher teacher = teacherMapper.toEntity(userResponse);
             userRepository.save(teacher);
         }
-        log.debug("Saved user: firstName - {}, lastName - {}, type - {}", userResponse.getFirstName(), userResponse.getLastName(), userResponse.getUserType());
+        log.debug("Saved user: type - {}", userResponse.getUserType());
     }
 
     @Override
@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
         userFormRequest.setPassword(passwordEncoder.encode(userFormRequest.getPassword()));
         Student student = studentMapper.toEntity(userFormRequest);
         userRepository.save(student);
-        log.info("Updated student info: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroup());
+        log.info("Updated student with id - {}", student.getId());
     }
 
     @Override
@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
                         .collect(Collectors.toList())
         );
         userRepository.save(teacher);
-        log.info("Updated teacher info: firstName - {}, lastName - {}", teacher.getFirstName(), teacher.getLastName());
+        log.info("Updated teacher info: id - {}", teacher.getId());
     }
 
     private StudyClass assignTeacherToClass(String teacherId, String classId) {
@@ -112,6 +112,7 @@ public class UserServiceImpl implements UserService {
         StudyClass studyClass = studyClassOptional.get();
         studyClass.setTeacher((Teacher) teacher);
         studyClassRepository.save(studyClass);
+        log.debug("Teacher was assigned to class");
         return studyClass;
     }
 
@@ -168,10 +169,10 @@ public class UserServiceImpl implements UserService {
     public void updateUser(UserFormRequest userFormRequest) {
         if (userFormRequest.getUserType().equalsIgnoreCase("STUDENT")) {
             updateStudent(userFormRequest);
-            log.info("Student was updated.");
+            log.info("Student with id {} was updated.", userFormRequest.getId());
         } else if (userFormRequest.getUserType().equalsIgnoreCase("TEACHER")) {
             updateTeacher(userFormRequest);
-            log.info("Student was updated.");
+            log.info("Teacher with id {} was updated.", userFormRequest.getId());
         }
     }
 
@@ -191,6 +192,7 @@ public class UserServiceImpl implements UserService {
                 }).collect(Collectors.toList());
         int classesCount = courses.size();
 
+        log.info("Count of courses that assigned to student - {} is {}", student.getId(), classesCount);
         return new PageImpl<>(courses, pageable, classesCount);
     }
 }

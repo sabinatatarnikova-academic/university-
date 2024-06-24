@@ -1,6 +1,7 @@
 package com.foxminded.university.service.classes;
 
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
+import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
@@ -48,13 +49,15 @@ public class StudyClassServiceImpl implements StudyClassService {
     private final CourseRepository courseRepository;
 
     @Override
-    public void saveStudyClass(StudyClassResponse studyClassResponse) {
-        if (studyClassResponse.getClassType().equals("ONLINE")) {
+    public void saveStudyClass(CreateStudyClassResponse studyClassResponse) {
+        if ("ONLINE".equals(studyClassResponse.getClassType())) {
             OnlineClass onlineClass = onlineClassMapper.toEntity(studyClassResponse);
             studyClassRepository.save(onlineClass);
+            log.info("Oline class was saved.");
         } else {
             OfflineClass offlineClass = offlineClassMapper.toEntity(studyClassResponse);
             studyClassRepository.save(offlineClass);
+            log.info("Offline class was saved.");
         }
     }
 

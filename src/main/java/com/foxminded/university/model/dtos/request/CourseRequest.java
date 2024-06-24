@@ -17,5 +17,3 @@ public class CourseRequest {
     private String name;
     private List<String> studyClasses;
 }
-
-

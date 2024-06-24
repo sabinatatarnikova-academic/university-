@@ -2,6 +2,7 @@ package com.foxminded.university.service.studyClasses;
 
 import com.foxminded.university.config.TestConfig;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
+import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.OfflineClassResponse;
 import com.foxminded.university.model.dtos.response.classes.OnlineClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
@@ -184,7 +185,7 @@ class StudyClassServiceImplTest {
 
     @Test
     void testSaveOnlineStudyClass() {
-        StudyClassResponse studyClass = OnlineClassResponse.builder()
+        CreateStudyClassResponse studyClass = CreateStudyClassResponse.builder()
                 .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
                 .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
                 .classType("ONLINE")
@@ -194,12 +195,14 @@ class StudyClassServiceImplTest {
         List<StudyClassResponse> classes = studyClassService.findAllClasses();
         StudyClassResponse actual = classes.get(2);
         actual.setId(null);
-        assertEquals(studyClass, actual);
+        assertEquals(studyClass.getStartTime(), actual.getStartTime());
+        assertEquals(studyClass.getEndTime(), actual.getEndTime());
+        assertEquals(studyClass.getClassType(), actual.getClassType());
     }
 
     @Test
     void testSaveOfflineStudyClass() {
-        StudyClassResponse studyClass = OfflineClassResponse.builder()
+        CreateStudyClassResponse studyClass = CreateStudyClassResponse.builder()
                 .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
                 .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
                 .classType("OFFLINE")
@@ -209,7 +212,9 @@ class StudyClassServiceImplTest {
         List<StudyClassResponse> classes = studyClassService.findAllClasses();
         StudyClassResponse actual = classes.get(2);
         actual.setId(null);
-        assertEquals(studyClass, actual);
+        assertEquals(studyClass.getStartTime(), actual.getStartTime());
+        assertEquals(studyClass.getEndTime(), actual.getEndTime());
+        assertEquals(studyClass.getClassType(), actual.getClassType());
     }
 
     @Test

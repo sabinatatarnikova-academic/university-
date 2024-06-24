@@ -2,6 +2,7 @@ package com.foxminded.university.controller;
 
 import com.foxminded.university.config.AdminControllerConfig;
 import com.foxminded.university.config.TestSecurityConfig;
+import com.foxminded.university.model.dtos.request.classes.CreateStudyClassRequest;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.classes.OnlineClassResponse;
@@ -299,7 +300,7 @@ class AdminControllerTest {
     void testShowAddStudyClassForm() throws Exception {
         mockMvc.perform(get("/admin/classes/new"))
                 .andExpect(model().attributeExists("class"))
-                .andExpect(model().attribute("class", new StudyClassRequest()))
+                .andExpect(model().attribute("class", new CreateStudyClassRequest()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/studyClass/add_class"));
     }

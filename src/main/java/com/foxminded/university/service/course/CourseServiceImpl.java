@@ -43,7 +43,7 @@ public class CourseServiceImpl implements CourseService {
     public void updateCourse(CourseRequest courseDTO) {
         Course course = findCourseById(courseDTO.getId());
         course.setName(courseDTO.getName());
-        List<StudyClass> studyClasses = courseDTO.getStudyClasses()
+        courseDTO.getStudyClasses()
                 .stream()
                 .map(classId -> {
                     StudyClass studyClass = studyClassService.findClassById(classId);
@@ -91,8 +91,8 @@ public class CourseServiceImpl implements CourseService {
         int pageSize = pageRequest.getPageSize();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         List<Course> courses = courseRepository.findAll();
-        List<CourseDTO> courseRespons = courses.stream().map(courseMapper::toDto).collect(Collectors.toList());
-        Page<CourseDTO> pageResult = new PageImpl<>(courseRespons, pageable, courseRespons.size());
+        List<CourseDTO> courseResponses = courses.stream().map(courseMapper::toDto).collect(Collectors.toList());
+        Page<CourseDTO> pageResult = new PageImpl<>(courseResponses, pageable, courseResponses.size());
         log.info("Found {} courses", pageResult.getTotalPages());
         return pageResult;
     }

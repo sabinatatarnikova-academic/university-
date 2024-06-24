@@ -1,5 +1,6 @@
 package com.foxminded.university.utils.mappers.classes;
 
+import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.OfflineClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.entity.classes.OfflineClass;
@@ -20,4 +21,6 @@ public interface OfflineClassMapper {
     OfflineClass toEntity(OfflineClassResponse offlineClassDTO);
 
     OfflineClass toEntity(StudyClassResponse offlineClassDTO);
+
+    OfflineClass toEntity(CreateStudyClassResponse offlineClassDTO);
 }

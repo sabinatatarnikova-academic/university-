@@ -1,5 +1,6 @@
 package com.foxminded.university.utils.mappers.classes;
 
+import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.OnlineClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.entity.classes.OnlineClass;
@@ -21,4 +22,6 @@ public interface OnlineClassMapper {
     OnlineClass toEntity(OnlineClassResponse onlineClassDTO);
 
     OnlineClass toEntity(StudyClassResponse onlineClassDTO);
+
+    OnlineClass toEntity(CreateStudyClassResponse studyClassResponse);
 }

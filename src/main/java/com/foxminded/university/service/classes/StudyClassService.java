@@ -1,6 +1,7 @@
 package com.foxminded.university.service.classes;
 
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
+import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.utils.RequestPage;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public interface StudyClassService {
 
-    void saveStudyClass(StudyClassResponse studyClassResponse);
+    void saveStudyClass(CreateStudyClassResponse studyClassResponse);
 
     StudyClass findClassById(String classId);
 

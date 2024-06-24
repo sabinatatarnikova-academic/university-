@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("teacher")
 public class TeacherController {
 
-    private UserService userService;
-    private CourseService courseService;
+    private final UserService userService;
+    private final CourseService courseService;
 
     @GetMapping()
     public String showTeachersList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
