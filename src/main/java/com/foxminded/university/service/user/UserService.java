@@ -36,5 +36,5 @@ public interface UserService {
 
     void updateUser(UserFormRequest userFormRequest);
 
-    Page<CourseDTO> showCoursesThatAssignedToStudent(String userId, RequestPage requestPage);
+    Page<CourseDTO> showCoursesThatAssignedToStudent(RequestPage requestPage);
 }

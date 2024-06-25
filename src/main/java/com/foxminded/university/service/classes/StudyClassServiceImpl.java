@@ -1,6 +1,7 @@
 package com.foxminded.university.service.classes;
 
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
+import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.entity.Course;
@@ -17,6 +18,7 @@ import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.location.LocationService;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.RequestPage;
+import com.foxminded.university.utils.mappers.CourseMapper;
 import com.foxminded.university.utils.mappers.classes.OfflineClassMapper;
 import com.foxminded.university.utils.mappers.classes.OnlineClassMapper;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
@@ -29,7 +31,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,6 +51,7 @@ public class StudyClassServiceImpl implements StudyClassService {
     private final UserService userService;
     private final LocationService locationService;
     private final CourseRepository courseRepository;
+    private final CourseMapper courseMapper;
 
     @Override
     public void saveStudyClass(CreateStudyClassResponse studyClassResponse) {
@@ -76,8 +81,12 @@ public class StudyClassServiceImpl implements StudyClassService {
     @Transactional
     public void updateStudyClass(StudyClassRequest studyClassRequest) {
         StudyClass studyClass = findClassById(studyClassRequest.getId());
-        studyClass.setStartTime(studyClassRequest.getStartTime());
-        studyClass.setEndTime(studyClassRequest.getEndTime());
+        if (studyClassRequest.getStartTime() != null) {
+            studyClass.setStartTime(studyClassRequest.getStartTime());
+        }
+        if (studyClassRequest.getEndTime() != null) {
+            studyClass.setEndTime(studyClassRequest.getEndTime());
+        }
         User teacher = userService.findUserById(studyClassRequest.getTeacherId());
         studyClass.setTeacher((Teacher) teacher);
         Optional<Course> course = courseRepository.findById(studyClassRequest.getCourseId());
@@ -128,5 +137,18 @@ public class StudyClassServiceImpl implements StudyClassService {
         log.info("Found {} classes", studyClasses.size());
         List<StudyClassResponse> studyClassResponses = studyClasses.stream().map(studyClassMapper::toDto).collect(Collectors.toList());
         return studyClassResponses;
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> getAllRequiredData() {
+        Map<String, Object> data = new HashMap<>();
+        List<Course> courses = courseRepository.findAll();
+        List<CourseDTO> courseResponses = courses.stream().map(courseMapper::toDto).collect(Collectors.toList());
+        data.put("courses", courseResponses);
+        data.put("groups", groupService.findAllGroups());
+        data.put("teachers", userService.findAllTeachers());
+        data.put("locations", locationService.findAllLocations());
+        return data;
     }
 }

@@ -1,6 +1,7 @@
 package com.foxminded.university.service.group;
 
 import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.model.dtos.request.GroupDTO;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -206,31 +208,31 @@ class GroupServiceImplTest {
 
     @Test
     void findAllGroupsWithPagination() {
-        Group groupA = Group.builder()
+        GroupDTO groupA = GroupDTO.builder()
                 .name("Group A")
                 .build();
-        Group groupB = Group.builder()
+        GroupDTO groupB = GroupDTO.builder()
                 .name("Group B")
                 .build();
 
-        List<Group> groups = Arrays.asList(groupA, groupB);
+        List<GroupDTO> groups = Arrays.asList(groupA, groupB);
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(Integer.MAX_VALUE));
-        List<Group> groupsActual = groupService.findAllGroupsWithPagination(page);
+        Page<GroupDTO> groupsActual = groupService.findAllGroupsWithPagination(page);
         groupsActual.forEach(course -> course.setId(null));
-        assertThat(groupsActual, is(groups));
+        assertThat(groupsActual.toList(), is(groups));
     }
 
     @Test
     void findAllGroups() {
-        Group groupA = Group.builder()
+        GroupDTO groupA = GroupDTO.builder()
                 .name("Group A")
                 .build();
-        Group groupB = Group.builder()
+        GroupDTO groupB = GroupDTO.builder()
                 .name("Group B")
                 .build();
 
-        List<Group> groups = Arrays.asList(groupA, groupB);
-        List<Group> groupsActual = groupService.findAllGroups();
+        List<GroupDTO> groups = Arrays.asList(groupA, groupB);
+        List<GroupDTO> groupsActual = groupService.findAllGroups();
         groupsActual.forEach(course -> course.setId(null));
         assertThat(groupsActual, is(groups));
     }

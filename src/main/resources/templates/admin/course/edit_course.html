@@ -20,11 +20,17 @@
         </div>
         <div class="mb-3">
             <label class="form-label" for="studyClasses">Study classes</label>
-            <select class="form-select" id="studyClasses" multiple th:field="*{studyClasses}">
-                <option th:each="studyClass : ${allStudyClasses}"
-                        th:text="${studyClass.classType + ': ' + studyClass.courseName + '; Start time:' + studyClass.getStartTime() + '; End time:' + studyClass.getEndTime() + '; Group: ' + studyClass.groupName}"
-                        th:value="${studyClass.id}"></option>
-            </select>
+            <div id="studyClasses">
+                <div th:each="studyClass : ${allStudyClasses}">
+                    <div class="form-check">
+                        <input class="form-check-input" th:field="*{studyClasses}" th:id="'studyClass_' + ${studyClass.id}"
+                               th:name="studyClasses" th:value="${studyClass.id}" type="checkbox">
+                        <label class="form-check-label" th:for="'studyClass_' + ${studyClass.id}"
+                               th:text="${studyClass.classType + ': ' + studyClass.courseName + '; Start time:' + studyClass.getStartTime() + '; End time:' + studyClass.getEndTime() + '; Group: ' + studyClass.groupName}">
+                        </label>
+                    </div>
+                </div>
+            </div>
         </div>
         <button class="btn btn-primary" type="submit">Save Changes</button>
     </form>

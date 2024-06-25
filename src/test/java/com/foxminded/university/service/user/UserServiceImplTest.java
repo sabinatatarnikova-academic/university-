@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -393,9 +394,10 @@ class UserServiceImplTest {
     }
 
     @Test
+    @WithMockUser(username = "username3", authorities = {"view"})
     void testShowCoursesAssignedToStudent() {
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
-        Page<CourseDTO> coursesActual = userService.showCoursesThatAssignedToStudent("username3", page);
+        Page<CourseDTO> coursesActual = userService.showCoursesThatAssignedToStudent(page);
 
         assertEquals(courseMapper.toDto(math), coursesActual.toList().getFirst());
     }

@@ -59,7 +59,7 @@ class StudentControllerTest {
                 .name("Group A")
                 .build()));
 
-        when(userService.showCoursesThatAssignedToStudent("username", page)).thenReturn(coursePage);
+        when(userService.showCoursesThatAssignedToStudent(page)).thenReturn(coursePage);
 
         mockMvc.perform(get("/student/courses").param("coursePage", "0").param("size", "10"))
                 .andExpect(status().isOk())

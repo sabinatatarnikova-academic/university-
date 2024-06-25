@@ -100,8 +100,8 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<CourseDTO> findAllCourses() {
         List<Course> courses = courseRepository.findAll();
-        List<CourseDTO> courseRespons = courses.stream().map(courseMapper::toDto).collect(Collectors.toList());
-        log.info("Found {} courses", courseRespons.size());
-        return courseRespons;
+        List<CourseDTO> courseResponses = courses.stream().map(courseMapper::toDto).collect(Collectors.toList());
+        log.info("Found {} courses", courseResponses.size());
+        return courseResponses;
     }
 }

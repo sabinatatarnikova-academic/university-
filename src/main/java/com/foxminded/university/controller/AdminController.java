@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Map;
+
 @Controller
 @AllArgsConstructor
 @RequestMapping("/admin")
@@ -156,11 +158,12 @@ public class AdminController {
     @GetMapping("/classes/edit")
     public String showEditStudyClassForm(@RequestParam String id, Model model) {
         StudyClass studyClass = studyClassService.findClassById(id);
+        Map<String, Object> data = studyClassService.getAllRequiredData();
         model.addAttribute("class", studyClassMapper.toDto(studyClass));
-        model.addAttribute("courses", courseService.findAllCourses());
-        model.addAttribute("groups", groupService.findAllGroups());
-        model.addAttribute("teachers", userService.findAllTeachers());
-        model.addAttribute("locations", locationService.findAllLocations());
+        model.addAttribute("courses", data.get("courses"));
+        model.addAttribute("groups", data.get("groups"));
+        model.addAttribute("teachers", data.get("teachers"));
+        model.addAttribute("locations", data.get("locations"));
         return "admin/studyClass/edit_class";
     }
 

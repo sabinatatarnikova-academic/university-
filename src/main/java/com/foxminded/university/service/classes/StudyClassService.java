@@ -8,6 +8,7 @@ import com.foxminded.university.utils.RequestPage;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Map;
 
 public interface StudyClassService {
 
@@ -24,4 +25,6 @@ public interface StudyClassService {
     Page<StudyClassResponse> findAllClassesWithPagination(RequestPage pageRequest);
 
     List<StudyClassResponse> findAllClasses();
+
+    Map<String, Object> getAllRequiredData();
 }

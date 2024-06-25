@@ -1,11 +1,13 @@
 package com.foxminded.university.service.studyClasses;
 
 import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.LocationDTO;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
+import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
-import com.foxminded.university.model.dtos.response.classes.OfflineClassResponse;
-import com.foxminded.university.model.dtos.response.classes.OnlineClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
+import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
@@ -38,9 +40,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -284,5 +290,34 @@ class StudyClassServiceImplTest {
         actualClasses.forEach(studyClass -> studyClass.setId(null));
         expectedClasses.forEach(studyClass -> studyClass.setId(null));
         assertEquals(expectedClasses, actualClasses);
+    }
+
+    @Test
+    void testGetAllRequiredData() {
+        Map<String, Object> map = studyClassService.getAllRequiredData();
+
+        assertThat(map, hasKey("courses"));
+        List<CourseDTO> courses = (List<CourseDTO>) map.get("courses");
+        assertThat(courses,
+                containsInAnyOrder(hasProperty("name", is("Mathematics")),
+                        hasProperty("name", is("Physics"))));
+
+        assertThat(map, hasKey("teachers"));
+        List<TeacherResponse> teachers = (List<TeacherResponse>) map.get("teachers");
+        assertThat(teachers,
+                containsInAnyOrder(hasProperty("firstName", is("Alice")),
+                        hasProperty("firstName", is("Bob"))));
+
+        assertThat(map, hasKey("groups"));
+        List<GroupDTO> groups = (List<GroupDTO>) map.get("groups");
+        assertThat(groups,
+                containsInAnyOrder(hasProperty("name", is("Group A")),
+                        hasProperty("name", is("Group B"))));
+
+        assertThat(map, hasKey("locations"));
+        List<LocationDTO> locations = (List<LocationDTO>) map.get("locations");
+        assertThat(locations,
+                containsInAnyOrder(hasProperty("department", is("ICS")),
+                        hasProperty("department", is("FDU"))));
     }
 }
