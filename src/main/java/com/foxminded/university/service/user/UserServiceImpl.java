@@ -1,9 +1,10 @@
 package com.foxminded.university.service.user;
 
-import com.foxminded.university.model.dtos.users.StudentDTO;
-import com.foxminded.university.model.dtos.users.TeacherDTO;
-import com.foxminded.university.model.dtos.users.UserDTO;
-import com.foxminded.university.model.dtos.users.UserFormDTO;
+import com.foxminded.university.model.dtos.request.users.UserFormRequest;
+import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.users.StudentResponse;
+import com.foxminded.university.model.dtos.response.users.TeacherResponse;
+import com.foxminded.university.model.dtos.response.users.UserResponse;
 import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
@@ -11,6 +12,7 @@ import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.repository.StudyClassRepository;
 import com.foxminded.university.repository.UserRepository;
 import com.foxminded.university.utils.RequestPage;
+import com.foxminded.university.utils.mappers.CourseMapper;
 import com.foxminded.university.utils.mappers.users.StudentMapper;
 import com.foxminded.university.utils.mappers.users.TeacherMapper;
 import com.foxminded.university.utils.mappers.users.UserMapper;
@@ -20,6 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,19 +43,20 @@ public class UserServiceImpl implements UserService {
     private final StudentMapper studentMapper;
     private final TeacherMapper teacherMapper;
     private final UserMapper userMapper;
+    private final CourseMapper courseMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void saveUser(UserDTO userDTO) {
-        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        if (userDTO.getUserType().equals("STUDENT")) {
-            Student student = studentMapper.toEntity(userDTO);
+    public void saveUser(UserResponse userResponse) {
+        userResponse.setPassword(passwordEncoder.encode(userResponse.getPassword()));
+        if (userResponse.getUserType().equals("STUDENT")) {
+            Student student = studentMapper.toEntity(userResponse);
             userRepository.save(student);
         } else {
-            Teacher teacher = teacherMapper.toEntity(userDTO);
+            Teacher teacher = teacherMapper.toEntity(userResponse);
             userRepository.save(teacher);
         }
-        log.debug("Saved user: firstName - {}, lastName - {}, type - {}", userDTO.getFirstName(), userDTO.getLastName(), userDTO.getUserType());
+        log.debug("Saved user: type - {}", userResponse.getUserType());
     }
 
     @Override
@@ -66,26 +71,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
-    public void updateStudent(UserFormDTO userFormDTO) {
-        userFormDTO.setPassword(passwordEncoder.encode(userFormDTO.getPassword()));
-        Student student = studentMapper.toEntity(userFormDTO);
-        userRepository.save(student);
-        log.info("Updated student info: firstName - {}, lastName - {}, group - {}", student.getFirstName(), student.getLastName(), student.getGroup());
+    public User findUserByUsername(String userName) {
+        Optional<User> user = userRepository.findByUsername(userName);
+        if (!user.isPresent()) {
+            log.error("User with username {} not found", userName);
+            throw new NoSuchElementException();
+        }
+        log.info("Founded the user with username {}", userName);
+        return user.get();
     }
 
     @Override
     @Transactional
-    public void updateTeacher(UserFormDTO userFormDTO) {
-        userFormDTO.setPassword(passwordEncoder.encode(userFormDTO.getPassword()));
-        Teacher teacher = teacherMapper.toEntity(userFormDTO);
+    public void updateStudent(UserFormRequest userFormRequest) {
+        userFormRequest.setPassword(passwordEncoder.encode(userFormRequest.getPassword()));
+        Student student = studentMapper.toEntity(userFormRequest);
+        userRepository.save(student);
+        log.info("Updated student with id - {}", student.getId());
+    }
+
+    @Override
+    @Transactional
+    public void updateTeacher(UserFormRequest userFormRequest) {
+        userFormRequest.setPassword(passwordEncoder.encode(userFormRequest.getPassword()));
+        Teacher teacher = teacherMapper.toEntity(userFormRequest);
         teacher.setStudyClasses(
-                userFormDTO.getStudyClasses().stream()
+                userFormRequest.getStudyClasses().stream()
                         .map(studyClassId -> assignTeacherToClass(teacher.getId(), studyClassId))
                         .collect(Collectors.toList())
         );
         userRepository.save(teacher);
-        log.info("Updated teacher info: firstName - {}, lastName - {}", teacher.getFirstName(), teacher.getLastName()/*, teacherDTO.getStudyClasses()*/);
+        log.info("Updated teacher info: id - {}", teacher.getId());
     }
 
     private StudyClass assignTeacherToClass(String teacherId, String classId) {
@@ -98,6 +114,7 @@ public class UserServiceImpl implements UserService {
         StudyClass studyClass = studyClassOptional.get();
         studyClass.setTeacher((Teacher) teacher);
         studyClassRepository.save(studyClass);
+        log.debug("Teacher was assigned to class");
         return studyClass;
     }
 
@@ -108,54 +125,78 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserDTO> findAllUsersWithPagination(RequestPage requestPage) {
+    public Page<UserResponse> findAllUsersWithPagination(RequestPage requestPage) {
         int pageNumber = requestPage.getPageNumber();
         int pageSize = requestPage.getPageSize();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         List<User> users = userRepository.findAll();
-        List<UserDTO> userDTOs = users.stream().map(userMapper::toDto).collect(Collectors.toList());
-        Page<UserDTO> pageResult = new PageImpl<>(userDTOs, pageable, userDTOs.size());
+        List<UserResponse> userResponses = users.stream().map(userMapper::toDto).collect(Collectors.toList());
+        Page<UserResponse> pageResult = new PageImpl<>(userResponses, pageable, userResponses.size());
         log.info("Found {} users", pageResult.getTotalPages());
         return pageResult;
     }
 
     @Override
-    public Page<StudentDTO> findAllStudentsWithPagination(RequestPage pageRequest) {
+    public Page<StudentResponse> findAllStudentsWithPagination(RequestPage pageRequest) {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
         List<Student> students = userRepository.findAllStudents();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         log.info("Found all students");
-        List<StudentDTO> studentDTOs = students.stream().map(studentMapper::toDto).collect(Collectors.toList());
-        return new PageImpl<>(studentDTOs, pageable, studentDTOs.size());
+        List<StudentResponse> studentResponses = students.stream().map(studentMapper::toDto).collect(Collectors.toList());
+        return new PageImpl<>(studentResponses, pageable, studentResponses.size());
     }
 
     @Override
-    public Page<TeacherDTO> findAllTeachersWithPagination(RequestPage pageRequest) {
+    public Page<TeacherResponse> findAllTeachersWithPagination(RequestPage pageRequest) {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         List<Teacher> teachers = userRepository.findAllTeachers();
-
         log.info("Found all teachers");
-        List<TeacherDTO> teacherDTOs = teachers.stream().map(teacherMapper::toDto).collect(Collectors.toList());
-        return new PageImpl<>(teacherDTOs, pageable, teacherDTOs.size());
+        List<TeacherResponse> teacherResponses = teachers.stream().map(teacherMapper::toDto).collect(Collectors.toList());
+        return new PageImpl<>(teacherResponses, pageable, teacherResponses.size());
     }
 
     @Override
-    public Object getUser(User user) {
-        return user.getUserType().equals("TEACHER") ? teacherMapper.toDto((Teacher) user) : studentMapper.toDto((Student) user);
+    public List<TeacherResponse> findAllTeachers() {
+        List<Teacher> teachers = userRepository.findAllTeachers();
+        List<TeacherResponse> teacherResponses = teachers.stream().map(teacherMapper::toDto).collect(Collectors.toList());
+        log.info("Found all teachers");
+        return teacherResponses;
     }
 
     @Override
     @Transactional
-    public void updateUser(UserFormDTO userFormDTO) {
-        if (userFormDTO.getUserType().equalsIgnoreCase("STUDENT")) {
-            updateStudent(userFormDTO);
-            log.info("Student was updated.");
-        } else if (userFormDTO.getUserType().equalsIgnoreCase("TEACHER")) {
-            updateTeacher(userFormDTO);
-            log.info("Student was updated.");
+    public void updateUser(UserFormRequest userFormRequest) {
+        if (userFormRequest.getUserType().equalsIgnoreCase("STUDENT")) {
+            updateStudent(userFormRequest);
+            log.info("Student with id {} was updated.", userFormRequest.getId());
+        } else if (userFormRequest.getUserType().equalsIgnoreCase("TEACHER")) {
+            updateTeacher(userFormRequest);
+            log.info("Teacher with id {} was updated.", userFormRequest.getId());
         }
+    }
+
+    @Override
+    @Transactional
+    public Page<CourseDTO> showCoursesThatAssignedToStudent(RequestPage pageRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        int pageNumber = pageRequest.getPageNumber();
+        int pageSize = pageRequest.getPageSize();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        Student student = (Student) findUserByUsername(username);
+        List<CourseDTO> courses = student.getGroup()
+                .getStudyClasses()
+                .stream()
+                .map(studyClass -> {
+                    return courseMapper.toDto(studyClass.getCourse());
+                }).collect(Collectors.toList());
+        int classesCount = courses.size();
+
+        log.info("Count of courses that assigned to student - {} is {}", student.getId(), classesCount);
+        return new PageImpl<>(courses, pageable, classesCount);
     }
 }

@@ -1,11 +1,13 @@
 package com.foxminded.university.service.studyClasses;
 
 import com.foxminded.university.config.TestConfig;
-import com.foxminded.university.model.dtos.CourseDTO;
-import com.foxminded.university.model.dtos.GroupDTO;
-import com.foxminded.university.model.dtos.classes.OfflineClassDTO;
-import com.foxminded.university.model.dtos.classes.OnlineClassDTO;
-import com.foxminded.university.model.dtos.users.TeacherDTO;
+import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.LocationDTO;
+import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
+import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
+import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
+import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
@@ -20,6 +22,8 @@ import com.foxminded.university.utils.RequestPage;
 import com.foxminded.university.utils.mappers.CourseMapper;
 import com.foxminded.university.utils.mappers.GroupMapper;
 import com.foxminded.university.utils.mappers.LocationMapper;
+import com.foxminded.university.utils.mappers.classes.OfflineClassMapper;
+import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
 import com.foxminded.university.utils.mappers.users.TeacherMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,9 +40,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -80,6 +89,10 @@ class StudyClassServiceImplTest {
     private OfflineClass offlineClass;
     private String username = "username";
     private String password = "password";
+    @Autowired
+    private StudyClassMapper studyClassMapper;
+    @Autowired
+    private OfflineClassMapper offlineClassMapper;
 
     @BeforeEach
     @Transactional
@@ -91,10 +104,10 @@ class StudyClassServiceImplTest {
         entityManager.getEntityManager().createNativeQuery("DELETE FROM locations").executeUpdate();
 
         groupA = Group.builder()
-                .groupName("Group A")
+                .name("Group A")
                 .build();
         groupB = Group.builder()
-                .groupName("Group B")
+                .name("Group B")
                 .build();
         groupA = entityManager.merge(groupA);
         groupB = entityManager.merge(groupB);
@@ -159,6 +172,7 @@ class StudyClassServiceImplTest {
                 .teacher(alice)
                 .group(groupA)
                 .url("http://example.com")
+                .classType("ONLINE")
                 .build();
         offlineClass = OfflineClass.builder()
                 .startTime(LocalDateTime.of(2024, 4, 23, 11, 0))
@@ -167,6 +181,7 @@ class StudyClassServiceImplTest {
                 .teacher(bob)
                 .group(groupB)
                 .location(ics)
+                .classType("OFFLINE")
                 .build();
         onlineClass = entityManager.merge(onlineClass);
         offlineClass = entityManager.merge(offlineClass);
@@ -175,92 +190,71 @@ class StudyClassServiceImplTest {
     }
 
     @Test
-    void saveOnlineClass() {
-        OnlineClassDTO onlineClassToSave = OnlineClassDTO.builder()
+    void testSaveOnlineStudyClass() {
+        CreateStudyClassResponse studyClass = CreateStudyClassResponse.builder()
                 .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
                 .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
-                .group(groupMapper.toDto(groupA))
-                .course(courseMapper.toDto(math))
-                .url("http://example.com")
+                .classType("ONLINE")
                 .build();
 
-        studyClassService.saveOnlineClass(onlineClassToSave);
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(3));
-        List<StudyClass> classes = studyClassService.findAllClassesWithPagination(page);
-        OnlineClass actual = (OnlineClass) classes.get(2);
-        assertEquals(onlineClassToSave.getUrl(), actual.getUrl());
-        assertEquals(onlineClassToSave.getStartTime(), actual.getStartTime());
-        assertEquals(onlineClassToSave.getEndTime(), actual.getEndTime());
-        assertEquals(groupA, actual.getGroup());
-        assertEquals(math, actual.getCourse());
+        studyClassService.saveStudyClass(studyClass);
+        List<StudyClassResponse> classes = studyClassService.findAllClasses();
+        StudyClassResponse actual = classes.get(2);
+        actual.setId(null);
+        assertEquals(studyClass.getStartTime(), actual.getStartTime());
+        assertEquals(studyClass.getEndTime(), actual.getEndTime());
+        assertEquals(studyClass.getClassType(), actual.getClassType());
     }
 
     @Test
-    void saveOfflineClass() {
-        OfflineClassDTO offlineClassToSave = OfflineClassDTO.builder()
+    void testSaveOfflineStudyClass() {
+        CreateStudyClassResponse studyClass = CreateStudyClassResponse.builder()
                 .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
                 .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
-                .group(groupMapper.toDto(groupA))
-                .course(courseMapper.toDto(physics))
-                .location(locationMapper.toDto(ics))
+                .classType("OFFLINE")
                 .build();
 
-        studyClassService.saveOfflineClass(offlineClassToSave);
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(3));
-        List<StudyClass> offlineClass = studyClassService.findAllClassesWithPagination(page);
-        OfflineClass actual = (OfflineClass) offlineClass.get(2);
-        assertEquals(ics, actual.getLocation());
-        assertEquals(physics, actual.getCourse());
-        assertEquals(groupA, actual.getGroup());
-        assertEquals(offlineClassToSave.getStartTime(), actual.getStartTime());
-        assertEquals(offlineClassToSave.getEndTime(), actual.getEndTime());
+        studyClassService.saveStudyClass(studyClass);
+        List<StudyClassResponse> classes = studyClassService.findAllClasses();
+        StudyClassResponse actual = classes.get(2);
+        actual.setId(null);
+        assertEquals(studyClass.getStartTime(), actual.getStartTime());
+        assertEquals(studyClass.getEndTime(), actual.getEndTime());
+        assertEquals(studyClass.getClassType(), actual.getClassType());
     }
 
     @Test
     void updateStudyClass() {
         String studyClassId = studyClassService.findAllClasses().getFirst().getId();
-        String courseId = studyClassService.findAllClasses().get(1).getCourse().getId();
-        String groupId = studyClassService.findAllClasses().get(1).getGroup().getId();
 
-        TeacherDTO teacherDTO = TeacherDTO.builder()
-                .firstName("Bob")
-                .lastName("Johnson")
-                .username(username)
-                .password(password)
-                .build();
-
-        OnlineClassDTO onlineClassDTO = OnlineClassDTO.builder()
+        StudyClassRequest studyClassRequest = StudyClassRequest.builder()
                 .id(studyClassId)
-                .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
-                .course(CourseDTO.builder()
-                        .id(courseId)
-                        .name("Physics")
-                        .build())
-                .group(GroupDTO.builder()
-                        .id(groupId)
-                        .groupName("Group B")
-                        .build())
+                .startTime(onlineClass.getStartTime())
+                .endTime(onlineClass.getEndTime())
+                .classType(onlineClass.getClassType())
+                .courseId(physics.getId())
+                .groupId(offlineClass.getGroup().getId())
+                .teacherId(offlineClass.getTeacher().getId())
                 .url("http://test.com")
                 .build();
 
-        studyClassService.updateStudyClass(onlineClassDTO, teacherDTO);
+        studyClassService.updateStudyClass(studyClassRequest);
 
         OnlineClass studyClass = (OnlineClass) studyClassService.findClassById(studyClassId);
-        assertThat(onlineClassDTO.getId(), is(studyClass.getId()));
-        assertThat(onlineClassDTO.getStartTime(), is(studyClass.getStartTime()));
-        assertThat(onlineClassDTO.getEndTime(), is(studyClass.getEndTime()));
-        assertThat(onlineClassDTO.getCourse().getId(), is(studyClass.getCourse().getId()));
-        assertThat(onlineClassDTO.getGroup().getId(), is(studyClass.getGroup().getId()));
-        assertThat(onlineClassDTO.getUrl(), is(studyClass.getUrl()));
+        assertThat(studyClassRequest.getId(), is(studyClass.getId()));
+        assertThat(studyClassRequest.getStartTime(), is(studyClass.getStartTime()));
+        assertThat(studyClassRequest.getEndTime(), is(studyClass.getEndTime()));
+        assertThat(studyClassRequest.getCourseId(), is(studyClass.getCourse().getId()));
+        assertThat(studyClassRequest.getGroupId(), is(studyClass.getGroup().getId()));
+        assertThat(studyClassRequest.getUrl(), is(studyClass.getUrl()));
     }
 
     @Test
     void findClassById() {
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(1));
-        StudyClass studyClass = studyClassService.findAllClassesWithPagination(page).get(0);
+        StudyClassResponse studyClass = studyClassService.findAllClasses().get(0);
         String classId = studyClass.getId();
-        assertEquals(studyClass, studyClassService.findClassById(classId));
+        StudyClass actual = studyClassService.findClassById(classId);
+        assertEquals(studyClass.getId(), actual.getId());
     }
 
     @Test
@@ -271,7 +265,7 @@ class StudyClassServiceImplTest {
     @Test
     void deleteClassById() {
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
-        StudyClass studyClass = studyClassService.findAllClassesWithPagination(page).get(1);
+        StudyClassResponse studyClass = studyClassService.findAllClassesWithPagination(page).toList().get(1);
         String classId = studyClass.getId();
 
         studyClassService.deleteClassById(classId);
@@ -281,17 +275,49 @@ class StudyClassServiceImplTest {
     @Test
     void findAllClassesWithPagination() {
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
-        List<StudyClass> expectedClasses = Arrays.asList(onlineClass, offlineClass);
-        List<StudyClass> actualClasses = studyClassService.findAllClassesWithPagination(page);
+        List<StudyClassResponse> expectedClasses = Arrays.asList(studyClassMapper.toDto(onlineClass), studyClassMapper.toDto(offlineClass));
+        Page<StudyClassResponse> actualClasses = studyClassService.findAllClassesWithPagination(page);
         actualClasses.forEach(studyClass -> studyClass.setId(null));
-        assertEquals(expectedClasses, actualClasses);
+        expectedClasses.forEach(studyClass -> studyClass.setId(null));
+        assertThat(expectedClasses.get(0), is(actualClasses.toList().get(0)));
+        assertThat(expectedClasses.get(1), is(actualClasses.toList().get(1)));
     }
 
     @Test
     void findAllClasses() {
-        List<StudyClass> expectedClasses = Arrays.asList(onlineClass, offlineClass);
-        List<StudyClass> actualClasses = studyClassService.findAllClasses();
+        List<StudyClassResponse> expectedClasses = Arrays.asList(studyClassMapper.toDto(onlineClass), studyClassMapper.toDto(offlineClass));
+        List<StudyClassResponse> actualClasses = studyClassService.findAllClasses();
         actualClasses.forEach(studyClass -> studyClass.setId(null));
+        expectedClasses.forEach(studyClass -> studyClass.setId(null));
         assertEquals(expectedClasses, actualClasses);
+    }
+
+    @Test
+    void testGetAllRequiredData() {
+        Map<String, Object> map = studyClassService.getAllRequiredData();
+
+        assertThat(map, hasKey("courses"));
+        List<CourseDTO> courses = (List<CourseDTO>) map.get("courses");
+        assertThat(courses,
+                containsInAnyOrder(hasProperty("name", is("Mathematics")),
+                        hasProperty("name", is("Physics"))));
+
+        assertThat(map, hasKey("teachers"));
+        List<TeacherResponse> teachers = (List<TeacherResponse>) map.get("teachers");
+        assertThat(teachers,
+                containsInAnyOrder(hasProperty("firstName", is("Alice")),
+                        hasProperty("firstName", is("Bob"))));
+
+        assertThat(map, hasKey("groups"));
+        List<GroupDTO> groups = (List<GroupDTO>) map.get("groups");
+        assertThat(groups,
+                containsInAnyOrder(hasProperty("name", is("Group A")),
+                        hasProperty("name", is("Group B"))));
+
+        assertThat(map, hasKey("locations"));
+        List<LocationDTO> locations = (List<LocationDTO>) map.get("locations");
+        assertThat(locations,
+                containsInAnyOrder(hasProperty("department", is("ICS")),
+                        hasProperty("department", is("FDU"))));
     }
 }

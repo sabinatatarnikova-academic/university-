@@ -1,6 +1,8 @@
 package com.foxminded.university.utils.mappers.classes;
 
-import com.foxminded.university.model.dtos.classes.OfflineClassDTO;
+import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
+import com.foxminded.university.model.dtos.response.classes.OfflineClassResponse;
+import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.entity.classes.OfflineClass;
 import com.foxminded.university.utils.mappers.CourseMapper;
 import com.foxminded.university.utils.mappers.GroupMapper;
@@ -13,8 +15,12 @@ import org.mapstruct.ReportingPolicy;
 @Mapper (unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring", uses = {CourseMapper.class, TeacherMapper.class, GroupMapper.class, LocationMapper.class})
 public interface OfflineClassMapper {
 
-    OfflineClassDTO toDto(OfflineClass offlineClass);
+    OfflineClassResponse toDto(OfflineClass offlineClass);
 
     @InheritInverseConfiguration
-    OfflineClass toEntity(OfflineClassDTO offlineClassDTO);
+    OfflineClass toEntity(OfflineClassResponse offlineClassDTO);
+
+    OfflineClass toEntity(StudyClassResponse offlineClassDTO);
+
+    OfflineClass toEntity(CreateStudyClassResponse offlineClassDTO);
 }

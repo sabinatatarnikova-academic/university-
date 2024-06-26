@@ -1,17 +1,22 @@
 package com.foxminded.university.service.group;
 
+import com.foxminded.university.model.dtos.request.GroupDTO;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.repository.GroupRepository;
 import com.foxminded.university.utils.RequestPage;
+import com.foxminded.university.utils.mappers.GroupMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,11 +24,12 @@ import java.util.Optional;
 public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
+    private final GroupMapper groupMapper;
 
     @Override
     public void saveGroup(Group group) {
         groupRepository.save(group);
-        log.info("Saved group with name - {}, classes - {}", group.getGroupName(), group.getStudyClasses());
+        log.info("Saved group with name - {}, classes - {}", group.getName(), group.getStudyClasses());
     }
 
     @Override
@@ -39,7 +45,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group findGroupByName(String groupName) {
-        Optional <Group> group = groupRepository.findGroupByGroupName(groupName);
+        Optional<Group> group = groupRepository.findGroupByName(groupName);
         if (!group.isPresent()) {
             log.error("Course with name {} not found", groupName);
             throw new NoSuchElementException();
@@ -51,7 +57,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void updateGroup(Group group) {
         groupRepository.save(group);
-        log.info("Updated group with id - {}, name - {}", group.getId(), group.getGroupName());
+        log.info("Updated group with id - {}, name - {}", group.getId(), group.getName());
     }
 
     @Override
@@ -61,20 +67,21 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<Group> findAllGroupsWithPagination(RequestPage pageRequest) {
+    public Page<GroupDTO> findAllGroupsWithPagination(RequestPage pageRequest) {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
-        Page<Group> pageResult = groupRepository.findAll(PageRequest.of(pageNumber, pageSize));
-        log.info("Found {} groups", pageResult.getTotalPages());
-        return pageResult.toList();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        List<Group> groups = groupRepository.findAll();
+        List<GroupDTO> groupDTOs = groups.stream().map(groupMapper::toDto).toList();
+        log.info("Found {} groups", groupDTOs.size());
+        return new PageImpl<>(groupDTOs, pageable, groupDTOs.size());
     }
 
     @Override
-    public List<Group> findAllGroups() {
+    public List<GroupDTO> findAllGroups() {
         List<Group> groups = groupRepository.findAll();
+        List<GroupDTO> groupDTOs = groups.stream().map(groupMapper::toDto).collect(Collectors.toList());
         log.info("Found {} groups", groups.size());
-        return groups;
+        return groupDTOs;
     }
-
-
 }

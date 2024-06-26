@@ -1,4 +1,4 @@
-package com.foxminded.university.model.dtos.classes;
+package com.foxminded.university.model.dtos.response.classes;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class OnlineClassDTO extends StudyClassDTO {
+public class OnlineClassResponse extends StudyClassResponse {
 
     private String url;
 }

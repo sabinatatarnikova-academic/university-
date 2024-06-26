@@ -47,6 +47,9 @@ public class StudyClass {
     @JoinColumn(name = "course_id")
     private Course course;
 
+    @Column(name = "class_type", insertable = false, updatable = false)
+    private String classType;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Teacher teacher;

@@ -1,10 +1,11 @@
-package com.foxminded.university.model.dtos.users;
+package com.foxminded.university.model.dtos.request.users;
 
-import com.foxminded.university.model.dtos.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserFormDTO {
+public class UserFormRequest {
 
     private String id;
 
@@ -20,8 +21,10 @@ public class UserFormDTO {
 
     private String lastName;
 
+    @ToString.Exclude
     private String username;
 
+    @ToString.Exclude
     private String password;
 
     private String userType;

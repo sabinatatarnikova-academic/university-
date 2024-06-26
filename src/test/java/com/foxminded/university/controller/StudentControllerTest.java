@@ -1,9 +1,9 @@
 package com.foxminded.university.controller;
 
-import com.foxminded.university.config.TestControllerConfig;
 import com.foxminded.university.config.TestSecurityConfig;
-import com.foxminded.university.model.dtos.users.StudentDTO;
-import com.foxminded.university.model.entity.Group;
+import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @WebMvcTest(StudentController.class)
-@Import({TestSecurityConfig.class, TestControllerConfig.class})
+@Import(TestSecurityConfig.class)
 class StudentControllerTest {
 
     @Autowired
@@ -37,19 +37,32 @@ class StudentControllerTest {
     @Test
     void testShowStudentList() throws Exception {
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
-        Group groupA = Group.builder()
-                .groupName("Group A")
-                .build();
-        Page<StudentDTO> pageDtoImpl = new PageImpl<>(Collections.singletonList(StudentDTO.builder()
+        Page<StudentResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(StudentResponse.builder()
                 .firstName("Charlie")
                 .lastName("Williams")
+                .group(GroupDTO.builder().name("Group A").build())
                 .build()));
+
         when(userService.findAllStudentsWithPagination(page)).thenReturn(pageDtoImpl);
 
         mockMvc.perform(get("/student").param("pageDtoImpl", "0").param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("student"))
+                .andExpect(view().name("student/student"))
                 .andExpect(model().attributeExists("studentPage"))
                 .andExpect(model().attribute("studentPage", pageDtoImpl));
+    }
+
+    @Test
+    void testShowAllCoursesList() throws Exception {
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        Page<CourseDTO> coursePage = new PageImpl<>(Collections.singletonList(CourseDTO.builder()
+                .name("Group A")
+                .build()));
+
+        when(userService.showCoursesThatAssignedToStudent(page)).thenReturn(coursePage);
+
+        mockMvc.perform(get("/student/courses").param("coursePage", "0").param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("student/student_courses"));
     }
 }

@@ -29,7 +29,7 @@
         <div class="mb-3" th:if="${user.userType} == 'STUDENT'">
             <label class="form-label" for="group">Group (only for students)</label>
             <select class="form-select" id="group" th:field="*{group.id}">
-                <option th:each="group : ${groups}" th:text="${group.getGroupName()}" th:value="${group.id}"></option>
+                <option th:each="group : ${groups}" th:text="${group.getName()}" th:value="${group.id}"></option>
                 <option th:value="null">None (only for teacher)</option>
             </select>
         </div>
@@ -42,13 +42,23 @@
             <input class="form-control" id="password" th:field="*{password}" type="text">
         </div>
         <div class="mb-3" th:if="${user.userType} == 'TEACHER'">
-            <label class="form-label" for="studyClasses">Study classes (only for teachers)</label>
-            <select class="form-select" id="studyClasses" multiple th:field="*{studyClasses}">
-                <option th:each="studyClass : ${allStudyClasses}"
-                        th:text="${studyClass.course.name + '; Start time:' + studyClass.getStartTime() + '; End time:' + studyClass.getEndTime() + '; Group: ' + studyClass.getGroup().getGroupName()}"
-                        th:value="${studyClass.id}"></option>
-                <option th:value="null">None (only for student)</option>
-            </select>
+            <label class="form-label" for="teacherStudyClasses">Study classes (only for teachers)</label>
+            <div id="teacherStudyClasses">
+                <div th:each="studyClass : ${allStudyClasses}">
+                    <div class="form-check">
+                        <input class="form-check-input" th:field="*{studyClasses}" th:id="'studyClass_' + ${studyClass.id}"
+                               th:name="studyClasses" th:value="${studyClass.id}" type="checkbox">
+                        <label class="form-check-label" th:for="'studyClass_' + ${studyClass.id}"
+                               th:text="${studyClass.classType + ': ' + studyClass.courseName + '; Start time:' + studyClass.getStartTime() + '; End time:' + studyClass.getEndTime() + '; Group: ' + studyClass.groupName}">
+                        </label>
+                    </div>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" id="noneOption" name="studyClasses" th:field="*{studyClasses}" type="checkbox"
+                           value="null">
+                    <label class="form-check-label" for="noneOption">None (only for student)</label>
+                </div>
+            </div>
         </div>
         <button class="btn btn-primary" type="submit">Save Changes</button>
     </form>

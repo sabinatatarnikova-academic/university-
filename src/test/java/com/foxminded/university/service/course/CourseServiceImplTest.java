@@ -1,6 +1,9 @@
 package com.foxminded.university.service.course;
 
 import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.model.dtos.request.CourseRequest;
+import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
@@ -8,23 +11,28 @@ import com.foxminded.university.model.entity.classes.OfflineClass;
 import com.foxminded.university.model.entity.classes.OnlineClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
+import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
+import com.foxminded.university.utils.mappers.CourseMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 @DataJpaTest
@@ -38,6 +46,11 @@ class CourseServiceImplTest {
     @Autowired
     private CourseServiceImpl courseService;
 
+    @Autowired
+    private StudyClassService studyClassService;
+
+    @Autowired
+    private CourseMapper courseMapper;
 
     @BeforeEach
     public void init() {
@@ -51,19 +64,21 @@ class CourseServiceImplTest {
         String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
 
         Group groupA = Group.builder()
-                .groupName("Group A")
+                .name("Group A")
                 .build();
         Group groupB = Group.builder()
-                .groupName("Group B")
+                .name("Group B")
                 .build();
         entityManager.persist(groupA);
         entityManager.persist(groupB);
 
         Course math = Course.builder()
                 .name("Mathematics")
+                .studyClasses(new ArrayList<>())
                 .build();
         Course physics = Course.builder()
                 .name("Physics")
+                .studyClasses(new ArrayList<>())
                 .build();
         entityManager.persist(math);
         entityManager.persist(physics);
@@ -135,14 +150,14 @@ class CourseServiceImplTest {
 
     @Test
     void saveCourse() {
-        Course groupToSave = Course.builder()
+        CourseDTO courseToSave = CourseDTO.builder()
                 .name("Mugiwaras")
                 .build();
 
-        courseService.saveCourse(groupToSave);
+        courseService.saveCourse(courseToSave);
         Course course = courseService.findCourseByName("Mugiwaras");
         course.setId(null);
-        assertThat(groupToSave, is(course));
+        assertThat(courseMapper.toEntity(courseToSave), is(course));
     }
 
     @Test
@@ -150,11 +165,8 @@ class CourseServiceImplTest {
         Course courseByName = courseService.findCourseByName("Mathematics");
         String courseId = courseByName.getId();
         Course course = courseService.findCourseById(courseId);
-        course.setId(null);
-        Course courseA = Course.builder()
-                .name("Mathematics")
-                .build();
-        assertThat(course, is(courseA));
+
+        assertEquals(course, courseByName);
     }
 
     @Test
@@ -165,11 +177,10 @@ class CourseServiceImplTest {
     @Test
     void findCourseByName() {
         Course course = courseService.findCourseByName("Mathematics");
-        course.setId(null);
-        Course courseA = Course.builder()
-                .name("Mathematics")
-                .build();
-        assertThat(course, is(courseA));
+        CourseDTO courseDTO = courseService.findAllCourses().get(0);
+
+        assertEquals(course.getId(), courseDTO.getId());
+        assertEquals(course.getName(), courseDTO.getName());
     }
 
     @Test
@@ -179,15 +190,17 @@ class CourseServiceImplTest {
 
     @Test
     void updateCourse() {
-        Course course = courseService.findCourseByName("Mathematics");
-        String courseId = course.getId();
-        Course courseToUpdate = Course.builder()
+        List<StudyClassResponse> classes = studyClassService.findAllClasses();
+        Course courseByName = courseService.findCourseByName("Mathematics");
+        String courseId = courseByName.getId();
+        CourseRequest courseToUpdate = CourseRequest.builder()
                 .id(courseId)
                 .name("Update name")
+                .studyClasses(List.of(classes.get(0).getId(), classes.get(1).getId()))
                 .build();
         courseService.updateCourse(courseToUpdate);
         Course updatedCourse = courseService.findCourseByName("Update name");
-        assertThat(courseToUpdate, is(updatedCourse));
+        assertEquals("Update name", updatedCourse.getName());
     }
 
     @Test
@@ -199,17 +212,19 @@ class CourseServiceImplTest {
 
     @Test
     void findAllCoursesWithPagination() {
-        Course courseA = Course.builder()
+        CourseDTO courseA = CourseDTO.builder()
                 .name("Mathematics")
+                .studyClasses(new ArrayList<>())
                 .build();
-        Course courseB = Course.builder()
+        CourseDTO courseB = CourseDTO.builder()
                 .name("Physics")
+                .studyClasses(new ArrayList<>())
                 .build();
 
-        List<Course> courses = Arrays.asList(courseA, courseB);
+        List<CourseDTO> courses = Arrays.asList(courseA, courseB);
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
-        List<Course> coursesActual = courseService.findAllCoursesWithPagination(page);
+        Page<CourseDTO> coursesActual = courseService.findAllCoursesWithPagination(page);
         coursesActual.forEach(course -> course.setId(null));
-        assertThat(coursesActual, is(courses));
+        assertThat(coursesActual.toList(), is(courses));
     }
 }

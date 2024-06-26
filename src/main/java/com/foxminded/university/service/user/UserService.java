@@ -1,33 +1,40 @@
 package com.foxminded.university.service.user;
 
-import com.foxminded.university.model.dtos.users.StudentDTO;
-import com.foxminded.university.model.dtos.users.TeacherDTO;
-import com.foxminded.university.model.dtos.users.UserDTO;
-import com.foxminded.university.model.dtos.users.UserFormDTO;
+import com.foxminded.university.model.dtos.request.users.UserFormRequest;
+import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.users.StudentResponse;
+import com.foxminded.university.model.dtos.response.users.TeacherResponse;
+import com.foxminded.university.model.dtos.response.users.UserResponse;
 import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.utils.RequestPage;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 
 public interface UserService {
 
-    void saveUser(UserDTO userDTO);
+    void saveUser(UserResponse userResponse);
 
     <U extends User> U findUserById(String userId);
 
-    void updateStudent(UserFormDTO userFormDTO);
+    <U extends User> U findUserByUsername(String username);
 
-    void updateTeacher(UserFormDTO userFormDTO);
+    void updateStudent(UserFormRequest userFormRequest);
+
+    void updateTeacher(UserFormRequest userFormRequest);
 
     void deleteUserById(String userId);
 
-    Page<UserDTO> findAllUsersWithPagination(RequestPage requestPage);
+    Page<UserResponse> findAllUsersWithPagination(RequestPage requestPage);
 
-    Page<StudentDTO> findAllStudentsWithPagination(RequestPage requestPage);
+    Page<StudentResponse> findAllStudentsWithPagination(RequestPage requestPage);
 
-    Page<TeacherDTO> findAllTeachersWithPagination(RequestPage requestPage);
+    Page<TeacherResponse> findAllTeachersWithPagination(RequestPage requestPage);
 
-    Object getUser(User user);
+    List<TeacherResponse> findAllTeachers();
 
-    void updateUser(UserFormDTO userFormDTO);
+    void updateUser(UserFormRequest userFormRequest);
+
+    Page<CourseDTO> showCoursesThatAssignedToStudent(RequestPage requestPage);
 }

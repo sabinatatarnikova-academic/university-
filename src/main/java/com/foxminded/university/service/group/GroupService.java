@@ -1,7 +1,9 @@
 package com.foxminded.university.service.group;
 
+import com.foxminded.university.model.dtos.request.GroupDTO;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.utils.RequestPage;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -17,7 +19,7 @@ public interface GroupService {
 
     void deleteGroupById(String groupId);
 
-    List<Group> findAllGroupsWithPagination(RequestPage pageRequest);
+    Page<GroupDTO> findAllGroupsWithPagination(RequestPage pageRequest);
 
-    List<Group> findAllGroups();
+    List<GroupDTO> findAllGroups();
 }

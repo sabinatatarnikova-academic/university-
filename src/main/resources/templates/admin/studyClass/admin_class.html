@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Classes</title>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" rel="stylesheet">
+</head>
+<body>
+<h2>Classes:</h2>
+<div class="mb-3">
+    <a class="btn btn-success" href="/admin/classes/new">Add New Classes</a>
+</div>
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Class type</th>
+        <th>Start time</th>
+        <th>End time</th>
+        <th>Course name</th>
+        <th>Group Name</th>
+        <th>Teacher</th>
+        <th>Location</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="class : ${studyClassPage}">
+        <td th:text="${class.id}"></td>
+        <td th:text="${class.classType}"></td>
+        <td th:text="${class.startTime}"></td>
+        <td th:text="${class.endTime}"></td>
+        <td th:text="${class.courseName}"></td>
+        <td th:text="${class.groupName}"></td>
+        <td th:text="${class.teacherFirstName + ' ' + class.teacherLastName}"></td>
+        <td>
+            <span th:if="${class.classType} == 'ONLINE'" th:text="${class.url}"></span>
+            <span th:text="${class.location == null ? 'No location' : (class.location.department + ' ' + class.location.classroom)}"
+                  th:unless="${class.classType} == 'ONLINE'"></span>
+        </td>
+        <td>
+            <a class="btn btn-primary" th:href="@{/admin/classes/edit(id=${class.id})}">Edit</a>
+            <form method="post" style="display:inline-block;"
+                  th:action="@{/admin/classes/delete/{id}(id=${class.id})}">
+                <input name="_method" type="hidden" value="DELETE"/>
+                <button class="btn btn-danger" type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div th:if="${studyClassPage!= null}">
+    <ul class="pagination">
+        <li class="page-item" th:each="i : ${#numbers.sequence(0, studyClassPage.totalPages - 1)}">
+            <a class="page-link" th:href="@{/admin/classes(page=${i}, size=${studyClassPage.size})}"
+               th:text="${i + 1}"></a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

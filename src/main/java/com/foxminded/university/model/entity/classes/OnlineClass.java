@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@DiscriminatorValue("online")
+@DiscriminatorValue("ONLINE")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

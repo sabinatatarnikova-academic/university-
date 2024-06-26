@@ -1,8 +1,8 @@
 package com.foxminded.university.utils.mappers.users;
 
-import com.foxminded.university.model.dtos.users.StudentDTO;
-import com.foxminded.university.model.dtos.users.UserDTO;
-import com.foxminded.university.model.dtos.users.UserFormDTO;
+import com.foxminded.university.model.dtos.request.users.UserFormRequest;
+import com.foxminded.university.model.dtos.response.users.StudentResponse;
+import com.foxminded.university.model.dtos.response.users.UserResponse;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.utils.mappers.GroupMapper;
 import org.mapstruct.InheritInverseConfiguration;
@@ -12,13 +12,13 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring", uses = {GroupMapper.class})
 public interface StudentMapper {
 
-    StudentDTO toDto(Student student);
+    StudentResponse toDto(Student student);
 
     @InheritInverseConfiguration
-    Student toEntity(StudentDTO studentDTO);
+    Student toEntity(StudentResponse studentResponse);
 
     @InheritInverseConfiguration
-    Student toEntity(UserFormDTO studentDTO);
+    Student toEntity(UserFormRequest studentDTO);
 
-    Student toEntity(UserDTO userDTO);
+    Student toEntity(UserResponse userResponse);
 }
