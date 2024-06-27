@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title th:text="#{welcome}"></title>
@@ -7,14 +7,7 @@
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
-<div class="d-flex justify-content-end">
-    <form method="get" class="form-label" action="#" th:action="@{/}">
-        <select class="form-select" name="lang" onchange="this.form.submit()">
-            <option value="en" th:selected="${#locale.language == 'en'}">English</option>
-            <option value="uk" th:selected="${#locale.language == 'uk'}">Українська</option>
-        </select>
-    </form>
-</div>
+<div th:insert="~{language :: language}"></div>
 <div class="d-flex justify-content-center">
         <h1 th:text="#{welcome}"></h1>
 </div>

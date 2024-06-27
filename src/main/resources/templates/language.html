@@ -1,0 +1,22 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<div th:fragment="language">
+    <div class="d-flex justify-content-end">
+        <form method="get" class="form-label" action="#">
+            <select class="form-select" name="lang" onchange="this.form.submit()">
+                <option value="en" th:selected="${#locale.language == 'en'}">English</option>
+                <option value="uk" th:selected="${#locale.language == 'uk'}">Українська</option>
+            </select>
+        </form>
+    </div>
+</div>
+</body>
+</html>

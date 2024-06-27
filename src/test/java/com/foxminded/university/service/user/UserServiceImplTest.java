@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -69,7 +70,7 @@ class UserServiceImplTest {
     private StudentMapper studentMapper;
 
     @Autowired
-    private TeacherMapper teacherMapper;
+    private CourseMapper courseMapper;
 
     private Group groupA;
     private Group groupB;
@@ -85,11 +86,6 @@ class UserServiceImplTest {
     private OfflineClass offlineClass;
     private String username = "username";
     private String password = "$2a$12$IgoUWIHUQ/hmX39dsVixgeIWHK3.vBS8luDFFZRxQSIRlTborOB66";
-    @Autowired
-    private CourseMapper courseMapper;
-
-    @Autowired
-    private GroupService groupService;
 
     @BeforeEach
     @Transactional
