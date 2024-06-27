@@ -10,12 +10,13 @@
     <title>Document</title>
 </head>
 <body>
+<div th:insert="~{language :: language}"></div>
 <table class="table table-bordered">
     <thead>
     <tr>
-        <th>ID</th>
-        <th>Course name</th>
-        <th>Classes</th>
+        <th th:text="#{id}"></th>
+        <th th:text="#{courses.name}"></th>
+        <th th:text="#{classes}"></th>
     </tr>
     </thead>
     <tbody>

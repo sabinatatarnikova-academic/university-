@@ -1,4 +1,4 @@
-package com.foxminded.university.security;
+package com.foxminded.university.config.security;
 
 import com.foxminded.university.service.user.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;

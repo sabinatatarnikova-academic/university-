@@ -47,7 +47,6 @@ public class AdminController {
     private final StudyClassMapper studyClassMapper;
     private final CourseService courseService;
     private final CourseMapper courseMapper;
-    private final LocationService locationService;
 
     @GetMapping()
     public String usersCoursesDecision() {

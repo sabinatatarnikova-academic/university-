@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = {
         "com.foxminded.university.service",
         "com.foxminded.university.utils",
-        "com.foxminded.university.security"
+        "com.foxminded.university.config"
 })
 public class TestConfig {
 

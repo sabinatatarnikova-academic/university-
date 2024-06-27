@@ -2,21 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin </title>
+    <title th:text="#{admin}"></title>
     <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" rel="stylesheet">
 </head>
 <body>
 <div class="d-flex justify-content-evenly flex-column">
-    <h1>Admin panel</h1>
+    <div th:insert="~{language :: language}"></div>
+    <h1 th:text="#{admin.panel}"></h1>
     <div class="mb-3">
-        <a class="btn btn-success" href="/admin/users">Users</a>
+        <a class="btn btn-success" href="/admin/users" th:text="#{users}"></a>
     </div>
     <div class="mb-3">
-        <a class="btn btn-success" href="/admin/courses">Courses</a>
+        <a class="btn btn-success" href="/admin/courses" th:text="#{courses}"></a>
     </div>
     <div class="mb-3">
-        <a class="btn btn-success" href="/admin/classes">Classes</a>
+        <a class="btn btn-success" href="/admin/classes" th:text="#{classes}">Classes</a>
     </div>
 </div>
 </body>

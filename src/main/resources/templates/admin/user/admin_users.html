@@ -7,20 +7,21 @@
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" rel="stylesheet">
 </head>
 <body>
-<h2>Users:</h2>
+<div th:insert="~{language :: language}"></div>
+<h2 th:text="#{users}"></h2>
 <div class="mb-3">
-    <a class="btn btn-success" href="/admin/users/new">Add New User</a>
+    <a class="btn btn-success" href="/admin/users/new" th:text="#{users.add}"></a>
 </div>
 <table class="table table-bordered">
     <thead>
     <tr>
-        <th>ID</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Type of user</th>
-        <th>Username</th>
-        <th>Password</th>
-        <th>Actions</th>
+        <th th:text="#{id}"></th>
+        <th th:text="#{firstName}"></th>
+        <th th:text="#{lastName}"></th>
+        <th th:text="#{type}"></th>
+        <th th:text="#{username}"></th>
+        <th th:text="#{password}"></th>
+        <th th:text="#{actions}"></th>
     </tr>
     </thead>
     <tbody>
@@ -32,10 +33,10 @@
         <td th:text="${user.getUsername()}"></td>
         <td th:text="${user.getPassword()}"></td>
         <td>
-            <a class="btn btn-primary" th:href="@{/admin/users/edit(id=${user.id})}">Edit</a>
+            <a class="btn btn-primary" th:href="@{/admin/users/edit(id=${user.id})}" th:text="#{edit}"></a>
             <form method="post" style="display:inline-block;" th:action="@{/admin/users/delete/{id}(id=${user.id})}">
                 <input name="_method" type="hidden" value="DELETE"/>
-                <button class="btn btn-danger" type="submit">Delete</button>
+                <button class="btn btn-danger" type="submit" th:text="#{delete}"></button>
             </form>
         </td>
     </tr>

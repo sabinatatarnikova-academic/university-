@@ -25,7 +25,7 @@ public class AdminControllerConfig {
     public PasswordEncoder passwordEncoder;
 
     @Bean
-    public AdminController adminController(UserService userService, GroupService groupService, StudyClassService studyClassService, UserMapper userMapper, StudyClassMapper studyClassMapper, CourseService courseService, CourseMapper courseMapper, LocationService locationService) {
-        return new AdminController(userService, userMapper, groupService, studyClassService, studyClassMapper, courseService, courseMapper, locationService);
+    public AdminController adminController(UserService userService, GroupService groupService, StudyClassService studyClassService, UserMapper userMapper, StudyClassMapper studyClassMapper, CourseService courseService, CourseMapper courseMapper) {
+        return new AdminController(userService, userMapper, groupService, studyClassService, studyClassMapper, courseService, courseMapper);
     }
 }
