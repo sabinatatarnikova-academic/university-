@@ -1,6 +1,6 @@
 package com.foxminded.university.service.course;
 
-import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.TestConfig;
 import com.foxminded.university.model.dtos.request.CourseRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
@@ -38,6 +40,9 @@ import static org.junit.Assert.assertThrows;
 @DataJpaTest
 @ActiveProfiles("h2")
 @Import(TestConfig.class)
+@ComponentScan(basePackages = {
+        "com.foxminded.university"
+})
 class CourseServiceImplTest {
 
     @Autowired

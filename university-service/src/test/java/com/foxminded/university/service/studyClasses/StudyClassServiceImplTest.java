@@ -1,6 +1,6 @@
 package com.foxminded.university.service.studyClasses;
 
-import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.TestConfig;
 import com.foxminded.university.model.dtos.request.GroupDTO;
 import com.foxminded.university.model.dtos.request.LocationDTO;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;

@@ -1,6 +1,6 @@
 package com.foxminded.university.service.location;
 
-import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.TestConfig;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;

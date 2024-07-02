@@ -1,4 +1,4 @@
-package com.foxminded.university.repository.config;
+package com.foxminded.university.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

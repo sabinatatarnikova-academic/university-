@@ -1,6 +1,6 @@
 package com.foxminded.university.service.group;
 
-import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.TestConfig;
 import com.foxminded.university.model.dtos.request.GroupDTO;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
