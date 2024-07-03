@@ -2,12 +2,10 @@ package com.foxminded.university.utils;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
 
 import static org.junit.Assert.assertEquals;
 
-@SpringBootTest
-@TestPropertySource(locations = "classpath:application.yml")
+@SpringBootTest(classes = PageUtils.class)
 class PageUtilsTest {
 
     @Test

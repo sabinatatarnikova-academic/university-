@@ -1,6 +1,6 @@
 package com.foxminded.university.service.studyClasses;
 
-import com.foxminded.university.TestConfig;
+import com.foxminded.university.config.TestConfig;
 import com.foxminded.university.model.dtos.request.GroupDTO;
 import com.foxminded.university.model.dtos.request.LocationDTO;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
@@ -19,21 +19,16 @@ import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.service.classes.StudyClassServiceImpl;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
-import com.foxminded.university.utils.mappers.CourseMapper;
-import com.foxminded.university.utils.mappers.GroupMapper;
-import com.foxminded.university.utils.mappers.LocationMapper;
-import com.foxminded.university.utils.mappers.classes.OfflineClassMapper;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
-import com.foxminded.university.utils.mappers.users.TeacherMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,7 +49,7 @@ import static org.junit.Assert.assertThrows;
 @DataJpaTest
 @ActiveProfiles("h2")
 @ExtendWith(SpringExtension.class)
-@Import(TestConfig.class)
+@ContextConfiguration(classes = TestConfig.class)
 class StudyClassServiceImplTest {
 
     @Autowired
@@ -64,16 +59,7 @@ class StudyClassServiceImplTest {
     private StudyClassServiceImpl studyClassService;
 
     @Autowired
-    private GroupMapper groupMapper;
-
-    @Autowired
-    private CourseMapper courseMapper;
-
-    @Autowired
-    private LocationMapper locationMapper;
-
-    @Autowired
-    private TeacherMapper teacherMapper;
+    private StudyClassMapper studyClassMapper;
 
     private Group groupA;
     private Group groupB;
@@ -89,10 +75,6 @@ class StudyClassServiceImplTest {
     private OfflineClass offlineClass;
     private String username = "username";
     private String password = "password";
-    @Autowired
-    private StudyClassMapper studyClassMapper;
-    @Autowired
-    private OfflineClassMapper offlineClassMapper;
 
     @BeforeEach
     @Transactional
