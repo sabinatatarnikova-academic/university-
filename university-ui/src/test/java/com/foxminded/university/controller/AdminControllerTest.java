@@ -2,11 +2,14 @@ package com.foxminded.university.controller;
 
 import com.foxminded.university.config.AdminControllerConfig;
 import com.foxminded.university.config.TestSecurityConfig;
+import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupRequest;
 import com.foxminded.university.model.dtos.request.classes.CreateStudyClassRequest;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.classes.OnlineClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
+import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.UserResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
@@ -35,6 +38,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -392,5 +396,130 @@ class AdminControllerTest {
                 .andExpect(redirectedUrl("/admin/classes"));
 
         verify(studyClassService, times(1)).deleteClassById(id);
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testShowAllGroupsList() throws Exception {
+        Page<GroupDTO> pageDtoImpl = new PageImpl<>(Collections.singletonList(GroupDTO.builder()
+                .name("Group")
+                .build()));
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        when(groupService.findAllGroupsWithPagination(page)).thenReturn(pageDtoImpl);
+
+        mockMvc.perform(get("/admin/groups").param("page", "0").param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/group/admin_groups"))
+                .andExpect(model().attributeExists("groupsPage"))
+                .andExpect(model().attribute("groupsPage", pageDtoImpl));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testShowAllStudentsAssignedToGroupList() throws Exception {
+        Group group = Group.builder().id("1").name("test").build();
+        List<StudentResponse> pageDtoImpl = Collections.singletonList(StudentResponse.builder()
+                .id("1")
+                .firstName("tEST")
+                .build());
+        when(groupService.findGroupById("1")).thenReturn(group);
+        when(groupService.findAllStudentsAssignedToGroup("1")).thenReturn(pageDtoImpl);
+
+        mockMvc.perform(get("/admin/groups/students").param("id", "1").with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/group/group_students"))
+                .andExpect(model().attributeExists("students"))
+                .andExpect(model().attributeExists("group"))
+                .andExpect(model().attribute("students", pageDtoImpl))
+                .andExpect(model().attribute("group", group));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testShowAllClassesAssignedToGroupList() throws Exception {
+        Group group = Group.builder().id("1").name("test").build();
+        List<StudyClassResponse> pageDtoImpl = Collections.singletonList(StudyClassResponse.builder()
+                .id("1")
+                .build());
+        when(groupService.findGroupById("1")).thenReturn(group);
+        when(groupService.findAllStudyClassesAssignedToGroup("1")).thenReturn(pageDtoImpl);
+
+        mockMvc.perform(get("/admin/groups/classes").param("id", "1").with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/group/group_classes"))
+                .andExpect(model().attributeExists("classes"))
+                .andExpect(model().attributeExists("group"))
+                .andExpect(model().attribute("classes", pageDtoImpl))
+                .andExpect(model().attribute("group", group));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testShowAddGroupForm() throws Exception {
+        mockMvc.perform(get("/admin/groups/new"))
+                .andExpect(model().attributeExists("group"))
+                .andExpect(model().attribute("group", new GroupDTO()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/group/add_group"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testAddGroup() throws Exception {
+        mockMvc.perform(post("/admin/groups/new")
+                        .param("id", "id")
+                        .param("name", "name")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/groups"));
+
+        verify(groupService, times(1)).saveGroup(any());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testShowEdiGroupForm() throws Exception {
+        String groupId = "1";
+        Group group = Group.builder()
+                .id(groupId)
+                .name("ONLINE")
+                .build();
+        when(groupService.findGroupById(groupId)).thenReturn(group);
+
+        mockMvc.perform(get("/admin/groups/edit").param("id", groupId).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/group/edit_group"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testEditGroup() throws Exception {
+        String groupId = "1";
+        Group group = Group.builder()
+                .id(groupId)
+                .name("ONLINE")
+                .build();
+        when(groupService.findGroupById(groupId)).thenReturn(group);
+
+        mockMvc.perform(post("/admin/groups/edit")
+                        .param("id", "id")
+                        .param("name", "test")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/groups"));
+
+        verify(groupService, times(1)).updateGroup((GroupRequest) any());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testDeleteGroup() throws Exception {
+        String id = "1";
+        mockMvc.perform(delete("/admin/groups/delete/{id}", id)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/groups"));
+
+        verify(groupService, times(1)).deleteGroupById(id);
     }
 }

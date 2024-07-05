@@ -33,6 +33,8 @@ public interface UserService {
 
     List<TeacherResponse> findAllTeachers();
 
+    List<StudentResponse> findAllStudents();
+
     void updateUser(UserFormRequest userFormRequest);
 
     Page<CourseDTO> showCoursesThatAssignedToStudent(RequestPage requestPage);

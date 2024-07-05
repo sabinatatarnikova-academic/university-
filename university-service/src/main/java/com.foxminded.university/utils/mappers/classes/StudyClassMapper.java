@@ -21,7 +21,10 @@ public interface StudyClassMapper {
     @SubclassMapping(source = OnlineClass.class, target = OnlineClassResponse.class)
     @SubclassMapping(source = OfflineClass.class, target = OfflineClassResponse.class)
     @Mapping(target = "courseName", source = "course.name")
+    @Mapping(target = "courseId", source = "course.id")
+    @Mapping(target = "groupId", source = "group.id")
     @Mapping(target = "groupName", source = "group.name")
+    @Mapping(target = "teacherId", source = "teacher.id")
     @Mapping(target = "teacherFirstName", source = "teacher.firstName")
     @Mapping(target = "teacherLastName", source = "teacher.lastName")
     StudyClassResponse toDto(StudyClass studyClass);
@@ -30,8 +33,11 @@ public interface StudyClassMapper {
     @BeanMapping(builder = @Builder(disableBuilder = true))
     @SubclassMapping(source = OnlineClassResponse.class, target = OnlineClass.class)
     @SubclassMapping(source = OfflineClassResponse.class, target = OfflineClass.class)
+    @Mapping(target = "course.id", source = "courseId")
     @Mapping(target = "course.name", source = "courseName")
+    @Mapping(target = "group.id", source = "groupId")
     @Mapping(target = "group.name", source = "groupName")
+    @Mapping(target = "teacher.id", source = "teacherId")
     @Mapping(target = "teacher.firstName", source = "teacherFirstName")
     @Mapping(target = "teacher.lastName", source = "teacherLastName")
     StudyClass toEntity(StudyClassResponse studyClassResponse);

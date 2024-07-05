@@ -2,8 +2,10 @@ package com.foxminded.university.controller;
 
 import com.foxminded.university.config.TestSecurityConfig;
 import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.GroupResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.service.course.CourseService;
+import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
@@ -37,6 +39,9 @@ class TeacherControllerTest {
     @MockBean
     private CourseService courseService;
 
+    @MockBean
+    private GroupService groupService;
+
     @Test
     void testShowTeacherList() throws Exception {
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
@@ -57,7 +62,7 @@ class TeacherControllerTest {
     void testShowAllCoursesList() throws Exception {
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
         Page<CourseDTO> coursePage = new PageImpl<>(Collections.singletonList(CourseDTO.builder()
-                .name("Group A")
+                .name("Course A")
                 .build()));
 
         when(courseService.findAllCoursesWithPagination(page)).thenReturn(coursePage);
@@ -67,5 +72,21 @@ class TeacherControllerTest {
                 .andExpect(view().name("teacher/teacher_courses"))
                 .andExpect(model().attributeExists("coursesPage"))
                 .andExpect(model().attribute("coursesPage", coursePage));
+    }
+
+    @Test
+    void testShowAllGroupsList() throws Exception {
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        Page<GroupResponse> groupPage = new PageImpl<>(Collections.singletonList(GroupResponse.builder()
+                .name("Group A")
+                .build()));
+
+        when(groupService.findAllGroupsResponsesWithPagination(page)).thenReturn(groupPage);
+
+        mockMvc.perform(get("/teacher/groups").param("groupsPage", "0").param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("teacher/teacher_groups"))
+                .andExpect(model().attributeExists("groupsPage"))
+                .andExpect(model().attribute("groupsPage", groupPage));
     }
 }

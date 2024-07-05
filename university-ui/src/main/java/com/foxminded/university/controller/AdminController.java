@@ -1,14 +1,18 @@
 package com.foxminded.university.controller;
 
 import com.foxminded.university.model.dtos.request.CourseRequest;
+import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupRequest;
 import com.foxminded.university.model.dtos.request.classes.CreateStudyClassRequest;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
+import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.UserResponse;
 import com.foxminded.university.model.entity.Course;
+import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.service.classes.StudyClassService;
@@ -18,6 +22,7 @@ import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
 import com.foxminded.university.utils.mappers.CourseMapper;
+import com.foxminded.university.utils.mappers.GroupMapper;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
 import com.foxminded.university.utils.mappers.users.UserMapper;
 import lombok.AllArgsConstructor;
@@ -32,6 +37,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -46,6 +52,7 @@ public class AdminController {
     private final StudyClassMapper studyClassMapper;
     private final CourseService courseService;
     private final CourseMapper courseMapper;
+    private final GroupMapper groupMapper;
 
     @GetMapping()
     public String usersCoursesDecision() {
@@ -175,5 +182,64 @@ public class AdminController {
     public String deleteStudyClass(@PathVariable("id") String id) {
         studyClassService.deleteClassById(id);
         return "redirect:/admin/classes";
+    }
+
+    @GetMapping("/groups")
+    public String showAllGroupsList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
+        RequestPage page = PageUtils.createPage(pageStr, sizeStr);
+        Page<GroupDTO> groupsPage = groupService.findAllGroupsWithPagination(page);
+        model.addAttribute("groupsPage", groupsPage);
+        return "admin/group/admin_groups";
+    }
+
+    @GetMapping("/groups/students")
+    public String showAllStudentsAssignedToGroup(@RequestParam String id, Model model) {
+        Group group = groupService.findGroupById(id);
+        List<StudentResponse> studentsAssignedToGroup = groupService.findAllStudentsAssignedToGroup(id);
+        model.addAttribute("students", studentsAssignedToGroup);
+        model.addAttribute("group", group);
+        return "admin/group/group_students";
+    }
+
+    @GetMapping("/groups/classes")
+    public String showAllClassesAssignedToGroup(@RequestParam String id, Model model) {
+        Group group = groupService.findGroupById(id);
+        List<StudyClassResponse> classesAssignedToGroup = groupService.findAllStudyClassesAssignedToGroup(id);
+        model.addAttribute("classes", classesAssignedToGroup);
+        model.addAttribute("group", group);
+        return "admin/group/group_classes";
+    }
+
+    @GetMapping("/groups/new")
+    public String showAddGroupForm(Model model) {
+        model.addAttribute("group", new GroupDTO());
+        return "admin/group/add_group";
+    }
+
+    @PostMapping("/groups/new")
+    public String addGroup(@ModelAttribute GroupDTO groupDTO) {
+        groupService.saveGroup(groupDTO);
+        return "redirect:/admin/groups";
+    }
+
+    @GetMapping("/groups/edit")
+    public String showEditGroupForm(@RequestParam String id, Model model) {
+        Group group = groupService.findGroupById(id);
+        model.addAttribute("group", groupMapper.toDtoResponse(group));
+        model.addAttribute("students", userService.findAllStudents());
+        model.addAttribute("studyClasses", studyClassService.findAllClasses());
+        return "admin/group/edit_group";
+    }
+
+    @PostMapping("/groups/edit")
+    public String editGroup(@ModelAttribute GroupRequest groupRequest) {
+        groupService.updateGroup(groupRequest);
+        return "redirect:/admin/groups";
+    }
+
+    @DeleteMapping("/groups/delete/{id}")
+    public String deleteGroup(@PathVariable("id") String id) {
+        groupService.deleteGroupById(id);
+        return "redirect:/admin/groups";
     }
 }

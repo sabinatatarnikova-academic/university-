@@ -308,7 +308,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findAllStudents() {
+    void findAllStudentsWithPagination() {
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
 
         StudentResponse charlieDTO = StudentResponse.builder()
@@ -334,6 +334,34 @@ class UserServiceImplTest {
         });
 
         assertIterableEquals(expectedStudents, actualStudents.toList());
+    }
+
+    @Test
+    void findAllStudent() {
+
+        StudentResponse charlieDTO = StudentResponse.builder()
+                .firstName("Charlie")
+                .lastName("Williams")
+                .group(GroupDTO.builder().name("Group A").build())
+                .username("username3")
+                .password(password)
+                .build();
+        StudentResponse dianaDTO = StudentResponse.builder()
+                .firstName("Diana")
+                .lastName("Brown")
+                .group(GroupDTO.builder().name("Group B").build())
+                .username("username4")
+                .password(password)
+                .build();
+
+        List<StudentResponse> expectedStudents = Arrays.asList(charlieDTO, dianaDTO);
+        List<StudentResponse> actualStudents = userService.findAllStudents();
+        actualStudents.forEach(user -> {
+            user.setId(null);
+            user.getGroup().setId(null);
+        });
+
+        assertIterableEquals(expectedStudents, actualStudents);
     }
 
     @Test

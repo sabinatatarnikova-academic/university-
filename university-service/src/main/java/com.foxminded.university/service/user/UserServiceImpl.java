@@ -167,6 +167,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<StudentResponse> findAllStudents() {
+        List<Student> students = userRepository.findAllStudents();
+        List<StudentResponse> studentsResponses = students.stream().map(studentMapper::toDto).collect(Collectors.toList());
+        log.info("Found all students");
+        return studentsResponses;
+    }
+
+    @Override
     @Transactional
     public void updateUser(UserFormRequest userFormRequest) {
         if (userFormRequest.getUserType().equalsIgnoreCase("STUDENT")) {
