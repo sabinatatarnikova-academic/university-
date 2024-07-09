@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GroupDTO {
+public class GroupFormationDTO {
 
     private String id;
     private String name;

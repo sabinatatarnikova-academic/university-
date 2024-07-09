@@ -2,7 +2,7 @@ package com.foxminded.university.controller;
 
 import com.foxminded.university.config.AdminControllerConfig;
 import com.foxminded.university.config.TestSecurityConfig;
-import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupFormationDTO;
 import com.foxminded.university.model.dtos.request.GroupRequest;
 import com.foxminded.university.model.dtos.request.classes.CreateStudyClassRequest;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
@@ -401,7 +401,7 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowAllGroupsList() throws Exception {
-        Page<GroupDTO> pageDtoImpl = new PageImpl<>(Collections.singletonList(GroupDTO.builder()
+        Page<GroupFormationDTO> pageDtoImpl = new PageImpl<>(Collections.singletonList(GroupFormationDTO.builder()
                 .name("Group")
                 .build()));
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
@@ -458,7 +458,7 @@ class AdminControllerTest {
     void testShowAddGroupForm() throws Exception {
         mockMvc.perform(get("/admin/groups/new"))
                 .andExpect(model().attributeExists("group"))
-                .andExpect(model().attribute("group", new GroupDTO()))
+                .andExpect(model().attribute("group", new GroupFormationDTO()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/group/add_group"));
     }
@@ -484,11 +484,20 @@ class AdminControllerTest {
                 .id(groupId)
                 .name("ONLINE")
                 .build();
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        Page<StudentResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(StudentResponse.builder()
+                .firstName("Charlie")
+                .lastName("Williams")
+                .group(GroupFormationDTO.builder().name("Group A").build())
+                .build()));
         when(groupService.findGroupById(groupId)).thenReturn(group);
+        when(userService.findAllStudentsWithPagination(page)).thenReturn(pageDtoImpl);
 
-        mockMvc.perform(get("/admin/groups/edit").param("id", groupId).with(csrf()))
+        mockMvc.perform(get("/admin/groups/edit").param("id", groupId).param("page", "0").param("size", "10").with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("admin/group/edit_group"));
+                .andExpect(view().name("admin/group/edit_group"))
+                .andExpect(model().attributeExists("students"))
+                .andExpect(model().attribute("students", pageDtoImpl));
     }
 
     @Test

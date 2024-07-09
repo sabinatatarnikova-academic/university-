@@ -1,7 +1,7 @@
 package com.foxminded.university.service.user;
 
 import com.foxminded.university.config.TestConfig;
-import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupFormationDTO;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
@@ -212,6 +212,15 @@ class UserServiceImplTest {
     }
 
     @Test
+    void findUserDTOById() {
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
+        UserResponse user = userService.findAllUsersWithPagination(page).toList().get(3);
+        String userId = user.getId();
+        UserResponse dto = userService.findUserDTOById(userId);
+        assertEquals(user, dto);
+    }
+
+    @Test
     void findUserByName() {
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
         UserResponse user = userService.findAllUsersWithPagination(page).toList().get(3);
@@ -314,14 +323,14 @@ class UserServiceImplTest {
         StudentResponse charlieDTO = StudentResponse.builder()
                 .firstName("Charlie")
                 .lastName("Williams")
-                .group(GroupDTO.builder().name("Group A").build())
+                .group(GroupFormationDTO.builder().name("Group A").build())
                 .username("username3")
                 .password(password)
                 .build();
         StudentResponse dianaDTO = StudentResponse.builder()
                 .firstName("Diana")
                 .lastName("Brown")
-                .group(GroupDTO.builder().name("Group B").build())
+                .group(GroupFormationDTO.builder().name("Group B").build())
                 .username("username4")
                 .password(password)
                 .build();
@@ -334,34 +343,6 @@ class UserServiceImplTest {
         });
 
         assertIterableEquals(expectedStudents, actualStudents.toList());
-    }
-
-    @Test
-    void findAllStudent() {
-
-        StudentResponse charlieDTO = StudentResponse.builder()
-                .firstName("Charlie")
-                .lastName("Williams")
-                .group(GroupDTO.builder().name("Group A").build())
-                .username("username3")
-                .password(password)
-                .build();
-        StudentResponse dianaDTO = StudentResponse.builder()
-                .firstName("Diana")
-                .lastName("Brown")
-                .group(GroupDTO.builder().name("Group B").build())
-                .username("username4")
-                .password(password)
-                .build();
-
-        List<StudentResponse> expectedStudents = Arrays.asList(charlieDTO, dianaDTO);
-        List<StudentResponse> actualStudents = userService.findAllStudents();
-        actualStudents.forEach(user -> {
-            user.setId(null);
-            user.getGroup().setId(null);
-        });
-
-        assertIterableEquals(expectedStudents, actualStudents);
     }
 
     @Test

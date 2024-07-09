@@ -2,8 +2,10 @@ package com.foxminded.university.service.classes;
 
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.GroupAssignResponse;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
+import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
@@ -78,6 +80,13 @@ public class StudyClassServiceImpl implements StudyClassService {
     }
 
     @Override
+    public StudyClassResponse findClassDTOById(String classId) {
+        StudyClassResponse dto = studyClassMapper.toDto(findClassById(classId));
+        log.info("Entity studyClass converted to dto");
+        return dto;
+    }
+
+    @Override
     @Transactional
     public void updateStudyClass(StudyClassRequest studyClassRequest) {
         StudyClass studyClass = findClassById(studyClassRequest.getId());
@@ -125,10 +134,10 @@ public class StudyClassServiceImpl implements StudyClassService {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<StudyClass> studyClasses = studyClassRepository.findAll();
+        Page<StudyClass> studyClasses = studyClassRepository.findAll(pageable);
         List<StudyClassResponse> studyClassResponses = studyClasses.stream().map(studyClassMapper::toDto).collect(Collectors.toList());
         log.info("Found {} classes", studyClassResponses.size());
-        return new PageImpl<>(studyClassResponses, pageable, studyClassResponses.size());
+        return new PageImpl<>(studyClassResponses, pageable, studyClasses.getTotalElements());
     }
 
     @Override
@@ -141,7 +150,7 @@ public class StudyClassServiceImpl implements StudyClassService {
 
     @Override
     @Transactional
-    public Map<String, Object> getAllRequiredData() {
+    public Map<String, Object> getAllRequiredDataForStudyClassEdit() {
         Map<String, Object> data = new HashMap<>();
         List<Course> courses = courseRepository.findAll();
         List<CourseDTO> courseResponses = courses.stream().map(courseMapper::toDto).collect(Collectors.toList());
@@ -149,6 +158,20 @@ public class StudyClassServiceImpl implements StudyClassService {
         data.put("groups", groupService.findAllGroups());
         data.put("teachers", userService.findAllTeachers());
         data.put("locations", locationService.findAllLocations());
+        return data;
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> getAllRequiredDataForGroupEdit(String id, RequestPage page) {
+        Map<String, Object> data = new HashMap<>();
+        GroupAssignResponse group = groupService.findGroupDTOById(id);
+        Page<StudentResponse> students = userService.findAllStudentsWithPagination(page);
+        List<StudyClassResponse> classes = findAllClasses();
+
+        data.put("group", group);
+        data.put("students", students);
+        data.put("classes", classes);
         return data;
     }
 }

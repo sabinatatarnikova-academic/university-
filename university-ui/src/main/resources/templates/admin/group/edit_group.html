@@ -47,6 +47,15 @@
                 </div>
             </div>
         </div>
+        <div>
+            <ul class="pagination">
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, students.totalPages - 1)}">
+                    <a class="page-link"
+                       th:href="@{/admin/groups/edit(id=${group.id}, page=${i}, size=${students.size})}"
+                       th:text="${i + 1}"></a>
+                </li>
+            </ul>
+        </div>
         <button class="btn btn-primary" type="submit">Save Changes</button>
     </form>
 </div>

@@ -1,12 +1,14 @@
 package com.foxminded.university.service.studyClasses;
 
 import com.foxminded.university.config.TestConfig;
-import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupFormationDTO;
 import com.foxminded.university.model.dtos.request.LocationDTO;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.GroupAssignResponse;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
+import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
@@ -17,6 +19,7 @@ import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.service.classes.StudyClassServiceImpl;
+import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
@@ -60,6 +63,9 @@ class StudyClassServiceImplTest {
 
     @Autowired
     private StudyClassMapper studyClassMapper;
+
+    @Autowired
+    private GroupService groupService;
 
     private Group groupA;
     private Group groupB;
@@ -240,6 +246,14 @@ class StudyClassServiceImplTest {
     }
 
     @Test
+    void findClassDTOById() {
+        StudyClassResponse studyClass = studyClassService.findAllClasses().get(0);
+        String classId = studyClass.getId();
+        StudyClassResponse actual = studyClassService.findClassDTOById(classId);
+        assertEquals(studyClass, actual);
+    }
+
+    @Test
     void assertThrowsExceptionIfClassIsNotPresent() {
         assertThrows(NoSuchElementException.class, () -> studyClassService.findClassById("testId"));
     }
@@ -275,8 +289,8 @@ class StudyClassServiceImplTest {
     }
 
     @Test
-    void testGetAllRequiredData() {
-        Map<String, Object> map = studyClassService.getAllRequiredData();
+    void testGetAllRequiredDataForStudyClassEdit() {
+        Map<String, Object> map = studyClassService.getAllRequiredDataForStudyClassEdit();
 
         assertThat(map, hasKey("courses"));
         List<CourseDTO> courses = (List<CourseDTO>) map.get("courses");
@@ -291,7 +305,7 @@ class StudyClassServiceImplTest {
                         hasProperty("firstName", is("Bob"))));
 
         assertThat(map, hasKey("groups"));
-        List<GroupDTO> groups = (List<GroupDTO>) map.get("groups");
+        List<GroupFormationDTO> groups = (List<GroupFormationDTO>) map.get("groups");
         assertThat(groups,
                 containsInAnyOrder(hasProperty("name", is("Group A")),
                         hasProperty("name", is("Group B"))));
@@ -301,5 +315,32 @@ class StudyClassServiceImplTest {
         assertThat(locations,
                 containsInAnyOrder(hasProperty("department", is("ICS")),
                         hasProperty("department", is("FDU"))));
+    }
+
+    @Test
+    void testGetAllRequiredData() {
+        String groupId = studyClassService.findAllClasses().getFirst().getGroupId();
+        RequestPage page = PageUtils.createPage("0", "10");
+
+
+        Map<String, Object> map = studyClassService.getAllRequiredDataForGroupEdit(groupId, page);
+        assertThat(map, hasKey("group"));
+
+        GroupAssignResponse group = (GroupAssignResponse) map.get("group");
+
+        GroupAssignResponse groupDTOById = groupService.findGroupDTOById(groupId);
+        assertThat(group, is(groupDTOById));
+
+        assertThat(map, hasKey("students"));
+
+        Page<StudentResponse> students = (Page<StudentResponse>) map.get("students");
+        assertThat(students,
+                containsInAnyOrder(hasProperty("firstName", is("Charlie")),
+                        hasProperty("firstName", is("Diana"))));
+
+        assertThat(map, hasKey("classes"));
+        List<StudyClassResponse> classes = studyClassService.findAllClasses();
+        List<StudyClassResponse> classesMap = (List<StudyClassResponse>) map.get("classes");
+        assertThat(classes, is(classesMap));
     }
 }

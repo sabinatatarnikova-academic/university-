@@ -71,6 +71,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse findUserDTOById(String userId) {
+        User user = findUserById(userId);
+        UserResponse dto = userMapper.toDto(user);
+        log.info("User entity converted to dto");
+        return dto;
+    }
+
+    @Override
     public User findUserByUsername(String userName) {
         Optional<User> user = userRepository.findByUsername(userName);
         if (!user.isPresent()) {
@@ -129,9 +137,11 @@ public class UserServiceImpl implements UserService {
         int pageNumber = requestPage.getPageNumber();
         int pageSize = requestPage.getPageSize();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<User> users = userRepository.findAll();
-        List<UserResponse> userResponses = users.stream().map(userMapper::toDto).collect(Collectors.toList());
-        Page<UserResponse> pageResult = new PageImpl<>(userResponses, pageable, userResponses.size());
+        Page<User> usersPage = userRepository.findAll(pageable);
+        List<UserResponse> userResponses = usersPage.stream()
+                .map(userMapper::toDto)
+                .collect(Collectors.toList());
+        Page<UserResponse> pageResult = new PageImpl<>(userResponses, pageable, usersPage.getTotalElements());
         log.info("Found {} users", pageResult.getTotalPages());
         return pageResult;
     }
@@ -140,11 +150,12 @@ public class UserServiceImpl implements UserService {
     public Page<StudentResponse> findAllStudentsWithPagination(RequestPage pageRequest) {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
-        List<Student> students = userRepository.findAllStudents();
+
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<Student> students = userRepository.findAllStudents(pageable);
         log.info("Found all students");
         List<StudentResponse> studentResponses = students.stream().map(studentMapper::toDto).collect(Collectors.toList());
-        return new PageImpl<>(studentResponses, pageable, studentResponses.size());
+        return new PageImpl<>(studentResponses, pageable, students.getTotalElements());
     }
 
     @Override
@@ -164,14 +175,6 @@ public class UserServiceImpl implements UserService {
         List<TeacherResponse> teacherResponses = teachers.stream().map(teacherMapper::toDto).collect(Collectors.toList());
         log.info("Found all teachers");
         return teacherResponses;
-    }
-
-    @Override
-    public List<StudentResponse> findAllStudents() {
-        List<Student> students = userRepository.findAllStudents();
-        List<StudentResponse> studentsResponses = students.stream().map(studentMapper::toDto).collect(Collectors.toList());
-        log.info("Found all students");
-        return studentsResponses;
     }
 
     @Override
@@ -207,4 +210,5 @@ public class UserServiceImpl implements UserService {
         log.info("Count of courses that assigned to student - {} is {}", student.getId(), classesCount);
         return new PageImpl<>(courses, pageable, classesCount);
     }
+
 }

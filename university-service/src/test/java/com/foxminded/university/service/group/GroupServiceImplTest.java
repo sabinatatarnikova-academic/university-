@@ -1,9 +1,9 @@
 package com.foxminded.university.service.group;
 
 import com.foxminded.university.config.TestConfig;
-import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupFormationDTO;
 import com.foxminded.university.model.dtos.request.GroupRequest;
-import com.foxminded.university.model.dtos.response.GroupResponse;
+import com.foxminded.university.model.dtos.response.GroupAssignResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.entity.Course;
@@ -15,6 +15,7 @@ import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +31,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -150,43 +150,40 @@ class GroupServiceImplTest {
 
     @Test
     void testSaveGroup() {
-        GroupDTO groupToSave = GroupDTO.builder()
+        GroupFormationDTO groupToSave = GroupFormationDTO.builder()
                 .name("Mugiwaras")
                 .build();
 
         groupService.saveGroup(groupToSave);
-        Group group = groupService.findGroupByName("Mugiwaras");
+        GroupFormationDTO group = groupService.findAllGroups().getLast();
         group.setId(null);
-        assertThat(groupToSave.getName(), is(group.getName()));
+        assertEquals(groupToSave, group);
     }
 
     @Test
     void findGroupById() {
-        Group groupByName = groupService.findGroupByName("Group A");
-        String groupId = groupByName.getId();
-        Group group = groupService.findGroupById(groupId);
-        assertEquals("Group A", group.getName());
+        GroupFormationDTO group = groupService.findAllGroups().getFirst();
+        String groupId = group.getId();
+        Group groupActual = groupService.findGroupById(groupId);
+        assertEquals("Group A", groupActual.getName());
     }
 
     @Test
-    void assertThrowsExceptionIfGroupIsNotPresent(){
-        assertThrows(NoSuchElementException.class, () -> groupService.findGroupById("testId"));
+    void findGroupDTOById() {
+        GroupFormationDTO group = groupService.findAllGroups().getFirst();
+        String groupId = group.getId();
+        GroupAssignResponse groupActual = groupService.findGroupDTOById(groupId);
+        assertEquals("Group A", groupActual.getName());
     }
 
     @Test
-    void findGroupByName() {
-        Group group = groupService.findGroupByName("Group A");
-        assertThat(group, is(groupService.findGroupById(group.getId())));
-    }
-
-    @Test
-    void assertThrowsExceptionIfGroupIsNotPresentByName(){
-        assertThrows(NoSuchElementException.class, () -> groupService.findGroupByName("test"));
+    void assertThrowsExceptionIfGroupIsNotPresent() {
+        assertThrows(EntityNotFoundException.class, () -> groupService.findGroupById("testId"));
     }
 
     @Test
     void updateGroup() {
-        Group group = groupService.findGroupByName("Group A");
+        GroupFormationDTO group = groupService.findAllGroups().getFirst();
         String groupId = group.getId();
         GroupRequest groupToUpdate = GroupRequest.builder()
                 .id(groupId)
@@ -195,7 +192,7 @@ class GroupServiceImplTest {
                 .studyClasses(new ArrayList<>())
                 .build();
         groupService.updateGroup(groupToUpdate);
-        Group updatedGroup = groupService.findGroupByName("Update name");
+        Group updatedGroup = groupService.findGroupById(groupId);
         assertEquals(groupToUpdate.getId(), updatedGroup.getId());
         assertEquals(null, updatedGroup.getStudents());
         assertEquals(null, updatedGroup.getStudyClasses());
@@ -203,61 +200,62 @@ class GroupServiceImplTest {
 
     @Test
     void deleteGroupById() {
-        String groupId = groupService.findGroupByName("Group A").getId();
+        GroupFormationDTO group = groupService.findAllGroups().getFirst();
+        String groupId = group.getId();
         groupService.deleteGroupById(groupId);
-        assertThrows(NoSuchElementException.class, () -> groupService.findGroupById(groupId));
+        assertThrows(EntityNotFoundException.class, () -> groupService.findGroupById(groupId));
     }
 
     @Test
     void findAllGroupsWithPagination() {
-        GroupDTO groupA = GroupDTO.builder()
+        GroupFormationDTO groupA = GroupFormationDTO.builder()
                 .name("Group A")
                 .build();
-        GroupDTO groupB = GroupDTO.builder()
+        GroupFormationDTO groupB = GroupFormationDTO.builder()
                 .name("Group B")
                 .build();
 
-        List<GroupDTO> groups = Arrays.asList(groupA, groupB);
+        List<GroupFormationDTO> groups = Arrays.asList(groupA, groupB);
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(Integer.MAX_VALUE));
-        Page<GroupDTO> groupsActual = groupService.findAllGroupsWithPagination(page);
+        Page<GroupFormationDTO> groupsActual = groupService.findAllGroupsWithPagination(page);
         groupsActual.forEach(course -> course.setId(null));
         assertThat(groupsActual.toList(), is(groups));
     }
 
     @Test
     void findAllGroupsResponseWithPagination() {
-        GroupResponse groupA = GroupResponse.builder()
+        GroupAssignResponse groupA = GroupAssignResponse.builder()
                 .name("Group A")
                 .build();
-        GroupResponse groupB = GroupResponse.builder()
+        GroupAssignResponse groupB = GroupAssignResponse.builder()
                 .name("Group B")
                 .build();
 
-        List<GroupResponse> groups = Arrays.asList(groupA, groupB);
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(Integer.MAX_VALUE));
-        Page<GroupResponse> groupsActual = groupService.findAllGroupsResponsesWithPagination(page);
+        List<GroupAssignResponse> groups = Arrays.asList(groupA, groupB);
+        RequestPage page = PageUtils.createPage("0", "2");
+        Page<GroupAssignResponse> groupsActual = groupService.findAllGroupsResponsesWithPagination(page);
         groupsActual.forEach(course -> course.setId(null));
         assertThat(groupsActual.toList(), is(groups));
     }
 
     @Test
     void findAllGroups() {
-        GroupDTO groupA = GroupDTO.builder()
+        GroupFormationDTO groupA = GroupFormationDTO.builder()
                 .name("Group A")
                 .build();
-        GroupDTO groupB = GroupDTO.builder()
+        GroupFormationDTO groupB = GroupFormationDTO.builder()
                 .name("Group B")
                 .build();
 
-        List<GroupDTO> groups = Arrays.asList(groupA, groupB);
-        List<GroupDTO> groupsActual = groupService.findAllGroups();
+        List<GroupFormationDTO> groups = Arrays.asList(groupA, groupB);
+        List<GroupFormationDTO> groupsActual = groupService.findAllGroups();
         groupsActual.forEach(course -> course.setId(null));
         assertThat(groupsActual, is(groups));
     }
 
     @Test
     void findAllStudentsAssignedToGroup() {
-        Group group = groupService.findGroupByName("Group A");
+        GroupFormationDTO group = groupService.findAllGroups().getFirst();
         String groupId = group.getId();
 
         List<StudentResponse> studentsAssignedToGroup = groupService.findAllStudentsAssignedToGroup(groupId);
@@ -267,7 +265,7 @@ class GroupServiceImplTest {
 
     @Test
     void findAllClassesAssignedToGroup() {
-        Group group = groupService.findGroupByName("Group A");
+        GroupFormationDTO group = groupService.findAllGroups().getFirst();
         String groupId = group.getId();
 
         List<StudyClassResponse> studyClassesAssignedToGroup = groupService.findAllStudyClassesAssignedToGroup(groupId);

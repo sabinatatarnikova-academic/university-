@@ -1,7 +1,7 @@
 package com.foxminded.university.controller;
 
 import com.foxminded.university.model.dtos.request.CourseRequest;
-import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupFormationDTO;
 import com.foxminded.university.model.dtos.request.GroupRequest;
 import com.foxminded.university.model.dtos.request.classes.CreateStudyClassRequest;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
@@ -11,20 +11,13 @@ import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResp
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.UserResponse;
-import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
-import com.foxminded.university.model.entity.classes.StudyClass;
-import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.course.CourseService;
 import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
-import com.foxminded.university.utils.mappers.CourseMapper;
-import com.foxminded.university.utils.mappers.GroupMapper;
-import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
-import com.foxminded.university.utils.mappers.users.UserMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -46,13 +39,9 @@ import java.util.Map;
 public class AdminController {
 
     private final UserService userService;
-    private final UserMapper userMapper;
     private final GroupService groupService;
     private final StudyClassService studyClassService;
-    private final StudyClassMapper studyClassMapper;
     private final CourseService courseService;
-    private final CourseMapper courseMapper;
-    private final GroupMapper groupMapper;
 
     @GetMapping()
     public String usersCoursesDecision() {
@@ -81,8 +70,7 @@ public class AdminController {
 
     @GetMapping("/users/edit")
     public String showEditUserForm(@RequestParam String id, Model model) {
-        User user = userService.findUserById(id);
-        model.addAttribute("user", userMapper.toDto(user));
+        model.addAttribute("user", userService.findUserDTOById(id));
         model.addAttribute("groups", groupService.findAllGroups());
         model.addAttribute("allStudyClasses", studyClassService.findAllClasses());
         return "admin/user/edit-user";
@@ -122,8 +110,7 @@ public class AdminController {
 
     @GetMapping("/courses/edit")
     public String showEditCourseForm(@RequestParam String id, Model model) {
-        Course course = courseService.findCourseById(id);
-        model.addAttribute("course", courseMapper.toDto(course));
+        model.addAttribute("course", courseService.findCourseDTOById(id));
         model.addAttribute("allStudyClasses", studyClassService.findAllClasses());
         return "admin/course/edit_course";
     }
@@ -162,9 +149,8 @@ public class AdminController {
 
     @GetMapping("/classes/edit")
     public String showEditStudyClassForm(@RequestParam String id, Model model) {
-        StudyClass studyClass = studyClassService.findClassById(id);
-        Map<String, Object> data = studyClassService.getAllRequiredData();
-        model.addAttribute("class", studyClassMapper.toDto(studyClass));
+        Map<String, Object> data = studyClassService.getAllRequiredDataForStudyClassEdit();
+        model.addAttribute("class", studyClassService.findClassDTOById(id));
         model.addAttribute("courses", data.get("courses"));
         model.addAttribute("groups", data.get("groups"));
         model.addAttribute("teachers", data.get("teachers"));
@@ -187,7 +173,7 @@ public class AdminController {
     @GetMapping("/groups")
     public String showAllGroupsList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
         RequestPage page = PageUtils.createPage(pageStr, sizeStr);
-        Page<GroupDTO> groupsPage = groupService.findAllGroupsWithPagination(page);
+        Page<GroupFormationDTO> groupsPage = groupService.findAllGroupsWithPagination(page);
         model.addAttribute("groupsPage", groupsPage);
         return "admin/group/admin_groups";
     }
@@ -212,22 +198,23 @@ public class AdminController {
 
     @GetMapping("/groups/new")
     public String showAddGroupForm(Model model) {
-        model.addAttribute("group", new GroupDTO());
+        model.addAttribute("group", new GroupFormationDTO());
         return "admin/group/add_group";
     }
 
     @PostMapping("/groups/new")
-    public String addGroup(@ModelAttribute GroupDTO groupDTO) {
-        groupService.saveGroup(groupDTO);
+    public String addGroup(@ModelAttribute GroupFormationDTO groupFormationDTO) {
+        groupService.saveGroup(groupFormationDTO);
         return "redirect:/admin/groups";
     }
 
     @GetMapping("/groups/edit")
-    public String showEditGroupForm(@RequestParam String id, Model model) {
-        Group group = groupService.findGroupById(id);
-        model.addAttribute("group", groupMapper.toDtoResponse(group));
-        model.addAttribute("students", userService.findAllStudents());
-        model.addAttribute("studyClasses", studyClassService.findAllClasses());
+    public String showEditGroupForm(@RequestParam String id, Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
+        RequestPage page = PageUtils.createPage(pageStr, sizeStr);
+        Map<String, Object> data = studyClassService.getAllRequiredDataForGroupEdit(id, page);
+        model.addAttribute("group", data.get("group"));
+        model.addAttribute("students", data.get("students"));
+        model.addAttribute("studyClasses", data.get("classes"));
         return "admin/group/edit_group";
     }
 

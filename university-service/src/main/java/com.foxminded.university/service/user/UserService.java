@@ -17,6 +17,8 @@ public interface UserService {
 
     <U extends User> U findUserById(String userId);
 
+    UserResponse findUserDTOById(String userId);
+
     <U extends User> U findUserByUsername(String username);
 
     void updateStudent(UserFormRequest userFormRequest);
@@ -32,8 +34,6 @@ public interface UserService {
     Page<TeacherResponse> findAllTeachersWithPagination(RequestPage requestPage);
 
     List<TeacherResponse> findAllTeachers();
-
-    List<StudentResponse> findAllStudents();
 
     void updateUser(UserFormRequest userFormRequest);
 

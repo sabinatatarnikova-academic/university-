@@ -2,7 +2,7 @@ package com.foxminded.university.controller;
 
 import com.foxminded.university.config.TestSecurityConfig;
 import com.foxminded.university.model.dtos.response.CourseDTO;
-import com.foxminded.university.model.dtos.response.GroupResponse;
+import com.foxminded.university.model.dtos.response.GroupAssignResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.service.course.CourseService;
 import com.foxminded.university.service.group.GroupService;
@@ -77,7 +77,7 @@ class TeacherControllerTest {
     @Test
     void testShowAllGroupsList() throws Exception {
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
-        Page<GroupResponse> groupPage = new PageImpl<>(Collections.singletonList(GroupResponse.builder()
+        Page<GroupAssignResponse> groupPage = new PageImpl<>(Collections.singletonList(GroupAssignResponse.builder()
                 .name("Group A")
                 .build()));
 

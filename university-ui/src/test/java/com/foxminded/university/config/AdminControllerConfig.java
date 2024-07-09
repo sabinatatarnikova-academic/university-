@@ -5,10 +5,6 @@ import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.course.CourseService;
 import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
-import com.foxminded.university.utils.mappers.CourseMapper;
-import com.foxminded.university.utils.mappers.GroupMapper;
-import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
-import com.foxminded.university.utils.mappers.users.UserMapper;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +21,7 @@ public class AdminControllerConfig {
     public PasswordEncoder passwordEncoder;
 
     @Bean
-    public AdminController adminController(UserService userService, GroupService groupService, StudyClassService studyClassService, UserMapper userMapper, StudyClassMapper studyClassMapper, CourseService courseService, CourseMapper courseMapper, GroupMapper groupMapper) {
-        return new AdminController(userService, userMapper, groupService, studyClassService, studyClassMapper, courseService, courseMapper, groupMapper);
+    public AdminController adminController(UserService userService, GroupService groupService, StudyClassService studyClassService, CourseService courseService) {
+        return new AdminController(userService, groupService, studyClassService, courseService);
     }
 }

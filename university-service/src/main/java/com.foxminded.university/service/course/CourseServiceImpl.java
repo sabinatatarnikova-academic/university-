@@ -69,6 +69,13 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public CourseDTO findCourseDTOById(String courseId) {
+        CourseDTO dto = courseMapper.toDto(findCourseById(courseId));
+        log.info("Entity course converted to dto");
+        return dto;
+    }
+
+    @Override
     public Course findCourseByName(String courseName) {
         Optional <Course> course = courseRepository.findCourseByName(courseName);
         if (!course.isPresent()) {
@@ -90,9 +97,9 @@ public class CourseServiceImpl implements CourseService {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<Course> courses = courseRepository.findAll();
+        Page<Course> courses = courseRepository.findAll(pageable);
         List<CourseDTO> courseResponses = courses.stream().map(courseMapper::toDto).collect(Collectors.toList());
-        Page<CourseDTO> pageResult = new PageImpl<>(courseResponses, pageable, courseResponses.size());
+        Page<CourseDTO> pageResult = new PageImpl<>(courseResponses, pageable, courses.getTotalElements());
         log.info("Found {} courses", pageResult.getTotalPages());
         return pageResult;
     }

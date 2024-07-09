@@ -1,8 +1,8 @@
 package com.foxminded.university.service.group;
 
-import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupFormationDTO;
 import com.foxminded.university.model.dtos.request.GroupRequest;
-import com.foxminded.university.model.dtos.response.GroupResponse;
+import com.foxminded.university.model.dtos.response.GroupAssignResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.entity.Group;
@@ -16,6 +16,7 @@ import com.foxminded.university.utils.RequestPage;
 import com.foxminded.university.utils.mappers.GroupMapper;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
 import com.foxminded.university.utils.mappers.users.StudentMapper;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -27,7 +28,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -44,7 +44,7 @@ public class GroupServiceImpl implements GroupService {
     private final StudyClassRepository studyClassRepository;
 
     @Override
-    public void saveGroup(GroupDTO group) {
+    public void saveGroup(GroupFormationDTO group) {
         groupRepository.save(groupMapper.toEntity(group));
         log.info("Saved group with name - {}", group.getName());
     }
@@ -53,22 +53,18 @@ public class GroupServiceImpl implements GroupService {
     public Group findGroupById(String groupId) {
         Optional <Group> group = groupRepository.findById(groupId);
         if (!group.isPresent()) {
-            log.error("Course with id {} not found", groupId);
-            throw new NoSuchElementException();
+            log.warn("Course with id {} not found", groupId);
+            throw new EntityNotFoundException();
         }
         log.info("Founded the group with id {}", groupId);
         return group.get();
     }
 
     @Override
-    public Group findGroupByName(String groupName) {
-        Optional<Group> group = groupRepository.findGroupByName(groupName);
-        if (!group.isPresent()) {
-            log.error("Course with name {} not found", groupName);
-            throw new NoSuchElementException();
-        }
-        log.info("Founded the group with id {}", groupName);
-        return group.get();
+    public GroupAssignResponse findGroupDTOById(String groupId) {
+        GroupAssignResponse dto = groupMapper.toDtoResponse(findGroupById(groupId));
+        log.info("Entity group converted to dto");
+        return dto;
     }
 
     @Override
@@ -103,8 +99,8 @@ public class GroupServiceImpl implements GroupService {
         Optional<User> studentOptional = userRepository.findById(studentId);
         Group group = findGroupById(groupId);
         if (!studentOptional.isPresent()) {
-            log.error("Student with id {} not found", studentId);
-            throw new NoSuchElementException();
+            log.warn("Student with id {} not found", studentId);
+            throw new EntityNotFoundException();
         }
         Student student = (Student) studentOptional.get();
         student.setGroup(group);
@@ -117,8 +113,8 @@ public class GroupServiceImpl implements GroupService {
         Optional<StudyClass> studyClassOptional = studyClassRepository.findById(classId);
         Group group = findGroupById(groupId);
         if (!studyClassOptional.isPresent()) {
-            log.error("StudyClass with id {} not found", classId);
-            throw new NoSuchElementException();
+            log.warn("StudyClass with id {} not found", classId);
+            throw new EntityNotFoundException();
         }
         StudyClass studyClass = studyClassOptional.get();
         studyClass.setGroup(group);
@@ -134,33 +130,33 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Page<GroupDTO> findAllGroupsWithPagination(RequestPage pageRequest) {
+    public Page<GroupFormationDTO> findAllGroupsWithPagination(RequestPage pageRequest) {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<Group> groups = groupRepository.findAll();
-        List<GroupDTO> groupDTOs = groups.stream().map(groupMapper::toDto).toList();
-        log.info("Found {} groups", groupDTOs.size());
-        return new PageImpl<>(groupDTOs, pageable, groupDTOs.size());
+        Page<Group> groups = groupRepository.findAll(pageable);
+        List<GroupFormationDTO> groupFormationDTOS = groups.stream().map(groupMapper::toDto).toList();
+        log.info("Found {} groups", groupFormationDTOS.size());
+        return new PageImpl<>(groupFormationDTOS, pageable, groups.getTotalElements());
     }
 
     @Override
-    public Page<GroupResponse> findAllGroupsResponsesWithPagination(RequestPage pageRequest) {
+    public Page<GroupAssignResponse> findAllGroupsResponsesWithPagination(RequestPage pageRequest) {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<Group> groups = groupRepository.findAll();
-        List<GroupResponse> groupResponses = groups.stream().map(groupMapper::toDtoResponse).collect(Collectors.toList());
-        log.info("Found {} groups", groupResponses.size());
-        return new PageImpl<>(groupResponses, pageable, groupResponses.size());
+        Page<Group> groups = groupRepository.findAll(pageable);
+        List<GroupAssignResponse> groupRespons = groups.stream().map(groupMapper::toDtoResponse).collect(Collectors.toList());
+        log.info("Found {} groups", groupRespons.size());
+        return new PageImpl<>(groupRespons, pageable, groups.getTotalElements());
     }
 
     @Override
-    public List<GroupDTO> findAllGroups() {
+    public List<GroupFormationDTO> findAllGroups() {
         List<Group> groups = groupRepository.findAll();
-        List<GroupDTO> groupDTOs = groups.stream().map(groupMapper::toDto).collect(Collectors.toList());
+        List<GroupFormationDTO> groupFormationDTOS = groups.stream().map(groupMapper::toDto).collect(Collectors.toList());
         log.info("Found {} groups", groups.size());
-        return groupDTOs;
+        return groupFormationDTOS;
     }
 
     @Override

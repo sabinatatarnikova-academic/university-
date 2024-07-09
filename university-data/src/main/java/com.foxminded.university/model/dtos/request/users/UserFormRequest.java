@@ -1,6 +1,6 @@
 package com.foxminded.university.model.dtos.request.users;
 
-import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupFormationDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,7 +29,7 @@ public class UserFormRequest {
 
     private String userType;
 
-    private GroupDTO group;
+    private GroupFormationDTO group;
 
     private List<String> studyClasses;
 }

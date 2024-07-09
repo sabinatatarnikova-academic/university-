@@ -1,8 +1,8 @@
 package com.foxminded.university.service.group;
 
-import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupFormationDTO;
 import com.foxminded.university.model.dtos.request.GroupRequest;
-import com.foxminded.university.model.dtos.response.GroupResponse;
+import com.foxminded.university.model.dtos.response.GroupAssignResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.entity.Group;
@@ -13,21 +13,21 @@ import java.util.List;
 
 public interface GroupService {
 
-    void saveGroup(GroupDTO group);
+    void saveGroup(GroupFormationDTO group);
 
     Group findGroupById(String groupId);
 
-    Group findGroupByName(String groupName);
+    GroupAssignResponse findGroupDTOById(String groupId);
 
     void updateGroup(GroupRequest groupResponse);
 
     void deleteGroupById(String groupId);
 
-    Page<GroupDTO> findAllGroupsWithPagination(RequestPage pageRequest);
+    Page<GroupFormationDTO> findAllGroupsWithPagination(RequestPage pageRequest);
 
-    Page<GroupResponse> findAllGroupsResponsesWithPagination(RequestPage pageRequest);
+    Page<GroupAssignResponse> findAllGroupsResponsesWithPagination(RequestPage pageRequest);
 
-    List<GroupDTO> findAllGroups();
+    List<GroupFormationDTO> findAllGroups();
 
     List<StudentResponse> findAllStudentsAssignedToGroup(String groupId);
 

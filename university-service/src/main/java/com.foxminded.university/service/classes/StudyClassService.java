@@ -16,6 +16,8 @@ public interface StudyClassService {
 
     StudyClass findClassById(String classId);
 
+    StudyClassResponse findClassDTOById(String classId);
+
     void updateStudyClass(StudyClassRequest studyClass);
 
     void updateStudyClass(StudyClass studyClass);
@@ -26,5 +28,7 @@ public interface StudyClassService {
 
     List<StudyClassResponse> findAllClasses();
 
-    Map<String, Object> getAllRequiredData();
+    Map<String, Object> getAllRequiredDataForStudyClassEdit();
+
+    Map<String, Object> getAllRequiredDataForGroupEdit(String id, RequestPage page);
 }

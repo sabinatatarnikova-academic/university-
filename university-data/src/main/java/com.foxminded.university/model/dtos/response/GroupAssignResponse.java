@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GroupResponse {
+public class GroupAssignResponse {
 
     private String id;
 

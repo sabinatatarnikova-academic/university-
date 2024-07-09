@@ -170,6 +170,15 @@ class CourseServiceImplTest {
     }
 
     @Test
+    void findCourseDTOById() {
+        Course courseByName = courseService.findCourseByName("Mathematics");
+        String courseId = courseByName.getId();
+        CourseDTO courseDTO = courseService.findCourseDTOById(courseId);
+
+        assertEquals(courseDTO, courseMapper.toDto(courseByName));
+    }
+
+    @Test
     void assertThrowsExceptionIfCourseIsNotPresent(){
         assertThrows(NoSuchElementException.class, () -> courseService.findCourseById("testId"));
     }
