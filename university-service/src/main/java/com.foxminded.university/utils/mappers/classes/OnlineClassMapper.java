@@ -10,7 +10,12 @@ import com.foxminded.university.utils.mappers.users.TeacherMapper;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring", uses = {CourseMapper.class, TeacherMapper.class, GroupMapper.class})
 public interface OnlineClassMapper {
@@ -23,5 +28,12 @@ public interface OnlineClassMapper {
 
     OnlineClass toEntity(StudyClassResponse onlineClassDTO);
 
+    @Named("localToZoned")
+    static ZonedDateTime localToZoned(LocalDateTime localDateTime) {
+        return localDateTime != null ? localDateTime.atZone(ZoneId.systemDefault()) : null;
+    }
+
+    @Mapping(source = "startTime", target = "startTime", qualifiedByName = "localToZoned")
+    @Mapping(source = "endTime", target = "endTime", qualifiedByName = "localToZoned")
     OnlineClass toEntity(CreateStudyClassResponse studyClassResponse);
 }

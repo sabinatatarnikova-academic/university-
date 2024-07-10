@@ -8,6 +8,7 @@ import com.foxminded.university.repository.CourseRepository;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.utils.RequestPage;
 import com.foxminded.university.utils.mappers.CourseMapper;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -43,7 +43,7 @@ public class CourseServiceImpl implements CourseService {
     public void updateCourse(CourseRequest courseDTO) {
         Course course = findCourseById(courseDTO.getId());
         course.setName(courseDTO.getName());
-        courseDTO.getStudyClasses()
+        courseDTO.getStudyClassesIds()
                 .stream()
                 .map(classId -> {
                     StudyClass studyClass = studyClassService.findClassById(classId);
@@ -62,15 +62,15 @@ public class CourseServiceImpl implements CourseService {
         Optional <Course> course = courseRepository.findById(courseId);
         if (!course.isPresent()) {
             log.error("Course with id {} not found", courseId);
-            throw new NoSuchElementException();
+            throw new EntityNotFoundException();
         }
         log.info("Founded the course with id {}", courseId);
         return course.get();
     }
 
     @Override
-    public CourseDTO findCourseDTOById(String courseId) {
-        CourseDTO dto = courseMapper.toDto(findCourseById(courseId));
+    public CourseRequest findCourseDTOById(String courseId) {
+        CourseRequest dto = courseMapper.toDtoRequest(findCourseById(courseId));
         log.info("Entity course converted to dto");
         return dto;
     }
@@ -80,7 +80,7 @@ public class CourseServiceImpl implements CourseService {
         Optional <Course> course = courseRepository.findCourseByName(courseName);
         if (!course.isPresent()) {
             log.error("Course with id {} not found", courseName);
-            throw new NoSuchElementException();
+            throw new EntityNotFoundException();
         }
         log.info("Founded the course with id {}", courseName);
         return course.get();

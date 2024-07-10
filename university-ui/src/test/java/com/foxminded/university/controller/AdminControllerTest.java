@@ -2,11 +2,15 @@ package com.foxminded.university.controller;
 
 import com.foxminded.university.config.AdminControllerConfig;
 import com.foxminded.university.config.TestSecurityConfig;
-import com.foxminded.university.model.dtos.request.GroupFormationDTO;
+import com.foxminded.university.model.dtos.request.CourseRequest;
+import com.foxminded.university.model.dtos.request.GroupFormation;
 import com.foxminded.university.model.dtos.request.GroupRequest;
 import com.foxminded.university.model.dtos.request.classes.CreateStudyClassRequest;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
+import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.GroupEditResponse;
+import com.foxminded.university.model.dtos.response.classes.EditStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.OnlineClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
@@ -36,6 +40,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -123,7 +128,7 @@ class AdminControllerTest {
     void testShowEditUserForm() throws Exception {
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
         String userId = "1";
-        Student user = Student.builder()
+        UserFormRequest user = UserFormRequest.builder()
                 .id(userId)
                 .firstName("Bob")
                 .lastName("Johnson")
@@ -131,7 +136,7 @@ class AdminControllerTest {
                 .username("bob.johnson")
                 .password("password")
                 .build();
-        when(userService.findUserById(userId)).thenReturn(user);
+        when(userService.findUserDTOById(userId)).thenReturn(user);
 
         mockMvc.perform(get("/admin/users/edit").param("id", userId).with(csrf()))
                 .andExpect(status().isOk())
@@ -232,14 +237,12 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowEditCourseForm() throws Exception {
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
         String courseId = "1";
-        Course course = Course.builder()
+        CourseRequest course = CourseRequest.builder()
                 .id(courseId)
                 .name("test")
-                .studyClasses(new ArrayList<>())
                 .build();
-        when(courseService.findCourseById(courseId)).thenReturn(course);
+        when(courseService.findCourseDTOById(courseId)).thenReturn(course);
 
         mockMvc.perform(get("/admin/courses/edit").param("id", courseId).with(csrf()))
                 .andExpect(status().isOk())
@@ -284,8 +287,8 @@ class AdminControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowAllStudyClassesList() throws Exception {
         Page<StudyClassResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(OnlineClassResponse.builder()
-                .startTime(LocalDateTime.of(2024, 4, 23, 11, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 12, 0))
+                .startTime((LocalDateTime.of(2024, 4, 23, 11, 0)).atZone(ZoneId.of("Europe/Kiev")))
+                .endTime((LocalDateTime.of(2024, 4, 23, 12, 0)).atZone(ZoneId.of("Europe/Kiev")))
                 .classType("ONLINE")
                 .url("www.test.com")
                 .build()));
@@ -326,14 +329,18 @@ class AdminControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowEdiStudyClassForm() throws Exception {
         String studyClassId = "1";
-        StudyClass studyClass = OnlineClass.builder()
+        StudyClassRequest studyClass = StudyClassRequest.builder()
                 .id(studyClassId)
                 .classType("ONLINE")
                 .url("www.test.com")
                 .build();
-        when(studyClassService.findClassById(studyClassId)).thenReturn(studyClass);
 
-        mockMvc.perform(get("/admin/classes/edit").param("id", studyClassId).with(csrf()))
+        when(studyClassService.findClassDTOById(studyClassId)).thenReturn(studyClass);
+        when(studyClassService.getAllRequiredDataForStudyClassEdit()).thenReturn(new EditStudyClassResponse());
+
+        mockMvc.perform(get("/admin/classes/edit")
+                        .param("id", studyClassId)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/studyClass/edit_class"));
     }
@@ -401,7 +408,7 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowAllGroupsList() throws Exception {
-        Page<GroupFormationDTO> pageDtoImpl = new PageImpl<>(Collections.singletonList(GroupFormationDTO.builder()
+        Page<GroupFormation> pageDtoImpl = new PageImpl<>(Collections.singletonList(GroupFormation.builder()
                 .name("Group")
                 .build()));
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
@@ -458,7 +465,7 @@ class AdminControllerTest {
     void testShowAddGroupForm() throws Exception {
         mockMvc.perform(get("/admin/groups/new"))
                 .andExpect(model().attributeExists("group"))
-                .andExpect(model().attribute("group", new GroupFormationDTO()))
+                .andExpect(model().attribute("group", new GroupFormation()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/group/add_group"));
     }
@@ -480,7 +487,7 @@ class AdminControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowEdiGroupForm() throws Exception {
         String groupId = "1";
-        Group group = Group.builder()
+        GroupRequest group = GroupRequest.builder()
                 .id(groupId)
                 .name("ONLINE")
                 .build();
@@ -488,10 +495,16 @@ class AdminControllerTest {
         Page<StudentResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(StudentResponse.builder()
                 .firstName("Charlie")
                 .lastName("Williams")
-                .group(GroupFormationDTO.builder().name("Group A").build())
+                .group(GroupFormation.builder().name("Group A").build())
                 .build()));
-        when(groupService.findGroupById(groupId)).thenReturn(group);
-        when(userService.findAllStudentsWithPagination(page)).thenReturn(pageDtoImpl);
+        List<StudyClassResponse> studyClassResponses = new ArrayList<>(Collections.singletonList(StudyClassResponse.builder().build()));
+        GroupEditResponse editResponse = GroupEditResponse.builder()
+                .group(group)
+                .students(pageDtoImpl)
+                .studyClasses(studyClassResponses)
+                .build();
+
+        when(studyClassService.getAllRequiredDataForGroupEdit(groupId, page)).thenReturn(editResponse);
 
         mockMvc.perform(get("/admin/groups/edit").param("id", groupId).param("page", "0").param("size", "10").with(csrf()))
                 .andExpect(status().isOk())

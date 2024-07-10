@@ -1,5 +1,6 @@
 package com.foxminded.university.utils.mappers.users;
 
+import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.model.dtos.response.users.UserResponse;
@@ -21,6 +22,8 @@ public interface UserMapper {
     @SubclassMapping(source = Teacher.class, target = TeacherResponse.class)
     @SubclassMapping(source = Student.class, target = StudentResponse.class)
     UserResponse toDto(User user);
+
+    UserFormRequest toDtoRequest(User user);
 
     @InheritInverseConfiguration
     @BeanMapping(builder = @Builder(disableBuilder = true))

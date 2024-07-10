@@ -10,6 +10,7 @@ import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,9 +22,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -116,16 +117,16 @@ class LocationServiceImplTest {
         entityManager.persist(arts);
 
         OnlineClass onlineClass = OnlineClass.builder()
-                .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
+                .startTime((LocalDateTime.of(2024, 4, 23, 9, 0)).atZone(ZoneId.of("Europe/Kiev")))
+                .endTime((LocalDateTime.of(2024, 4, 23, 10, 0)).atZone(ZoneId.of("Europe/Kiev")))
                 .course(math)
                 .teacher(alice)
                 .group(groupA)
                 .url("http://example.com")
                 .build();
         OfflineClass offlineClass = OfflineClass.builder()
-                .startTime(LocalDateTime.of(2024, 4, 23, 11, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 12, 0))
+                .startTime((LocalDateTime.of(2024, 4, 23, 11, 0)).atZone(ZoneId.of("Europe/Kiev")))
+                .endTime((LocalDateTime.of(2024, 4, 23, 12, 0)).atZone(ZoneId.of("Europe/Kiev")))
                 .course(physics)
                 .teacher(bob)
                 .group(groupB)
@@ -165,7 +166,7 @@ class LocationServiceImplTest {
 
     @Test
     void assertThrowsExceptionIfLocationIsNotPresent(){
-        assertThrows(NoSuchElementException.class, () -> locationService.findLocationById("testId"));
+        assertThrows(EntityNotFoundException.class, () -> locationService.findLocationById("testId"));
     }
 
     @Test
@@ -197,7 +198,7 @@ class LocationServiceImplTest {
     void deleteLocationById() {
         String locationId = locationService.findLocationByDepartmentAndClassroom("ICS", "101").getId();
         locationService.deleteLocationById(locationId);
-        assertThrows(NoSuchElementException.class, () -> locationService.findLocationById(locationId));
+        assertThrows(EntityNotFoundException.class, () -> locationService.findLocationById(locationId));
     }
 
     @Test

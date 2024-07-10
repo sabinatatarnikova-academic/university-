@@ -15,6 +15,6 @@ public class GroupRequest {
 
     private String id;
     private String name;
-    private List<String> students;
-    private List<String> studyClasses;
+    private List<String> studentsIds;
+    private List<String> studyClassesIds;
 }

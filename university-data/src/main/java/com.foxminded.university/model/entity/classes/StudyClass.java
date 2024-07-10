@@ -20,7 +20,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "classes")
@@ -38,10 +39,10 @@ public class StudyClass {
     private String id;
 
     @Column (name = "start_time")
-    private LocalDateTime startTime;
+    private ZonedDateTime startTime;
 
     @Column (name = "end_time")
-    private LocalDateTime endTime;
+    private ZonedDateTime endTime;
 
     @ManyToOne
     @JoinColumn(name = "course_id")
@@ -57,4 +58,20 @@ public class StudyClass {
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
+
+    public ZonedDateTime getStartTime() {
+        return startTime != null ? startTime.withZoneSameInstant(ZoneId.of("Europe/Kiev")) : null;
+    }
+
+    public void setStartTime(ZonedDateTime startTime) {
+        this.startTime = startTime != null ? startTime.withZoneSameInstant(ZoneId.of("Europe/Kiev")) : null;
+    }
+
+    public ZonedDateTime getEndTime() {
+        return endTime != null ? endTime.withZoneSameInstant(ZoneId.of("Europe/Kiev")) : null;
+    }
+
+    public void setEndTime(ZonedDateTime endTime) {
+        this.endTime = endTime != null ? endTime.withZoneSameInstant(ZoneId.of("Europe/Kiev")) : null;
+    }
 }

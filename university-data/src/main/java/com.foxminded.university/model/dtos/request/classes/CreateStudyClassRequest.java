@@ -5,7 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Data
 @AllArgsConstructor
@@ -13,7 +14,23 @@ import java.time.LocalDateTime;
 @Builder
 public class CreateStudyClassRequest {
 
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private ZonedDateTime startTime;
+    private ZonedDateTime endTime;
     private String classType;
+
+    public ZonedDateTime getStartTime() {
+        return startTime != null ? startTime.withZoneSameInstant(ZoneId.of("Europe/Kiev")) : null;
+    }
+
+    public void setStartTime(ZonedDateTime startTime) {
+        this.startTime = startTime != null ? startTime.withZoneSameInstant(ZoneId.of("Europe/Kiev")) : null;
+    }
+
+    public ZonedDateTime getEndTime() {
+        return endTime != null ? endTime.withZoneSameInstant(ZoneId.of("Europe/Kiev")) : null;
+    }
+
+    public void setEndTime(ZonedDateTime endTime) {
+        this.endTime = endTime != null ? endTime.withZoneSameInstant(ZoneId.of("Europe/Kiev")) : null;
+    }
 }

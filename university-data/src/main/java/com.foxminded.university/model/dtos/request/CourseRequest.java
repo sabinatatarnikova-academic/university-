@@ -15,5 +15,5 @@ public class CourseRequest {
 
     private String id;
     private String name;
-    private List<String> studyClasses;
+    private List<String> studyClassesIds;
 }

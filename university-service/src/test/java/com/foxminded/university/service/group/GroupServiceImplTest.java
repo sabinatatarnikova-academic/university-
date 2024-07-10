@@ -1,7 +1,7 @@
 package com.foxminded.university.service.group;
 
 import com.foxminded.university.config.TestConfig;
-import com.foxminded.university.model.dtos.request.GroupFormationDTO;
+import com.foxminded.university.model.dtos.request.GroupFormation;
 import com.foxminded.university.model.dtos.request.GroupRequest;
 import com.foxminded.university.model.dtos.response.GroupAssignResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
@@ -28,6 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -123,16 +124,16 @@ class GroupServiceImplTest {
         entityManager.persist(arts);
 
         OnlineClass onlineClass = OnlineClass.builder()
-                .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
+                .startTime((LocalDateTime.of(2024, 4, 23, 9, 0)).atZone(ZoneId.of("Europe/Kiev")))
+                .endTime((LocalDateTime.of(2024, 4, 23, 10, 0)).atZone(ZoneId.of("Europe/Kiev")))
                 .course(math)
                 .teacher(alice)
                 .group(groupA)
                 .url("http://example.com")
                 .build();
         OfflineClass offlineClass = OfflineClass.builder()
-                .startTime(LocalDateTime.of(2024, 4, 23, 11, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 12, 0))
+                .startTime((LocalDateTime.of(2024, 4, 23, 11, 0)).atZone(ZoneId.of("Europe/Kiev")))
+                .endTime((LocalDateTime.of(2024, 4, 23, 12, 0)).atZone(ZoneId.of("Europe/Kiev")))
                 .course(physics)
                 .teacher(bob)
                 .group(groupB)
@@ -150,19 +151,19 @@ class GroupServiceImplTest {
 
     @Test
     void testSaveGroup() {
-        GroupFormationDTO groupToSave = GroupFormationDTO.builder()
+        GroupFormation groupToSave = GroupFormation.builder()
                 .name("Mugiwaras")
                 .build();
 
         groupService.saveGroup(groupToSave);
-        GroupFormationDTO group = groupService.findAllGroups().getLast();
+        GroupFormation group = groupService.findAllGroups().getLast();
         group.setId(null);
         assertEquals(groupToSave, group);
     }
 
     @Test
     void findGroupById() {
-        GroupFormationDTO group = groupService.findAllGroups().getFirst();
+        GroupFormation group = groupService.findAllGroups().getFirst();
         String groupId = group.getId();
         Group groupActual = groupService.findGroupById(groupId);
         assertEquals("Group A", groupActual.getName());
@@ -170,9 +171,9 @@ class GroupServiceImplTest {
 
     @Test
     void findGroupDTOById() {
-        GroupFormationDTO group = groupService.findAllGroups().getFirst();
+        GroupFormation group = groupService.findAllGroups().getFirst();
         String groupId = group.getId();
-        GroupAssignResponse groupActual = groupService.findGroupDTOById(groupId);
+        GroupRequest groupActual = groupService.findGroupDTOById(groupId);
         assertEquals("Group A", groupActual.getName());
     }
 
@@ -183,13 +184,13 @@ class GroupServiceImplTest {
 
     @Test
     void updateGroup() {
-        GroupFormationDTO group = groupService.findAllGroups().getFirst();
+        GroupFormation group = groupService.findAllGroups().getFirst();
         String groupId = group.getId();
         GroupRequest groupToUpdate = GroupRequest.builder()
                 .id(groupId)
                 .name("Update name")
-                .students(new ArrayList<>())
-                .studyClasses(new ArrayList<>())
+                .studentsIds(new ArrayList<>())
+                .studyClassesIds(new ArrayList<>())
                 .build();
         groupService.updateGroup(groupToUpdate);
         Group updatedGroup = groupService.findGroupById(groupId);
@@ -200,7 +201,7 @@ class GroupServiceImplTest {
 
     @Test
     void deleteGroupById() {
-        GroupFormationDTO group = groupService.findAllGroups().getFirst();
+        GroupFormation group = groupService.findAllGroups().getFirst();
         String groupId = group.getId();
         groupService.deleteGroupById(groupId);
         assertThrows(EntityNotFoundException.class, () -> groupService.findGroupById(groupId));
@@ -208,16 +209,16 @@ class GroupServiceImplTest {
 
     @Test
     void findAllGroupsWithPagination() {
-        GroupFormationDTO groupA = GroupFormationDTO.builder()
+        GroupFormation groupA = GroupFormation.builder()
                 .name("Group A")
                 .build();
-        GroupFormationDTO groupB = GroupFormationDTO.builder()
+        GroupFormation groupB = GroupFormation.builder()
                 .name("Group B")
                 .build();
 
-        List<GroupFormationDTO> groups = Arrays.asList(groupA, groupB);
+        List<GroupFormation> groups = Arrays.asList(groupA, groupB);
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(Integer.MAX_VALUE));
-        Page<GroupFormationDTO> groupsActual = groupService.findAllGroupsWithPagination(page);
+        Page<GroupFormation> groupsActual = groupService.findAllGroupsWithPagination(page);
         groupsActual.forEach(course -> course.setId(null));
         assertThat(groupsActual.toList(), is(groups));
     }
@@ -240,22 +241,22 @@ class GroupServiceImplTest {
 
     @Test
     void findAllGroups() {
-        GroupFormationDTO groupA = GroupFormationDTO.builder()
+        GroupFormation groupA = GroupFormation.builder()
                 .name("Group A")
                 .build();
-        GroupFormationDTO groupB = GroupFormationDTO.builder()
+        GroupFormation groupB = GroupFormation.builder()
                 .name("Group B")
                 .build();
 
-        List<GroupFormationDTO> groups = Arrays.asList(groupA, groupB);
-        List<GroupFormationDTO> groupsActual = groupService.findAllGroups();
+        List<GroupFormation> groups = Arrays.asList(groupA, groupB);
+        List<GroupFormation> groupsActual = groupService.findAllGroups();
         groupsActual.forEach(course -> course.setId(null));
         assertThat(groupsActual, is(groups));
     }
 
     @Test
     void findAllStudentsAssignedToGroup() {
-        GroupFormationDTO group = groupService.findAllGroups().getFirst();
+        GroupFormation group = groupService.findAllGroups().getFirst();
         String groupId = group.getId();
 
         List<StudentResponse> studentsAssignedToGroup = groupService.findAllStudentsAssignedToGroup(groupId);
@@ -265,12 +266,12 @@ class GroupServiceImplTest {
 
     @Test
     void findAllClassesAssignedToGroup() {
-        GroupFormationDTO group = groupService.findAllGroups().getFirst();
+        GroupFormation group = groupService.findAllGroups().getFirst();
         String groupId = group.getId();
 
         List<StudyClassResponse> studyClassesAssignedToGroup = groupService.findAllStudyClassesAssignedToGroup(groupId);
-        assertEquals(LocalDateTime.of(2024, 4, 23, 9, 0), studyClassesAssignedToGroup.getFirst().getStartTime());
-        assertEquals(LocalDateTime.of(2024, 4, 23, 10, 0), studyClassesAssignedToGroup.getFirst().getEndTime());
+        assertEquals((LocalDateTime.of(2024, 4, 23, 9, 0)).atZone(ZoneId.of("Europe/Kiev")), studyClassesAssignedToGroup.getFirst().getStartTime());
+        assertEquals((LocalDateTime.of(2024, 4, 23, 10, 0)).atZone(ZoneId.of("Europe/Kiev")), studyClassesAssignedToGroup.getFirst().getEndTime());
         assertEquals(groupId, studyClassesAssignedToGroup.getFirst().getGroupId());
         assertEquals("Group A", studyClassesAssignedToGroup.getFirst().getGroupName());
     }

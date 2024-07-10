@@ -1,14 +1,15 @@
 package com.foxminded.university.service.classes;
 
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
+import com.foxminded.university.model.dtos.response.GroupEditResponse;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
+import com.foxminded.university.model.dtos.response.classes.EditStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.utils.RequestPage;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
-import java.util.Map;
 
 public interface StudyClassService {
 
@@ -16,7 +17,7 @@ public interface StudyClassService {
 
     StudyClass findClassById(String classId);
 
-    StudyClassResponse findClassDTOById(String classId);
+    StudyClassRequest findClassDTOById(String classId);
 
     void updateStudyClass(StudyClassRequest studyClass);
 
@@ -28,7 +29,7 @@ public interface StudyClassService {
 
     List<StudyClassResponse> findAllClasses();
 
-    Map<String, Object> getAllRequiredDataForStudyClassEdit();
+    EditStudyClassResponse getAllRequiredDataForStudyClassEdit();
 
-    Map<String, Object> getAllRequiredDataForGroupEdit(String id, RequestPage page);
+    GroupEditResponse getAllRequiredDataForGroupEdit(String id, RequestPage page);
 }

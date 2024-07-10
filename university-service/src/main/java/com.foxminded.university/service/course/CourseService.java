@@ -14,7 +14,7 @@ public interface CourseService {
 
     Course findCourseById(String courseId);
 
-    CourseDTO findCourseDTOById(String courseId);
+    CourseRequest findCourseDTOById(String courseId);
 
     Course findCourseByName(String courseName);
 

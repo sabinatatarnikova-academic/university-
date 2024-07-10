@@ -1,13 +1,15 @@
 package com.foxminded.university.controller;
 
 import com.foxminded.university.model.dtos.request.CourseRequest;
-import com.foxminded.university.model.dtos.request.GroupFormationDTO;
+import com.foxminded.university.model.dtos.request.GroupFormation;
 import com.foxminded.university.model.dtos.request.GroupRequest;
 import com.foxminded.university.model.dtos.request.classes.CreateStudyClassRequest;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.GroupEditResponse;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
+import com.foxminded.university.model.dtos.response.classes.EditStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.UserResponse;
@@ -18,11 +20,15 @@ import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @AllArgsConstructor
@@ -42,6 +47,11 @@ public class AdminController {
     private final GroupService groupService;
     private final StudyClassService studyClassService;
     private final CourseService courseService;
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFoundException(EntityNotFoundException e) {
+        return new ResponseEntity<>("Resource not found: " + e.getMessage(), HttpStatus.NOT_FOUND);
+    }
 
     @GetMapping()
     public String usersCoursesDecision() {
@@ -149,12 +159,12 @@ public class AdminController {
 
     @GetMapping("/classes/edit")
     public String showEditStudyClassForm(@RequestParam String id, Model model) {
-        Map<String, Object> data = studyClassService.getAllRequiredDataForStudyClassEdit();
+        EditStudyClassResponse data = studyClassService.getAllRequiredDataForStudyClassEdit();
         model.addAttribute("class", studyClassService.findClassDTOById(id));
-        model.addAttribute("courses", data.get("courses"));
-        model.addAttribute("groups", data.get("groups"));
-        model.addAttribute("teachers", data.get("teachers"));
-        model.addAttribute("locations", data.get("locations"));
+        model.addAttribute("courses", data.getCourses());
+        model.addAttribute("groups", data.getGroups());
+        model.addAttribute("teachers", data.getTeachers());
+        model.addAttribute("locations", data.getLocations());
         return "admin/studyClass/edit_class";
     }
 
@@ -173,7 +183,7 @@ public class AdminController {
     @GetMapping("/groups")
     public String showAllGroupsList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
         RequestPage page = PageUtils.createPage(pageStr, sizeStr);
-        Page<GroupFormationDTO> groupsPage = groupService.findAllGroupsWithPagination(page);
+        Page<GroupFormation> groupsPage = groupService.findAllGroupsWithPagination(page);
         model.addAttribute("groupsPage", groupsPage);
         return "admin/group/admin_groups";
     }
@@ -198,23 +208,23 @@ public class AdminController {
 
     @GetMapping("/groups/new")
     public String showAddGroupForm(Model model) {
-        model.addAttribute("group", new GroupFormationDTO());
+        model.addAttribute("group", new GroupFormation());
         return "admin/group/add_group";
     }
 
     @PostMapping("/groups/new")
-    public String addGroup(@ModelAttribute GroupFormationDTO groupFormationDTO) {
-        groupService.saveGroup(groupFormationDTO);
+    public String addGroup(@ModelAttribute GroupFormation groupFormation) {
+        groupService.saveGroup(groupFormation);
         return "redirect:/admin/groups";
     }
 
     @GetMapping("/groups/edit")
     public String showEditGroupForm(@RequestParam String id, Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
         RequestPage page = PageUtils.createPage(pageStr, sizeStr);
-        Map<String, Object> data = studyClassService.getAllRequiredDataForGroupEdit(id, page);
-        model.addAttribute("group", data.get("group"));
-        model.addAttribute("students", data.get("students"));
-        model.addAttribute("studyClasses", data.get("classes"));
+        GroupEditResponse data = studyClassService.getAllRequiredDataForGroupEdit(id, page);
+        model.addAttribute("group", data.getGroup());
+        model.addAttribute("students", data.getStudents());
+        model.addAttribute("studyClasses", data.getStudyClasses());
         return "admin/group/edit_group";
     }
 

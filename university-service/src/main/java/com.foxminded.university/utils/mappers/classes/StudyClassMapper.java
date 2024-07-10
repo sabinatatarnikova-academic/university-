@@ -1,5 +1,6 @@
 package com.foxminded.university.utils.mappers.classes;
 
+import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.response.classes.OfflineClassResponse;
 import com.foxminded.university.model.dtos.response.classes.OnlineClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
@@ -11,8 +12,13 @@ import org.mapstruct.Builder;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.SubclassMapping;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface StudyClassMapper {
@@ -29,6 +35,16 @@ public interface StudyClassMapper {
     @Mapping(target = "teacherLastName", source = "teacher.lastName")
     StudyClassResponse toDto(StudyClass studyClass);
 
+    @Named("zonedToLocal")
+    static LocalDateTime zonedToLocal(ZonedDateTime zonedDateTime) {
+        return zonedDateTime != null ? zonedDateTime.toLocalDateTime() : null;
+    }
+
+    @Named("localToZoned")
+    static ZonedDateTime localToZoned(LocalDateTime localDateTime) {
+        return localDateTime != null ? localDateTime.atZone(ZoneId.systemDefault()) : null;
+    }
+
     @InheritInverseConfiguration
     @BeanMapping(builder = @Builder(disableBuilder = true))
     @SubclassMapping(source = OnlineClassResponse.class, target = OnlineClass.class)
@@ -41,4 +57,12 @@ public interface StudyClassMapper {
     @Mapping(target = "teacher.firstName", source = "teacherFirstName")
     @Mapping(target = "teacher.lastName", source = "teacherLastName")
     StudyClass toEntity(StudyClassResponse studyClassResponse);
+
+    @Mapping(source = "startTime", target = "startTime", qualifiedByName = "zonedToLocal")
+    @Mapping(source = "endTime", target = "endTime", qualifiedByName = "zonedToLocal")
+    StudyClassRequest toDtoRequest(StudyClass studyClass);
+
+    @Mapping(source = "startTime", target = "startTime", qualifiedByName = "localToZoned")
+    @Mapping(source = "endTime", target = "endTime", qualifiedByName = "localToZoned")
+    StudyClass toEntity(StudyClassRequest studyClassRequest);
 }

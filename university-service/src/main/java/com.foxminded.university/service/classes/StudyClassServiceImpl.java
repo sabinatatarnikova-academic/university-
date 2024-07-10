@@ -1,11 +1,16 @@
 package com.foxminded.university.service.classes;
 
+import com.foxminded.university.model.dtos.request.GroupFormation;
+import com.foxminded.university.model.dtos.request.GroupRequest;
+import com.foxminded.university.model.dtos.request.LocationDTO;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
-import com.foxminded.university.model.dtos.response.GroupAssignResponse;
+import com.foxminded.university.model.dtos.response.GroupEditResponse;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
+import com.foxminded.university.model.dtos.response.classes.EditStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
+import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
@@ -24,6 +29,7 @@ import com.foxminded.university.utils.mappers.CourseMapper;
 import com.foxminded.university.utils.mappers.classes.OfflineClassMapper;
 import com.foxminded.university.utils.mappers.classes.OnlineClassMapper;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -33,10 +39,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
+import java.time.ZoneId;
 import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -73,15 +77,15 @@ public class StudyClassServiceImpl implements StudyClassService {
         Optional<StudyClass> studyClass = studyClassRepository.findById(classId);
         if (!studyClass.isPresent()) {
             log.error("StudyClass with id {} not found", classId);
-            throw new NoSuchElementException();
+            throw new EntityNotFoundException();
         }
         log.info("Founded the class with id {}", classId);
         return studyClass.get();
     }
 
     @Override
-    public StudyClassResponse findClassDTOById(String classId) {
-        StudyClassResponse dto = studyClassMapper.toDto(findClassById(classId));
+    public StudyClassRequest findClassDTOById(String classId) {
+        StudyClassRequest dto = studyClassMapper.toDtoRequest(findClassById(classId));
         log.info("Entity studyClass converted to dto");
         return dto;
     }
@@ -91,10 +95,10 @@ public class StudyClassServiceImpl implements StudyClassService {
     public void updateStudyClass(StudyClassRequest studyClassRequest) {
         StudyClass studyClass = findClassById(studyClassRequest.getId());
         if (studyClassRequest.getStartTime() != null) {
-            studyClass.setStartTime(studyClassRequest.getStartTime());
+            studyClass.setStartTime((studyClassRequest.getStartTime()).atZone(ZoneId.of("Europe/Kiev")));
         }
         if (studyClassRequest.getEndTime() != null) {
-            studyClass.setEndTime(studyClassRequest.getEndTime());
+            studyClass.setEndTime((studyClassRequest.getEndTime()).atZone(ZoneId.of("Europe/Kiev")));
         }
         User teacher = userService.findUserById(studyClassRequest.getTeacherId());
         studyClass.setTeacher((Teacher) teacher);
@@ -110,7 +114,7 @@ public class StudyClassServiceImpl implements StudyClassService {
         if (studyClass instanceof OnlineClass) {
             ((OnlineClass) studyClass).setUrl(studyClassRequest.getUrl());
         } else {
-            Location location = locationService.findLocationById(studyClassRequest.getLocation());
+            Location location = locationService.findLocationById(studyClassRequest.getLocationId());
             ((OfflineClass) studyClass).setLocation(location);
         }
         studyClassRepository.save(studyClass);
@@ -150,28 +154,32 @@ public class StudyClassServiceImpl implements StudyClassService {
 
     @Override
     @Transactional
-    public Map<String, Object> getAllRequiredDataForStudyClassEdit() {
-        Map<String, Object> data = new HashMap<>();
+    public EditStudyClassResponse getAllRequiredDataForStudyClassEdit() {
         List<Course> courses = courseRepository.findAll();
         List<CourseDTO> courseResponses = courses.stream().map(courseMapper::toDto).collect(Collectors.toList());
-        data.put("courses", courseResponses);
-        data.put("groups", groupService.findAllGroups());
-        data.put("teachers", userService.findAllTeachers());
-        data.put("locations", locationService.findAllLocations());
-        return data;
+        List<GroupFormation> groups = groupService.findAllGroups();
+        List<TeacherResponse> teachers = userService.findAllTeachers();
+        List<LocationDTO> locations = locationService.findAllLocations();
+
+        return EditStudyClassResponse.builder()
+                .courses(courseResponses)
+                .groups(groups)
+                .teachers(teachers)
+                .locations(locations)
+                .build();
     }
 
     @Override
     @Transactional
-    public Map<String, Object> getAllRequiredDataForGroupEdit(String id, RequestPage page) {
-        Map<String, Object> data = new HashMap<>();
-        GroupAssignResponse group = groupService.findGroupDTOById(id);
+    public GroupEditResponse getAllRequiredDataForGroupEdit(String id, RequestPage page) {
+        GroupRequest group = groupService.findGroupDTOById(id);
         Page<StudentResponse> students = userService.findAllStudentsWithPagination(page);
         List<StudyClassResponse> classes = findAllClasses();
 
-        data.put("group", group);
-        data.put("students", students);
-        data.put("classes", classes);
-        return data;
+        return GroupEditResponse.builder()
+                .group(group)
+                .students(students)
+                .studyClasses(classes)
+                .build();
     }
 }

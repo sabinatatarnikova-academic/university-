@@ -5,6 +5,7 @@ import com.foxminded.university.model.entity.Location;
 import com.foxminded.university.repository.LocationRepository;
 import com.foxminded.university.utils.RequestPage;
 import com.foxminded.university.utils.mappers.LocationMapper;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,7 +35,7 @@ public class LocationServiceImpl implements LocationService {
         Optional<Location> location = locationRepository.findById(locationId);
         if (!location.isPresent()) {
             log.error("Location with id {} not found", locationId);
-            throw new NoSuchElementException();
+            throw new EntityNotFoundException();
         }
         log.info("Founded the location with id {}", locationId);
         return location.get();

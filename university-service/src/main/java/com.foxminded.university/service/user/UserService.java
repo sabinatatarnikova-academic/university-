@@ -17,7 +17,7 @@ public interface UserService {
 
     <U extends User> U findUserById(String userId);
 
-    UserResponse findUserDTOById(String userId);
+    UserFormRequest findUserDTOById(String userId);
 
     <U extends User> U findUserByUsername(String username);
 

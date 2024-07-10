@@ -15,6 +15,7 @@ import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
 import com.foxminded.university.utils.mappers.CourseMapper;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +26,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -127,16 +128,16 @@ class CourseServiceImplTest {
         entityManager.persist(arts);
 
         OnlineClass onlineClass = OnlineClass.builder()
-                .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
+                .startTime((LocalDateTime.of(2024, 4, 23, 9, 0)).atZone(ZoneId.of("Europe/Kiev")))
+                .endTime((LocalDateTime.of(2024, 4, 23, 10, 0)).atZone(ZoneId.of("Europe/Kiev")))
                 .course(math)
                 .teacher(alice)
                 .group(groupA)
                 .url("http://example.com")
                 .build();
         OfflineClass offlineClass = OfflineClass.builder()
-                .startTime(LocalDateTime.of(2024, 4, 23, 11, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 12, 0))
+                .startTime((LocalDateTime.of(2024, 4, 23, 11, 0)).atZone(ZoneId.of("Europe/Kiev")))
+                .endTime((LocalDateTime.of(2024, 4, 23, 12, 0)).atZone(ZoneId.of("Europe/Kiev")))
                 .course(physics)
                 .teacher(bob)
                 .group(groupB)
@@ -173,14 +174,14 @@ class CourseServiceImplTest {
     void findCourseDTOById() {
         Course courseByName = courseService.findCourseByName("Mathematics");
         String courseId = courseByName.getId();
-        CourseDTO courseDTO = courseService.findCourseDTOById(courseId);
+        CourseRequest courseDTO = courseService.findCourseDTOById(courseId);
 
-        assertEquals(courseDTO, courseMapper.toDto(courseByName));
+        assertEquals(courseDTO, courseMapper.toDtoRequest(courseByName));
     }
 
     @Test
     void assertThrowsExceptionIfCourseIsNotPresent(){
-        assertThrows(NoSuchElementException.class, () -> courseService.findCourseById("testId"));
+        assertThrows(EntityNotFoundException.class, () -> courseService.findCourseById("testId"));
     }
 
     @Test
@@ -194,7 +195,7 @@ class CourseServiceImplTest {
 
     @Test
     void assertThrowsExceptionIfCourseIsNotPresentByName(){
-        assertThrows(NoSuchElementException.class, () -> courseService.findCourseByName("test"));
+        assertThrows(EntityNotFoundException.class, () -> courseService.findCourseByName("test"));
     }
 
     @Test
@@ -205,7 +206,7 @@ class CourseServiceImplTest {
         CourseRequest courseToUpdate = CourseRequest.builder()
                 .id(courseId)
                 .name("Update name")
-                .studyClasses(List.of(classes.get(0).getId(), classes.get(1).getId()))
+                .studyClassesIds(List.of(classes.get(0).getId(), classes.get(1).getId()))
                 .build();
         courseService.updateCourse(courseToUpdate);
         Course updatedCourse = courseService.findCourseByName("Update name");
@@ -216,7 +217,7 @@ class CourseServiceImplTest {
     void deleteCourseById() {
         String courseId = courseService.findCourseByName("Mathematics").getId();
         courseService.deleteCourseById(courseId);
-        assertThrows(NoSuchElementException.class, () -> courseService.findCourseById(courseId));
+        assertThrows(EntityNotFoundException.class, () -> courseService.findCourseById(courseId));
     }
 
     @Test

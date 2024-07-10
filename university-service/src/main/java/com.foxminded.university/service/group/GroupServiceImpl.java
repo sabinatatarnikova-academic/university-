@@ -1,6 +1,6 @@
 package com.foxminded.university.service.group;
 
-import com.foxminded.university.model.dtos.request.GroupFormationDTO;
+import com.foxminded.university.model.dtos.request.GroupFormation;
 import com.foxminded.university.model.dtos.request.GroupRequest;
 import com.foxminded.university.model.dtos.response.GroupAssignResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
@@ -44,7 +44,7 @@ public class GroupServiceImpl implements GroupService {
     private final StudyClassRepository studyClassRepository;
 
     @Override
-    public void saveGroup(GroupFormationDTO group) {
+    public void saveGroup(GroupFormation group) {
         groupRepository.save(groupMapper.toEntity(group));
         log.info("Saved group with name - {}", group.getName());
     }
@@ -61,8 +61,8 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public GroupAssignResponse findGroupDTOById(String groupId) {
-        GroupAssignResponse dto = groupMapper.toDtoResponse(findGroupById(groupId));
+    public GroupRequest findGroupDTOById(String groupId) {
+        GroupRequest dto = groupMapper.toDtoRequest(findGroupById(groupId));
         log.info("Entity group converted to dto");
         return dto;
     }
@@ -75,17 +75,17 @@ public class GroupServiceImpl implements GroupService {
                 .name(groupRequest.getName())
                 .build();
 
-        if (!groupRequest.getStudents().isEmpty()) {
+        if (!groupRequest.getStudentsIds().isEmpty()) {
             group.setStudents(
-                    groupRequest.getStudents().stream()
+                    groupRequest.getStudentsIds().stream()
                             .map(studentId -> assignStudentToGroup(group.getId(), studentId))
                             .collect(Collectors.toList())
             );
         }
 
-        if (!groupRequest.getStudyClasses().isEmpty()) {
+        if (!groupRequest.getStudyClassesIds().isEmpty()) {
             group.setStudyClasses(
-                    groupRequest.getStudyClasses().stream()
+                    groupRequest.getStudyClassesIds().stream()
                             .map(studyClassId -> assignClassToGroup(group.getId(), studyClassId))
                             .collect(Collectors.toList())
             );
@@ -130,14 +130,14 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Page<GroupFormationDTO> findAllGroupsWithPagination(RequestPage pageRequest) {
+    public Page<GroupFormation> findAllGroupsWithPagination(RequestPage pageRequest) {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Group> groups = groupRepository.findAll(pageable);
-        List<GroupFormationDTO> groupFormationDTOS = groups.stream().map(groupMapper::toDto).toList();
-        log.info("Found {} groups", groupFormationDTOS.size());
-        return new PageImpl<>(groupFormationDTOS, pageable, groups.getTotalElements());
+        List<GroupFormation> groupFormations = groups.stream().map(groupMapper::toDto).toList();
+        log.info("Found {} groups", groupFormations.size());
+        return new PageImpl<>(groupFormations, pageable, groups.getTotalElements());
     }
 
     @Override
@@ -152,11 +152,11 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<GroupFormationDTO> findAllGroups() {
+    public List<GroupFormation> findAllGroups() {
         List<Group> groups = groupRepository.findAll();
-        List<GroupFormationDTO> groupFormationDTOS = groups.stream().map(groupMapper::toDto).collect(Collectors.toList());
+        List<GroupFormation> groupFormations = groups.stream().map(groupMapper::toDto).collect(Collectors.toList());
         log.info("Found {} groups", groups.size());
-        return groupFormationDTOS;
+        return groupFormations;
     }
 
     @Override
