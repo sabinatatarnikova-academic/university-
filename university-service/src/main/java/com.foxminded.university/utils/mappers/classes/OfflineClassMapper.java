@@ -28,12 +28,12 @@ public interface OfflineClassMapper {
 
     OfflineClass toEntity(StudyClassResponse offlineClassDTO);
 
+    @Mapping(source = "startTime", target = "startTime", qualifiedByName = "localToZoned")
+    @Mapping(source = "endTime", target = "endTime", qualifiedByName = "localToZoned")
+    OfflineClass toEntity(CreateStudyClassResponse offlineClassDTO);
+
     @Named("localToZoned")
     static ZonedDateTime localToZoned(LocalDateTime localDateTime) {
         return localDateTime != null ? localDateTime.atZone(ZoneId.systemDefault()) : null;
     }
-
-    @Mapping(source = "startTime", target = "startTime", qualifiedByName = "localToZoned")
-    @Mapping(source = "endTime", target = "endTime", qualifiedByName = "localToZoned")
-    OfflineClass toEntity(CreateStudyClassResponse offlineClassDTO);
 }

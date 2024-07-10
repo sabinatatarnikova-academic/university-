@@ -28,12 +28,12 @@ public interface OnlineClassMapper {
 
     OnlineClass toEntity(StudyClassResponse onlineClassDTO);
 
+    @Mapping(source = "startTime", target = "startTime", qualifiedByName = "localToZoned")
+    @Mapping(source = "endTime", target = "endTime", qualifiedByName = "localToZoned")
+    OnlineClass toEntity(CreateStudyClassResponse studyClassResponse);
+
     @Named("localToZoned")
     static ZonedDateTime localToZoned(LocalDateTime localDateTime) {
         return localDateTime != null ? localDateTime.atZone(ZoneId.systemDefault()) : null;
     }
-
-    @Mapping(source = "startTime", target = "startTime", qualifiedByName = "localToZoned")
-    @Mapping(source = "endTime", target = "endTime", qualifiedByName = "localToZoned")
-    OnlineClass toEntity(CreateStudyClassResponse studyClassResponse);
 }

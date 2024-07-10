@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Data
@@ -43,7 +42,7 @@ public class StudyClassResponse {
     @ToString.Exclude
     private String teacherLastName;
 
-    public ZonedDateTime getStartTime() {
+/*    public ZonedDateTime getStartTime() {
         return startTime != null ? startTime.withZoneSameInstant(ZoneId.of("Europe/Kiev")) : null;
     }
 
@@ -57,5 +56,5 @@ public class StudyClassResponse {
 
     public void setEndTime(ZonedDateTime endTime) {
         this.endTime = endTime != null ? endTime.withZoneSameInstant(ZoneId.of("Europe/Kiev")) : null;
-    }
+    }*/
 }

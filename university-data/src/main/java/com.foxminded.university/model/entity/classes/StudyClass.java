@@ -20,7 +20,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -59,7 +58,7 @@ public class StudyClass {
     @JoinColumn(name = "group_id")
     private Group group;
 
-    public ZonedDateTime getStartTime() {
+/*    public ZonedDateTime getStartTime() {
         return startTime != null ? startTime.withZoneSameInstant(ZoneId.of("Europe/Kiev")) : null;
     }
 
@@ -73,5 +72,5 @@ public class StudyClass {
 
     public void setEndTime(ZonedDateTime endTime) {
         this.endTime = endTime != null ? endTime.withZoneSameInstant(ZoneId.of("Europe/Kiev")) : null;
-    }
+    }*/
 }

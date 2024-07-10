@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 @Data
@@ -18,7 +17,7 @@ public class CreateStudyClassRequest {
     private ZonedDateTime endTime;
     private String classType;
 
-    public ZonedDateTime getStartTime() {
+   /* public ZonedDateTime getStartTime() {
         return startTime != null ? startTime.withZoneSameInstant(ZoneId.of("Europe/Kiev")) : null;
     }
 
@@ -32,5 +31,5 @@ public class CreateStudyClassRequest {
 
     public void setEndTime(ZonedDateTime endTime) {
         this.endTime = endTime != null ? endTime.withZoneSameInstant(ZoneId.of("Europe/Kiev")) : null;
-    }
+    }*/
 }

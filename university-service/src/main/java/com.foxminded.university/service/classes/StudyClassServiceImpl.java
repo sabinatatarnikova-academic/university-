@@ -95,10 +95,10 @@ public class StudyClassServiceImpl implements StudyClassService {
     public void updateStudyClass(StudyClassRequest studyClassRequest) {
         StudyClass studyClass = findClassById(studyClassRequest.getId());
         if (studyClassRequest.getStartTime() != null) {
-            studyClass.setStartTime((studyClassRequest.getStartTime()).atZone(ZoneId.of("Europe/Kiev")));
+            studyClass.setStartTime((studyClassRequest.getStartTime()).atZone(ZoneId.of("UTC")));
         }
         if (studyClassRequest.getEndTime() != null) {
-            studyClass.setEndTime((studyClassRequest.getEndTime()).atZone(ZoneId.of("Europe/Kiev")));
+            studyClass.setEndTime((studyClassRequest.getEndTime()).atZone(ZoneId.of("UTC")));
         }
         User teacher = userService.findUserById(studyClassRequest.getTeacherId());
         studyClass.setTeacher((Teacher) teacher);
