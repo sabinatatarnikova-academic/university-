@@ -20,6 +20,6 @@ public class StudyClassRequest {
     private String courseId;
     private String groupId;
     private String teacherId;
-    private String location;
+    private String locationId;
     private String url;
 }

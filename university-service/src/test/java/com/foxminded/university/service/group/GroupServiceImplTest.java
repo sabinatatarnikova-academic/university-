@@ -1,7 +1,11 @@
 package com.foxminded.university.service.group;
 
 import com.foxminded.university.config.TestConfig;
-import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupFormation;
+import com.foxminded.university.model.dtos.request.GroupRequest;
+import com.foxminded.university.model.dtos.response.GroupAssignResponse;
+import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
+import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
@@ -11,6 +15,7 @@ import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,13 +28,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 @DataJpaTest
@@ -89,7 +95,6 @@ class GroupServiceImplTest {
         entityManager.persist(alice);
         entityManager.persist(bob);
 
-
         Student charlie = Student.builder()
                 .firstName("Charlie")
                 .lastName("Williams")
@@ -119,16 +124,16 @@ class GroupServiceImplTest {
         entityManager.persist(arts);
 
         OnlineClass onlineClass = OnlineClass.builder()
-                .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
+                .startTime((LocalDateTime.of(2024, 4, 23, 9, 0)).atZone(ZoneId.of("Europe/Kiev")))
+                .endTime((LocalDateTime.of(2024, 4, 23, 10, 0)).atZone(ZoneId.of("Europe/Kiev")))
                 .course(math)
                 .teacher(alice)
                 .group(groupA)
                 .url("http://example.com")
                 .build();
         OfflineClass offlineClass = OfflineClass.builder()
-                .startTime(LocalDateTime.of(2024, 4, 23, 11, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 12, 0))
+                .startTime((LocalDateTime.of(2024, 4, 23, 11, 0)).atZone(ZoneId.of("Europe/Kiev")))
+                .endTime((LocalDateTime.of(2024, 4, 23, 12, 0)).atZone(ZoneId.of("Europe/Kiev")))
                 .course(physics)
                 .teacher(bob)
                 .group(groupB)
@@ -137,103 +142,137 @@ class GroupServiceImplTest {
         entityManager.persist(onlineClass);
         entityManager.persist(offlineClass);
 
+        groupA.setStudents(Arrays.asList(charlie));
+        groupA.setStudyClasses(Arrays.asList(onlineClass));
+        groupA = entityManager.persist(groupA);
+
         entityManager.flush();
     }
 
     @Test
     void testSaveGroup() {
-        Group groupToSave = Group.builder()
+        GroupFormation groupToSave = GroupFormation.builder()
                 .name("Mugiwaras")
                 .build();
 
         groupService.saveGroup(groupToSave);
-        Group group = groupService.findGroupByName("Mugiwaras");
+        GroupFormation group = groupService.findAllGroups().getLast();
         group.setId(null);
-        assertThat(groupToSave, is(group));
+        assertEquals(groupToSave, group);
     }
 
     @Test
     void findGroupById() {
-        Group groupByName = groupService.findGroupByName("Group A");
-        String groupId = groupByName.getId();
-        Group group = groupService.findGroupById(groupId);
-        group.setId(null);
-        Group groupA = Group.builder()
-                .name("Group A")
-                .build();
-        assertThat(group, is(groupA));
+        GroupFormation group = groupService.findAllGroups().getFirst();
+        String groupId = group.getId();
+        Group groupActual = groupService.findGroupById(groupId);
+        assertEquals("Group A", groupActual.getName());
     }
 
     @Test
-    void assertThrowsExceptionIfGroupIsNotPresent(){
-        assertThrows(NoSuchElementException.class, () -> groupService.findGroupById("testId"));
+    void findGroupDTOById() {
+        GroupFormation group = groupService.findAllGroups().getFirst();
+        String groupId = group.getId();
+        GroupRequest groupActual = groupService.findGroupDTOById(groupId);
+        assertEquals("Group A", groupActual.getName());
     }
 
     @Test
-    void findGroupByName() {
-        Group group = groupService.findGroupByName("Group A");
-        group.setId(null);
-        Group groupA = Group.builder()
-                .name("Group A")
-                .build();
-        assertThat(group, is(groupA));
-    }
-
-    @Test
-    void assertThrowsExceptionIfGroupIsNotPresentByName(){
-        assertThrows(NoSuchElementException.class, () -> groupService.findGroupByName("test"));
+    void assertThrowsExceptionIfGroupIsNotPresent() {
+        assertThrows(EntityNotFoundException.class, () -> groupService.findGroupById("testId"));
     }
 
     @Test
     void updateGroup() {
-        Group group = groupService.findGroupByName("Group A");
+        GroupFormation group = groupService.findAllGroups().getFirst();
         String groupId = group.getId();
-        Group groupToUpdate = Group.builder()
+        GroupRequest groupToUpdate = GroupRequest.builder()
                 .id(groupId)
                 .name("Update name")
-                .students(new ArrayList<>())
-                .studyClasses(new ArrayList<>())
+                .studentsIds(new ArrayList<>())
+                .studyClassesIds(new ArrayList<>())
                 .build();
         groupService.updateGroup(groupToUpdate);
-        Group updatedGroup = groupService.findGroupByName("Update name");
-        assertThat(groupToUpdate, is(updatedGroup));
+        Group updatedGroup = groupService.findGroupById(groupId);
+        assertEquals(groupToUpdate.getId(), updatedGroup.getId());
+        assertEquals(null, updatedGroup.getStudents());
+        assertEquals(null, updatedGroup.getStudyClasses());
     }
 
     @Test
     void deleteGroupById() {
-        String groupId = groupService.findGroupByName("Group A").getId();
+        GroupFormation group = groupService.findAllGroups().getFirst();
+        String groupId = group.getId();
         groupService.deleteGroupById(groupId);
-        assertThrows(NoSuchElementException.class, () -> groupService.findGroupById(groupId));
+        assertThrows(EntityNotFoundException.class, () -> groupService.findGroupById(groupId));
     }
 
     @Test
     void findAllGroupsWithPagination() {
-        GroupDTO groupA = GroupDTO.builder()
+        GroupFormation groupA = GroupFormation.builder()
                 .name("Group A")
                 .build();
-        GroupDTO groupB = GroupDTO.builder()
+        GroupFormation groupB = GroupFormation.builder()
                 .name("Group B")
                 .build();
 
-        List<GroupDTO> groups = Arrays.asList(groupA, groupB);
+        List<GroupFormation> groups = Arrays.asList(groupA, groupB);
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(Integer.MAX_VALUE));
-        Page<GroupDTO> groupsActual = groupService.findAllGroupsWithPagination(page);
+        Page<GroupFormation> groupsActual = groupService.findAllGroupsWithPagination(page);
+        groupsActual.forEach(course -> course.setId(null));
+        assertThat(groupsActual.toList(), is(groups));
+    }
+
+    @Test
+    void findAllGroupsResponseWithPagination() {
+        GroupAssignResponse groupA = GroupAssignResponse.builder()
+                .name("Group A")
+                .build();
+        GroupAssignResponse groupB = GroupAssignResponse.builder()
+                .name("Group B")
+                .build();
+
+        List<GroupAssignResponse> groups = Arrays.asList(groupA, groupB);
+        RequestPage page = PageUtils.createPage("0", "2");
+        Page<GroupAssignResponse> groupsActual = groupService.findAllGroupsResponsesWithPagination(page);
         groupsActual.forEach(course -> course.setId(null));
         assertThat(groupsActual.toList(), is(groups));
     }
 
     @Test
     void findAllGroups() {
-        GroupDTO groupA = GroupDTO.builder()
+        GroupFormation groupA = GroupFormation.builder()
                 .name("Group A")
                 .build();
-        GroupDTO groupB = GroupDTO.builder()
+        GroupFormation groupB = GroupFormation.builder()
                 .name("Group B")
                 .build();
 
-        List<GroupDTO> groups = Arrays.asList(groupA, groupB);
-        List<GroupDTO> groupsActual = groupService.findAllGroups();
+        List<GroupFormation> groups = Arrays.asList(groupA, groupB);
+        List<GroupFormation> groupsActual = groupService.findAllGroups();
         groupsActual.forEach(course -> course.setId(null));
         assertThat(groupsActual, is(groups));
+    }
+
+    @Test
+    void findAllStudentsAssignedToGroup() {
+        GroupFormation group = groupService.findAllGroups().getFirst();
+        String groupId = group.getId();
+
+        List<StudentResponse> studentsAssignedToGroup = groupService.findAllStudentsAssignedToGroup(groupId);
+        assertEquals("Charlie", studentsAssignedToGroup.getFirst().getFirstName());
+        assertEquals("Williams", studentsAssignedToGroup.getFirst().getLastName());
+    }
+
+    @Test
+    void findAllClassesAssignedToGroup() {
+        GroupFormation group = groupService.findAllGroups().getFirst();
+        String groupId = group.getId();
+
+        List<StudyClassResponse> studyClassesAssignedToGroup = groupService.findAllStudyClassesAssignedToGroup(groupId);
+        assertEquals((LocalDateTime.of(2024, 4, 23, 9, 0)).atZone(ZoneId.of("Europe/Kiev")), studyClassesAssignedToGroup.getFirst().getStartTime());
+        assertEquals((LocalDateTime.of(2024, 4, 23, 10, 0)).atZone(ZoneId.of("Europe/Kiev")), studyClassesAssignedToGroup.getFirst().getEndTime());
+        assertEquals(groupId, studyClassesAssignedToGroup.getFirst().getGroupId());
+        assertEquals("Group A", studyClassesAssignedToGroup.getFirst().getGroupName());
     }
 }

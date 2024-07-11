@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @NoArgsConstructor
@@ -17,10 +17,10 @@ public class StudyClassResponse {
     private String id;
 
     @ToString.Exclude
-    private LocalDateTime startTime;
+    private ZonedDateTime startTime;
 
     @ToString.Exclude
-    private LocalDateTime endTime;
+    private ZonedDateTime endTime;
 
     private String classType;
 

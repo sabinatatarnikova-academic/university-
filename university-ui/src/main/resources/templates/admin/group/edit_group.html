@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <title th:text="#{group.edit}"></title>
+    <link rel="stylesheet" th:href="@{/static/css/bootstrap.min.css}"/>
+</head>
+<body>
+<div class="container mt-4">
+    <h1 th:text="#{group.edit}"></h1>
+    <form method="post" th:action="@{/admin/groups/edit}" th:object="${group}">
+        <input th:field="*{id}" type="hidden">
+        <div class="mb-3">
+            <label class="form-label" for="groupName" th:text="#{group.name}"></label>
+            <input class="form-control" id="groupName" th:field="*{name}" type="text">
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="studyClasses" th:text="#{classes}"></label>
+            <div id="studyClasses">
+                <div th:each="studyClass : ${studyClasses}">
+                    <div class="form-check">
+                        <input class="form-check-input" th:field="*{studyClassesIds}"
+                               th:id="'studyClass_' + ${studyClass.id}"
+                               th:name="studyClasses" th:value="${studyClass.id}" type="checkbox">
+                        <label class="form-check-label" th:for="'studyClass_' + ${studyClass.id}"
+                               th:text="${studyClass.classType + ': ' + studyClass.courseName + '; Start time:' + studyClass.getStartTime() + '; End time:' + studyClass.getEndTime() + '; Group: ' + studyClass.groupName}">
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="students" th:text="#{group.student}"></label>
+            <div id="students">
+                <div th:each="student : ${students}">
+                    <div class="form-check">
+                        <input class="form-check-input" th:field="*{studentsIds}" th:id="'student_' + ${student.id}"
+                               th:name="students" th:value="${student.id}" type="checkbox">
+                        <label class="form-check-label" th:for="'student_' + ${student.id}"
+                               th:text="${student.firstName + ' ' + student.lastName + '; Current group: ' + (student.group?.getName() != null ? student.group.getName() : '-')}">
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <ul class="pagination">
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, students.totalPages - 1)}">
+                    <a class="page-link"
+                       th:href="@{/admin/groups/edit(id=${group.id}, page=${i}, size=${students.size})}"
+                       th:text="${i + 1}"></a>
+                </li>
+            </ul>
+        </div>
+        <button class="btn btn-primary" type="submit">Save Changes</button>
+    </form>
+</div>
+</body>
+</html>

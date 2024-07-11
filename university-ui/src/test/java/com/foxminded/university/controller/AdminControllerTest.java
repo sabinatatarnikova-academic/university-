@@ -2,11 +2,18 @@ package com.foxminded.university.controller;
 
 import com.foxminded.university.config.AdminControllerConfig;
 import com.foxminded.university.config.TestSecurityConfig;
+import com.foxminded.university.model.dtos.request.CourseRequest;
+import com.foxminded.university.model.dtos.request.GroupFormation;
+import com.foxminded.university.model.dtos.request.GroupRequest;
 import com.foxminded.university.model.dtos.request.classes.CreateStudyClassRequest;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
+import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.GroupEditResponse;
+import com.foxminded.university.model.dtos.response.classes.EditStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.OnlineClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
+import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.UserResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
@@ -33,8 +40,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -119,7 +128,7 @@ class AdminControllerTest {
     void testShowEditUserForm() throws Exception {
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
         String userId = "1";
-        Student user = Student.builder()
+        UserFormRequest user = UserFormRequest.builder()
                 .id(userId)
                 .firstName("Bob")
                 .lastName("Johnson")
@@ -127,7 +136,7 @@ class AdminControllerTest {
                 .username("bob.johnson")
                 .password("password")
                 .build();
-        when(userService.findUserById(userId)).thenReturn(user);
+        when(userService.findUserDTOById(userId)).thenReturn(user);
 
         mockMvc.perform(get("/admin/users/edit").param("id", userId).with(csrf()))
                 .andExpect(status().isOk())
@@ -228,14 +237,12 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowEditCourseForm() throws Exception {
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
         String courseId = "1";
-        Course course = Course.builder()
+        CourseRequest course = CourseRequest.builder()
                 .id(courseId)
                 .name("test")
-                .studyClasses(new ArrayList<>())
                 .build();
-        when(courseService.findCourseById(courseId)).thenReturn(course);
+        when(courseService.findCourseDTOById(courseId)).thenReturn(course);
 
         mockMvc.perform(get("/admin/courses/edit").param("id", courseId).with(csrf()))
                 .andExpect(status().isOk())
@@ -280,8 +287,8 @@ class AdminControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowAllStudyClassesList() throws Exception {
         Page<StudyClassResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(OnlineClassResponse.builder()
-                .startTime(LocalDateTime.of(2024, 4, 23, 11, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 12, 0))
+                .startTime((LocalDateTime.of(2024, 4, 23, 11, 0)).atZone(ZoneId.of("Europe/Kiev")))
+                .endTime((LocalDateTime.of(2024, 4, 23, 12, 0)).atZone(ZoneId.of("Europe/Kiev")))
                 .classType("ONLINE")
                 .url("www.test.com")
                 .build()));
@@ -322,14 +329,18 @@ class AdminControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowEdiStudyClassForm() throws Exception {
         String studyClassId = "1";
-        StudyClass studyClass = OnlineClass.builder()
+        StudyClassRequest studyClass = StudyClassRequest.builder()
                 .id(studyClassId)
                 .classType("ONLINE")
                 .url("www.test.com")
                 .build();
-        when(studyClassService.findClassById(studyClassId)).thenReturn(studyClass);
 
-        mockMvc.perform(get("/admin/classes/edit").param("id", studyClassId).with(csrf()))
+        when(studyClassService.findClassDTOById(studyClassId)).thenReturn(studyClass);
+        when(studyClassService.getAllRequiredDataForStudyClassEdit()).thenReturn(new EditStudyClassResponse());
+
+        mockMvc.perform(get("/admin/classes/edit")
+                        .param("id", studyClassId)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/studyClass/edit_class"));
     }
@@ -392,5 +403,145 @@ class AdminControllerTest {
                 .andExpect(redirectedUrl("/admin/classes"));
 
         verify(studyClassService, times(1)).deleteClassById(id);
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testShowAllGroupsList() throws Exception {
+        Page<GroupFormation> pageDtoImpl = new PageImpl<>(Collections.singletonList(GroupFormation.builder()
+                .name("Group")
+                .build()));
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        when(groupService.findAllGroupsWithPagination(page)).thenReturn(pageDtoImpl);
+
+        mockMvc.perform(get("/admin/groups").param("page", "0").param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/group/admin_groups"))
+                .andExpect(model().attributeExists("groupsPage"))
+                .andExpect(model().attribute("groupsPage", pageDtoImpl));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testShowAllStudentsAssignedToGroupList() throws Exception {
+        Group group = Group.builder().id("1").name("test").build();
+        List<StudentResponse> pageDtoImpl = Collections.singletonList(StudentResponse.builder()
+                .id("1")
+                .firstName("tEST")
+                .build());
+        when(groupService.findGroupById("1")).thenReturn(group);
+        when(groupService.findAllStudentsAssignedToGroup("1")).thenReturn(pageDtoImpl);
+
+        mockMvc.perform(get("/admin/groups/students").param("id", "1").with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/group/group_students"))
+                .andExpect(model().attributeExists("students"))
+                .andExpect(model().attributeExists("group"))
+                .andExpect(model().attribute("students", pageDtoImpl))
+                .andExpect(model().attribute("group", group));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testShowAllClassesAssignedToGroupList() throws Exception {
+        Group group = Group.builder().id("1").name("test").build();
+        List<StudyClassResponse> pageDtoImpl = Collections.singletonList(StudyClassResponse.builder()
+                .id("1")
+                .build());
+        when(groupService.findGroupById("1")).thenReturn(group);
+        when(groupService.findAllStudyClassesAssignedToGroup("1")).thenReturn(pageDtoImpl);
+
+        mockMvc.perform(get("/admin/groups/classes").param("id", "1").with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/group/group_classes"))
+                .andExpect(model().attributeExists("classes"))
+                .andExpect(model().attributeExists("group"))
+                .andExpect(model().attribute("classes", pageDtoImpl))
+                .andExpect(model().attribute("group", group));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testShowAddGroupForm() throws Exception {
+        mockMvc.perform(get("/admin/groups/new"))
+                .andExpect(model().attributeExists("group"))
+                .andExpect(model().attribute("group", new GroupFormation()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/group/add_group"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testAddGroup() throws Exception {
+        mockMvc.perform(post("/admin/groups/new")
+                        .param("id", "id")
+                        .param("name", "name")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/groups"));
+
+        verify(groupService, times(1)).saveGroup(any());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testShowEdiGroupForm() throws Exception {
+        String groupId = "1";
+        GroupRequest group = GroupRequest.builder()
+                .id(groupId)
+                .name("ONLINE")
+                .build();
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        Page<StudentResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(StudentResponse.builder()
+                .firstName("Charlie")
+                .lastName("Williams")
+                .group(GroupFormation.builder().name("Group A").build())
+                .build()));
+        List<StudyClassResponse> studyClassResponses = new ArrayList<>(Collections.singletonList(StudyClassResponse.builder().build()));
+        GroupEditResponse editResponse = GroupEditResponse.builder()
+                .group(group)
+                .students(pageDtoImpl)
+                .studyClasses(studyClassResponses)
+                .build();
+
+        when(studyClassService.getAllRequiredDataForGroupEdit(groupId, page)).thenReturn(editResponse);
+
+        mockMvc.perform(get("/admin/groups/edit").param("id", groupId).param("page", "0").param("size", "10").with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/group/edit_group"))
+                .andExpect(model().attributeExists("students"))
+                .andExpect(model().attribute("students", pageDtoImpl));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testEditGroup() throws Exception {
+        String groupId = "1";
+        Group group = Group.builder()
+                .id(groupId)
+                .name("ONLINE")
+                .build();
+        when(groupService.findGroupById(groupId)).thenReturn(group);
+
+        mockMvc.perform(post("/admin/groups/edit")
+                        .param("id", "id")
+                        .param("name", "test")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/groups"));
+
+        verify(groupService, times(1)).updateGroup((GroupRequest) any());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testDeleteGroup() throws Exception {
+        String id = "1";
+        mockMvc.perform(delete("/admin/groups/delete/{id}", id)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/groups"));
+
+        verify(groupService, times(1)).deleteGroupById(id);
     }
 }

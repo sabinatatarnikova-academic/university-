@@ -1,8 +1,10 @@
 package com.foxminded.university.controller;
 
 import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.GroupAssignResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.service.course.CourseService;
+import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
@@ -21,6 +23,7 @@ public class TeacherController {
 
     private final UserService userService;
     private final CourseService courseService;
+    private final GroupService groupService;
 
     @GetMapping()
     public String showTeachersList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
@@ -36,5 +39,13 @@ public class TeacherController {
         Page<CourseDTO> coursePage = courseService.findAllCoursesWithPagination(page);
         model.addAttribute("coursesPage", coursePage);
         return "teacher/teacher_courses";
+    }
+
+    @GetMapping("/groups")
+    public String showAllGroupsList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
+        RequestPage page = PageUtils.createPage(pageStr, sizeStr);
+        Page<GroupAssignResponse> groups = groupService.findAllGroupsResponsesWithPagination(page);
+        model.addAttribute("groupsPage", groups);
+        return "teacher/teacher_groups";
     }
 }

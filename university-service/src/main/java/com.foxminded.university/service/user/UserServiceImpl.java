@@ -16,6 +16,7 @@ import com.foxminded.university.utils.mappers.CourseMapper;
 import com.foxminded.university.utils.mappers.users.StudentMapper;
 import com.foxminded.university.utils.mappers.users.TeacherMapper;
 import com.foxminded.university.utils.mappers.users.UserMapper;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -29,7 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -64,10 +64,18 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = userRepository.findById(userId);
         if (!user.isPresent()) {
             log.error("User with id {} not found", userId);
-            throw new NoSuchElementException();
+            throw new EntityNotFoundException();
         }
         log.info("Founded the user with id {}", userId);
         return user.get();
+    }
+
+    @Override
+    public UserFormRequest findUserDTOById(String userId) {
+        User user = findUserById(userId);
+        UserFormRequest dto = userMapper.toDtoRequest(user);
+        log.info("User entity converted to dto");
+        return dto;
     }
 
     @Override
@@ -75,7 +83,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = userRepository.findByUsername(userName);
         if (!user.isPresent()) {
             log.error("User with username {} not found", userName);
-            throw new NoSuchElementException();
+            throw new EntityNotFoundException();
         }
         log.info("Founded the user with username {}", userName);
         return user.get();
@@ -96,7 +104,7 @@ public class UserServiceImpl implements UserService {
         userFormRequest.setPassword(passwordEncoder.encode(userFormRequest.getPassword()));
         Teacher teacher = teacherMapper.toEntity(userFormRequest);
         teacher.setStudyClasses(
-                userFormRequest.getStudyClasses().stream()
+                userFormRequest.getStudyClassesIds().stream()
                         .map(studyClassId -> assignTeacherToClass(teacher.getId(), studyClassId))
                         .collect(Collectors.toList())
         );
@@ -109,7 +117,7 @@ public class UserServiceImpl implements UserService {
         User teacher = findUserById(teacherId);
         if (!studyClassOptional.isPresent()) {
             log.error("StudyClass with id {} not found", classId);
-            throw new NoSuchElementException();
+            throw new EntityNotFoundException();
         }
         StudyClass studyClass = studyClassOptional.get();
         studyClass.setTeacher((Teacher) teacher);
@@ -129,9 +137,11 @@ public class UserServiceImpl implements UserService {
         int pageNumber = requestPage.getPageNumber();
         int pageSize = requestPage.getPageSize();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<User> users = userRepository.findAll();
-        List<UserResponse> userResponses = users.stream().map(userMapper::toDto).collect(Collectors.toList());
-        Page<UserResponse> pageResult = new PageImpl<>(userResponses, pageable, userResponses.size());
+        Page<User> usersPage = userRepository.findAll(pageable);
+        List<UserResponse> userResponses = usersPage.stream()
+                .map(userMapper::toDto)
+                .collect(Collectors.toList());
+        Page<UserResponse> pageResult = new PageImpl<>(userResponses, pageable, usersPage.getTotalElements());
         log.info("Found {} users", pageResult.getTotalPages());
         return pageResult;
     }
@@ -140,11 +150,12 @@ public class UserServiceImpl implements UserService {
     public Page<StudentResponse> findAllStudentsWithPagination(RequestPage pageRequest) {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();
-        List<Student> students = userRepository.findAllStudents();
+
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<Student> students = userRepository.findAllStudents(pageable);
         log.info("Found all students");
         List<StudentResponse> studentResponses = students.stream().map(studentMapper::toDto).collect(Collectors.toList());
-        return new PageImpl<>(studentResponses, pageable, studentResponses.size());
+        return new PageImpl<>(studentResponses, pageable, students.getTotalElements());
     }
 
     @Override
@@ -199,4 +210,5 @@ public class UserServiceImpl implements UserService {
         log.info("Count of courses that assigned to student - {} is {}", student.getId(), classesCount);
         return new PageImpl<>(courses, pageable, classesCount);
     }
+
 }

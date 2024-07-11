@@ -1,12 +1,16 @@
 package com.foxminded.university.service.studyClasses;
 
 import com.foxminded.university.config.TestConfig;
-import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupFormation;
+import com.foxminded.university.model.dtos.request.GroupRequest;
 import com.foxminded.university.model.dtos.request.LocationDTO;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.GroupEditResponse;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
+import com.foxminded.university.model.dtos.response.classes.EditStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
+import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
@@ -17,9 +21,11 @@ import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.service.classes.StudyClassServiceImpl;
+import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,14 +39,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -60,6 +64,9 @@ class StudyClassServiceImplTest {
 
     @Autowired
     private StudyClassMapper studyClassMapper;
+
+    @Autowired
+    private GroupService groupService;
 
     private Group groupA;
     private Group groupB;
@@ -148,8 +155,8 @@ class StudyClassServiceImplTest {
         fdu = entityManager.merge(fdu);
 
         onlineClass = OnlineClass.builder()
-                .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
+                .startTime((LocalDateTime.of(2024, 4, 23, 9, 0)).atZone(ZoneId.of("Europe/Kiev")))
+                .endTime((LocalDateTime.of(2024, 4, 23, 10, 0)).atZone(ZoneId.of("Europe/Kiev")))
                 .course(math)
                 .teacher(alice)
                 .group(groupA)
@@ -157,8 +164,8 @@ class StudyClassServiceImplTest {
                 .classType("ONLINE")
                 .build();
         offlineClass = OfflineClass.builder()
-                .startTime(LocalDateTime.of(2024, 4, 23, 11, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 12, 0))
+                .startTime((LocalDateTime.of(2024, 4, 23, 11, 0)).atZone(ZoneId.of("Europe/Kiev")))
+                .endTime((LocalDateTime.of(2024, 4, 23, 12, 0)).atZone(ZoneId.of("Europe/Kiev")))
                 .course(physics)
                 .teacher(bob)
                 .group(groupB)
@@ -183,8 +190,8 @@ class StudyClassServiceImplTest {
         List<StudyClassResponse> classes = studyClassService.findAllClasses();
         StudyClassResponse actual = classes.get(2);
         actual.setId(null);
-        assertEquals(studyClass.getStartTime(), actual.getStartTime());
-        assertEquals(studyClass.getEndTime(), actual.getEndTime());
+        assertEquals(studyClass.getStartTime(), actual.getStartTime().toLocalDateTime());
+        assertEquals(studyClass.getEndTime(), actual.getEndTime().toLocalDateTime());
         assertEquals(studyClass.getClassType(), actual.getClassType());
     }
 
@@ -200,8 +207,8 @@ class StudyClassServiceImplTest {
         List<StudyClassResponse> classes = studyClassService.findAllClasses();
         StudyClassResponse actual = classes.get(2);
         actual.setId(null);
-        assertEquals(studyClass.getStartTime(), actual.getStartTime());
-        assertEquals(studyClass.getEndTime(), actual.getEndTime());
+        assertEquals(studyClass.getStartTime().atZone(ZoneId.of("Europe/Kiev")), actual.getStartTime());
+        assertEquals(studyClass.getEndTime().atZone(ZoneId.of("Europe/Kiev")), actual.getEndTime());
         assertEquals(studyClass.getClassType(), actual.getClassType());
     }
 
@@ -211,8 +218,8 @@ class StudyClassServiceImplTest {
 
         StudyClassRequest studyClassRequest = StudyClassRequest.builder()
                 .id(studyClassId)
-                .startTime(onlineClass.getStartTime())
-                .endTime(onlineClass.getEndTime())
+                .startTime(onlineClass.getStartTime().toLocalDateTime())
+                .endTime(onlineClass.getEndTime().toLocalDateTime())
                 .classType(onlineClass.getClassType())
                 .courseId(physics.getId())
                 .groupId(offlineClass.getGroup().getId())
@@ -224,8 +231,8 @@ class StudyClassServiceImplTest {
 
         OnlineClass studyClass = (OnlineClass) studyClassService.findClassById(studyClassId);
         assertThat(studyClassRequest.getId(), is(studyClass.getId()));
-        assertThat(studyClassRequest.getStartTime(), is(studyClass.getStartTime()));
-        assertThat(studyClassRequest.getEndTime(), is(studyClass.getEndTime()));
+        assertThat(studyClassRequest.getStartTime(), is(studyClass.getStartTime().toLocalDateTime()));
+        assertThat(studyClassRequest.getEndTime(), is(studyClass.getEndTime().toLocalDateTime()));
         assertThat(studyClassRequest.getCourseId(), is(studyClass.getCourse().getId()));
         assertThat(studyClassRequest.getGroupId(), is(studyClass.getGroup().getId()));
         assertThat(studyClassRequest.getUrl(), is(studyClass.getUrl()));
@@ -240,8 +247,16 @@ class StudyClassServiceImplTest {
     }
 
     @Test
+    void findClassDTOById() {
+        StudyClassResponse studyClass = studyClassService.findAllClasses().get(0);
+        String classId = studyClass.getId();
+        StudyClassRequest actual = studyClassService.findClassDTOById(classId);
+        assertEquals(studyClass.getId(), actual.getId());
+    }
+
+    @Test
     void assertThrowsExceptionIfClassIsNotPresent() {
-        assertThrows(NoSuchElementException.class, () -> studyClassService.findClassById("testId"));
+        assertThrows(EntityNotFoundException.class, () -> studyClassService.findClassById("testId"));
     }
 
     @Test
@@ -251,7 +266,7 @@ class StudyClassServiceImplTest {
         String classId = studyClass.getId();
 
         studyClassService.deleteClassById(classId);
-        assertThrows(NoSuchElementException.class, () -> studyClassService.findClassById(classId));
+        assertThrows(EntityNotFoundException.class, () -> studyClassService.findClassById(classId));
     }
 
     @Test
@@ -275,31 +290,59 @@ class StudyClassServiceImplTest {
     }
 
     @Test
-    void testGetAllRequiredData() {
-        Map<String, Object> map = studyClassService.getAllRequiredData();
+    void testGetAllRequiredDataForStudyClassEdit() {
+        EditStudyClassResponse data = studyClassService.getAllRequiredDataForStudyClassEdit();
 
-        assertThat(map, hasKey("courses"));
-        List<CourseDTO> courses = (List<CourseDTO>) map.get("courses");
+        assertThat(data, hasProperty("courses"));
+        List<CourseDTO> courses = data.getCourses();
         assertThat(courses,
                 containsInAnyOrder(hasProperty("name", is("Mathematics")),
                         hasProperty("name", is("Physics"))));
 
-        assertThat(map, hasKey("teachers"));
-        List<TeacherResponse> teachers = (List<TeacherResponse>) map.get("teachers");
+        assertThat(data, hasProperty("teachers"));
+        List<TeacherResponse> teachers = data.getTeachers();
         assertThat(teachers,
                 containsInAnyOrder(hasProperty("firstName", is("Alice")),
                         hasProperty("firstName", is("Bob"))));
 
-        assertThat(map, hasKey("groups"));
-        List<GroupDTO> groups = (List<GroupDTO>) map.get("groups");
+        assertThat(data, hasProperty("groups"));
+        List<GroupFormation> groups = data.getGroups();
         assertThat(groups,
                 containsInAnyOrder(hasProperty("name", is("Group A")),
                         hasProperty("name", is("Group B"))));
 
-        assertThat(map, hasKey("locations"));
-        List<LocationDTO> locations = (List<LocationDTO>) map.get("locations");
+        assertThat(data, hasProperty("locations"));
+        List<LocationDTO> locations = data.getLocations();
         assertThat(locations,
                 containsInAnyOrder(hasProperty("department", is("ICS")),
                         hasProperty("department", is("FDU"))));
+    }
+
+    @Test
+    void testGetAllRequiredData() {
+        String groupId = studyClassService.findAllClasses().getFirst().getGroupId();
+        RequestPage page = PageUtils.createPage("0", "10");
+
+
+        GroupEditResponse data = studyClassService.getAllRequiredDataForGroupEdit(groupId, page);
+        assertThat(data, hasProperty("group"));
+
+        GroupRequest group = data.getGroup();
+
+        GroupRequest groupDTOById = groupService.findGroupDTOById(groupId);
+        assertThat(group.getId(), is(groupDTOById.getId()));
+        assertThat(group.getName(), is(groupDTOById.getName()));
+
+        assertThat(data, hasProperty("students"));
+
+        Page<StudentResponse> students = data.getStudents();
+        assertThat(students,
+                containsInAnyOrder(hasProperty("firstName", is("Charlie")),
+                        hasProperty("firstName", is("Diana"))));
+
+        assertThat(data, hasProperty("studyClasses"));
+        List<StudyClassResponse> classes = studyClassService.findAllClasses();
+        List<StudyClassResponse> classesMap = data.getStudyClasses();
+        assertThat(classes, is(classesMap));
     }
 }

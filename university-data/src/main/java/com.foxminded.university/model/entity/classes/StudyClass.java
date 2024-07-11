@@ -20,7 +20,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "classes")
@@ -38,10 +38,10 @@ public class StudyClass {
     private String id;
 
     @Column (name = "start_time")
-    private LocalDateTime startTime;
+    private ZonedDateTime startTime;
 
     @Column (name = "end_time")
-    private LocalDateTime endTime;
+    private ZonedDateTime endTime;
 
     @ManyToOne
     @JoinColumn(name = "course_id")

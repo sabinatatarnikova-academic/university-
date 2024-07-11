@@ -17,6 +17,8 @@ public interface UserService {
 
     <U extends User> U findUserById(String userId);
 
+    UserFormRequest findUserDTOById(String userId);
+
     <U extends User> U findUserByUsername(String username);
 
     void updateStudent(UserFormRequest userFormRequest);

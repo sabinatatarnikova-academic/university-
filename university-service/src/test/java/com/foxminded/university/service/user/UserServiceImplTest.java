@@ -1,7 +1,7 @@
 package com.foxminded.university.service.user;
 
 import com.foxminded.university.config.TestConfig;
-import com.foxminded.university.model.dtos.request.GroupDTO;
+import com.foxminded.university.model.dtos.request.GroupFormation;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
@@ -21,6 +21,7 @@ import com.foxminded.university.utils.mappers.CourseMapper;
 import com.foxminded.university.utils.mappers.GroupMapper;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
 import com.foxminded.university.utils.mappers.users.StudentMapper;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,9 +36,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
@@ -158,16 +159,16 @@ class UserServiceImplTest {
         fdu = entityManager.merge(fdu);
 
         onlineClass = OnlineClass.builder()
-                .startTime(LocalDateTime.of(2024, 4, 23, 9, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 10, 0))
+                .startTime((LocalDateTime.of(2024, 4, 23, 9, 0)).atZone(ZoneId.of("Europe/Kiev")))
+                .endTime((LocalDateTime.of(2024, 4, 23, 10, 0)).atZone(ZoneId.of("Europe/Kiev")))
                 .course(math)
                 .teacher(alice)
                 .group(groupA)
                 .url("http://example.com")
                 .build();
         offlineClass = OfflineClass.builder()
-                .startTime(LocalDateTime.of(2024, 4, 23, 11, 0))
-                .endTime(LocalDateTime.of(2024, 4, 23, 12, 0))
+                .startTime((LocalDateTime.of(2024, 4, 23, 11, 0)).atZone(ZoneId.of("Europe/Kiev")))
+                .endTime((LocalDateTime.of(2024, 4, 23, 12, 0)).atZone(ZoneId.of("Europe/Kiev")))
                 .course(physics)
                 .teacher(bob)
                 .group(groupB)
@@ -212,6 +213,15 @@ class UserServiceImplTest {
     }
 
     @Test
+    void findUserDTOById() {
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
+        UserResponse user = userService.findAllUsersWithPagination(page).toList().get(3);
+        String userId = user.getId();
+        UserFormRequest dto = userService.findUserDTOById(userId);
+        assertEquals(user.getId(), dto.getId());
+    }
+
+    @Test
     void findUserByName() {
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
         UserResponse user = userService.findAllUsersWithPagination(page).toList().get(3);
@@ -221,7 +231,7 @@ class UserServiceImplTest {
 
     @Test
     void assertThrowsExceptionIfCourseIsNotPresent(){
-        assertThrows(NoSuchElementException.class, () -> userService.findUserById("testId"));
+        assertThrows(EntityNotFoundException.class, () -> userService.findUserById("testId"));
     }
 
     @Test
@@ -262,7 +272,7 @@ class UserServiceImplTest {
                 .lastName("Test")
                 .password(password)
                 .username(username)
-                .studyClasses(List.of(onlineClassDTO.getId(), offlineClassDTO.getId()))
+                .studyClassesIds(List.of(onlineClassDTO.getId(), offlineClassDTO.getId()))
                 .build();
 
         userService.updateTeacher(teacherToSave);
@@ -280,7 +290,7 @@ class UserServiceImplTest {
         String userId = user.getId();
 
         userService.deleteUserById(userId);
-        assertThrows(NoSuchElementException.class, () -> userService.findUserById(userId));
+        assertThrows(EntityNotFoundException.class, () -> userService.findUserById(userId));
     }
 
     @Test
@@ -308,20 +318,20 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findAllStudents() {
+    void findAllStudentsWithPagination() {
         RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
 
         StudentResponse charlieDTO = StudentResponse.builder()
                 .firstName("Charlie")
                 .lastName("Williams")
-                .group(GroupDTO.builder().name("Group A").build())
+                .group(GroupFormation.builder().name("Group A").build())
                 .username("username3")
                 .password(password)
                 .build();
         StudentResponse dianaDTO = StudentResponse.builder()
                 .firstName("Diana")
                 .lastName("Brown")
-                .group(GroupDTO.builder().name("Group B").build())
+                .group(GroupFormation.builder().name("Group B").build())
                 .username("username4")
                 .password(password)
                 .build();

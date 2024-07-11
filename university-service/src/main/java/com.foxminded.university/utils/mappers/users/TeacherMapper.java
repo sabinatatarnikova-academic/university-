@@ -29,7 +29,7 @@ public interface TeacherMapper {
 
     Teacher toEntity(UserResponse userResponse);
 
-    @Mapping(target = "studyClasses", source = "studyClasses", qualifiedByName = "mapStudyClasses")
+    @Mapping(target = "studyClasses", source = "studyClassesIds", qualifiedByName = "mapStudyClasses")
     Teacher toEntity(UserFormRequest teacherDTO);
 
     @Named("mapStudyClasses")
