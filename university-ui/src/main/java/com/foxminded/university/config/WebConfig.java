@@ -44,10 +44,4 @@ public class WebConfig implements WebMvcConfigurer {
         resourceBundleMessageSource.setAlwaysUseMessageFormat(true);
         return resourceBundleMessageSource;
     }
-
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/");
-    }
 }

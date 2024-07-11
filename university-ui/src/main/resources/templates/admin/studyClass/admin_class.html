@@ -7,6 +7,7 @@
           name="viewport">
     <meta content="ie=edge" http-equiv="X-UA-Compatible">
     <link rel="stylesheet" th:href="@{/static/css/bootstrap.min.css}"/>
+    <script th:src="@{/static/js/script.js}"></script>
 </head>
 <body>
 <div th:insert="~{language :: language}"></div>
@@ -32,8 +33,8 @@
     <tr th:each="class : ${studyClassPage}">
         <td th:text="${class.id}"></td>
         <td th:text="${class.classType}"></td>
-        <td th:text="${class.startTime}"></td>
-        <td th:text="${class.endTime}"></td>
+        <td class="convert-time" th:attr="data-utc=${class.startTime}"></td>
+        <td class="convert-time" th:attr="data-utc=${class.endTime}"></td>
         <td th:text="${class.courseName}"></td>
         <td th:text="${class.groupName}"></td>
         <td th:text="${class.teacherFirstName + ' ' + class.teacherLastName}"></td>
