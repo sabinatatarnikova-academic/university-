@@ -15,11 +15,18 @@
     <thead>
     <tr>
         <th th:text="#{student}"></th>
+        <th th:text="#{actions}"></th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="student : ${students}">
         <td th:text="${student.firstName + ' ' + student.lastName}"></td>
+        <td>
+            <form method="post" style="display:inline-block;" th:action="@{/admin/groups/students/delete/{id}(id=${student.id})}">
+            <input name="_method" type="hidden" value="DELETE"/>
+            <button class="btn btn-danger" type="submit" th:text="#{delete}"></button>
+        </form>
+        </td>
     </tr>
     </tbody>
 </table>

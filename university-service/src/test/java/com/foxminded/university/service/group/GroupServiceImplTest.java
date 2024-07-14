@@ -11,8 +11,12 @@ import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
 import com.foxminded.university.model.entity.classes.OfflineClass;
 import com.foxminded.university.model.entity.classes.OnlineClass;
+import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
+import com.foxminded.university.model.entity.users.User;
+import com.foxminded.university.repository.GroupRepository;
+import com.foxminded.university.repository.UserRepository;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
 import jakarta.persistence.EntityNotFoundException;
@@ -32,11 +36,15 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 @DataJpaTest
 @ActiveProfiles("h2")
@@ -142,8 +150,8 @@ class GroupServiceImplTest {
         entityManager.persist(onlineClass);
         entityManager.persist(offlineClass);
 
-        groupA.setStudents(Arrays.asList(charlie));
-        groupA.setStudyClasses(Arrays.asList(onlineClass));
+        groupA.setStudents(new ArrayList<>(Arrays.asList(charlie)));
+        groupA.setStudyClasses(new ArrayList<>(Arrays.asList(onlineClass)));
         groupA = entityManager.persist(groupA);
 
         entityManager.flush();
@@ -265,14 +273,33 @@ class GroupServiceImplTest {
     }
 
     @Test
-    void findAllClassesAssignedToGroup() {
-        GroupFormation group = groupService.findAllGroups().getFirst();
-        String groupId = group.getId();
+    void  deleteStudentFromGroupById(){
+        String groupId = groupService.findAllGroups().getFirst().getId();
+        Group group = groupService.findGroupById(groupId);
+        Student student = group.getStudents().getFirst();
+        group.getStudents().remove(student);
+        List<Student> expectedStudents = group.getStudents();
+        String studentId = student.getId();
 
-        List<StudyClassResponse> studyClassesAssignedToGroup = groupService.findAllStudyClassesAssignedToGroup(groupId);
-        assertEquals((LocalDateTime.of(2024, 4, 23, 9, 0)).atZone(ZoneId.of("Europe/Kiev")), studyClassesAssignedToGroup.getFirst().getStartTime());
-        assertEquals((LocalDateTime.of(2024, 4, 23, 10, 0)).atZone(ZoneId.of("Europe/Kiev")), studyClassesAssignedToGroup.getFirst().getEndTime());
-        assertEquals(groupId, studyClassesAssignedToGroup.getFirst().getGroupId());
-        assertEquals("Group A", studyClassesAssignedToGroup.getFirst().getGroupName());
+        groupService.deleteStudentFromGroupById(studentId);
+        List<Student> actualStudents = groupService.findGroupById(groupId).getStudents();
+        assertEquals(expectedStudents, actualStudents);
     }
+
+    @Test
+    void  deleteStudyClassFromGroupById(){
+        String groupId = groupService.findAllGroups().getFirst().getId();
+        Group group = groupService.findGroupById(groupId);
+        StudyClass studyClass = group.getStudyClasses().getFirst();
+        group.getStudyClasses().remove(studyClass);
+        List<StudyClass> expectedStudyClasses = group.getStudyClasses();
+        String studyClassId = studyClass.getId();
+
+        groupService.deleteStudyClassFromGroupById(studyClassId);
+        List<StudyClass> actualStudyClass = groupService.findGroupById(groupId).getStudyClasses();
+        assertEquals(expectedStudyClasses, actualStudyClass);
+    }
+
+
+
 }

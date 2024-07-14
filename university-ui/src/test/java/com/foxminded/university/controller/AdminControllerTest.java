@@ -544,4 +544,28 @@ class AdminControllerTest {
 
         verify(groupService, times(1)).deleteGroupById(id);
     }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testDeleteStudentFromGroup() throws Exception {
+        String id = "1";
+        mockMvc.perform(delete("/admin/groups/students/delete/{id}", id)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/groups"));
+
+        verify(groupService, times(1)).deleteStudentFromGroupById(id);
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testDeleteStudyClassFromGroup() throws Exception {
+        String id = "1";
+        mockMvc.perform(delete("/admin/groups/classes/delete/{id}", id)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/groups"));
+
+        verify(groupService, times(1)).deleteStudyClassFromGroupById(id);
+    }
 }

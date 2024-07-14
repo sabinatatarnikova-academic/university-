@@ -23,6 +23,10 @@ public interface GroupService {
 
     void deleteGroupById(String groupId);
 
+    void deleteStudentFromGroupById(String studentId);
+
+    void deleteStudyClassFromGroupById(String classId);
+
     Page<GroupFormation> findAllGroupsWithPagination(RequestPage pageRequest);
 
     Page<GroupAssignResponse> findAllGroupsResponsesWithPagination(RequestPage pageRequest);
