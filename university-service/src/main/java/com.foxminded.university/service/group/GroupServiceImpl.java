@@ -130,6 +130,40 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
+    public void deleteStudentFromGroupById(String studentId) {
+        Optional <User> optionalUser = userRepository.findById(studentId);
+        if (!optionalUser.isPresent()){
+            log.warn("User with id {} not found", studentId);
+            throw new EntityNotFoundException();
+        }
+        Student student = (Student) optionalUser.get();
+        Group group = student.getGroup();
+        group.getStudents().remove(student);
+        student.setGroup(null);
+
+        groupRepository.save(group);
+        userRepository.save(student);
+    }
+
+    @Override
+    @Transactional
+    public void deleteStudyClassFromGroupById(String classId) {
+        Optional<StudyClass> classOptional = studyClassRepository.findById(classId);
+        if (!classOptional.isPresent()){
+            log.warn("StudyClass with id {} not found", classId);
+            throw new EntityNotFoundException();
+        }
+        StudyClass studyClass =  classOptional.get();
+        Group group = studyClass.getGroup();
+        group.getStudyClasses().remove(studyClass);
+        studyClass.setGroup(null);
+
+        groupRepository.save(group);
+        studyClassRepository.save(studyClass);
+    }
+
+    @Override
     public Page<GroupFormation> findAllGroupsWithPagination(RequestPage pageRequest) {
         int pageNumber = pageRequest.getPageNumber();
         int pageSize = pageRequest.getPageSize();

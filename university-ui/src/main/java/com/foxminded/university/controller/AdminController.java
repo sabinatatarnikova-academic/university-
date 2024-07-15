@@ -198,6 +198,12 @@ public class AdminController {
         return "admin/group/group_students";
     }
 
+    @DeleteMapping("/groups/students/delete/{id}")
+    public String deleteStudentFromGroup(@PathVariable("id") String id) {
+        groupService.deleteStudentFromGroupById(id);
+        return "redirect:/admin/groups";
+    }
+
     @GetMapping("/groups/classes")
     public String showAllClassesAssignedToGroup(@RequestParam String id, Model model) {
         Group group = groupService.findGroupById(id);
@@ -205,6 +211,12 @@ public class AdminController {
         model.addAttribute("classes", classesAssignedToGroup);
         model.addAttribute("group", group);
         return "admin/group/group_classes";
+    }
+
+    @DeleteMapping("/groups/classes/delete/{id}")
+    public String deleteStudyClassFromGroup(@PathVariable("id") String id) {
+        groupService.deleteStudyClassFromGroupById(id);
+        return "redirect:/admin/groups";
     }
 
     @GetMapping("/groups/new")
