@@ -1,5 +1,6 @@
 package com.foxminded.university.service.user;
 
+import com.foxminded.university.model.dtos.request.users.TeacherClassUpdateRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
@@ -24,6 +25,8 @@ public interface UserService {
     void updateStudent(UserFormRequest userFormRequest);
 
     void updateTeacher(UserFormRequest userFormRequest);
+
+    void updateTeacherWithStudyClasses(TeacherClassUpdateRequest teacherClassUpdateRequest);
 
     void deleteUserById(String userId);
 

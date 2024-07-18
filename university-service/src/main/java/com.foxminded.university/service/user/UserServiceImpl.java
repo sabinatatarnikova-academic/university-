@@ -1,5 +1,6 @@
 package com.foxminded.university.service.user;
 
+import com.foxminded.university.model.dtos.request.users.TeacherClassUpdateRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
@@ -103,13 +104,29 @@ public class UserServiceImpl implements UserService {
     public void updateTeacher(UserFormRequest userFormRequest) {
         userFormRequest.setPassword(passwordEncoder.encode(userFormRequest.getPassword()));
         Teacher teacher = teacherMapper.toEntity(userFormRequest);
+        List<String> studyClassesIds = userFormRequest.getStudyClassesIds();
         teacher.setStudyClasses(
-                userFormRequest.getStudyClassesIds().stream()
-                        .map(studyClassId -> assignTeacherToClass(teacher.getId(), studyClassId))
-                        .collect(Collectors.toList())
+                updateStudyClassesAssignedToTeacher(studyClassesIds, teacher)
         );
         userRepository.save(teacher);
         log.info("Updated teacher info: id - {}", teacher.getId());
+    }
+
+    @Override
+    @Transactional
+    public void updateTeacherWithStudyClasses(TeacherClassUpdateRequest teacherClassUpdateRequest) {
+        Teacher teacher = (Teacher) findUserById(teacherClassUpdateRequest.getId());
+        List<String> studyClassesIds = teacherClassUpdateRequest.getStudyClassesIds();
+        teacher.setStudyClasses(
+                updateStudyClassesAssignedToTeacher(studyClassesIds, teacher)
+        );
+        userRepository.save(teacher);
+    }
+
+    private List<StudyClass> updateStudyClassesAssignedToTeacher(List<String> studyClassesIds, Teacher teacher) {
+        return studyClassesIds.stream()
+                .map(studyClassId -> assignTeacherToClass(teacher.getId(), studyClassId))
+                .collect(Collectors.toList());
     }
 
     private StudyClass assignTeacherToClass(String teacherId, String classId) {

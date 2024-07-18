@@ -7,8 +7,17 @@
           name="viewport">
     <meta content="ie=edge" http-equiv="X-UA-Compatible">
     <link href="../../static/css/bootstrap.min.css" rel="stylesheet"/>
+    <style>
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+    </style>
     <script th:src="@{/static/js/script.js}"></script>
 </head>
+<body>
 <div class="d-flex justify-content-evenly flex-column">
     <div th:insert="~{language :: language}"></div>
     <h1 th:text="#{teachers.header}"></h1>
@@ -19,6 +28,7 @@
             <th th:text="#{firstName}"></th>
             <th th:text="#{lastName}"></th>
             <th th:text="#{classes}"></th>
+            <th th:text="#{actions}"></th>
         </tr>
         </thead>
         <tbody>
@@ -36,8 +46,17 @@
                            <span class="convert-time" th:attr="data-utc=${studyClass.endTime}"></span>
                            <span th:text="${' ' + studyClass.groupName}"></span>
                         </span>
+                        <form method="post" style="display:inline-block;"
+                              th:action="@{teacher/classes/delete/{id}(id=${studyClass.id})}">
+                            <input name="_method" type="hidden" value="DELETE"/>
+                            <button class="btn btn-danger" th:text="#{delete}" type="submit"></button>
+                        </form>
                     </li>
                 </ul>
+            </td>
+            <td>
+                <a class="btn btn-primary" th:href="@{/teacher/classes/add(id=${teacher.id})}"
+                   th:text="#{classes.new}"></a>
             </td>
         </tr>
         </tbody>
@@ -45,7 +64,7 @@
     <div>
         <ul>
             <li class="page-item" th:each="i : ${#numbers.sequence(0, teacherPage.totalPages - 1)}">
-                <a class="page-link" th:href="@{/templates/teacher(page=${i}, size=${teacherPage.size})}"
+                <a class="page-link" th:href="@{/teacher(page=${i}, size=${teacherPage.size})}"
                    th:text="${i + 1}"></a>
             </li>
         </ul>

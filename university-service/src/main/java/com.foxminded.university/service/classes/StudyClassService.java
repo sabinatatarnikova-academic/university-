@@ -25,6 +25,8 @@ public interface StudyClassService {
 
     void deleteClassById(String classId);
 
+    void deleteTeacherFromStudyClass(String classId);
+
     Page<StudyClassResponse> findAllClassesWithPagination(RequestPage pageRequest);
 
     List<StudyClassResponse> findAllClasses();

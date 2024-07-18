@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -344,5 +345,18 @@ class StudyClassServiceImplTest {
         List<StudyClassResponse> classes = studyClassService.findAllClasses();
         List<StudyClassResponse> classesMap = data.getStudyClasses();
         assertThat(classes, is(classesMap));
+    }
+
+    @Test
+    void testDeleteTeacherFromStudyClass() {
+        String id = studyClassService.findAllClasses().getFirst().getId();
+
+        StudyClass studyClass = studyClassService.findClassById(id);
+        List<StudyClass> studyClassesList = new ArrayList<>();
+        studyClassesList.add(studyClass);
+        studyClass.getTeacher().setStudyClasses(studyClassesList);
+
+        studyClassService.deleteTeacherFromStudyClass(id);
+        assertEquals(studyClass.getTeacher(), null);
     }
 }

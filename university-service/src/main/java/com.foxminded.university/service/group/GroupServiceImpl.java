@@ -70,10 +70,10 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional
     public void updateGroup(GroupRequest groupRequest) {
-        Group group = Group.builder()
-                .id(groupRequest.getId())
-                .name(groupRequest.getName())
-                .build();
+        Group group = findGroupById(groupRequest.getId());
+        if (groupRequest.getName() != null) {
+            group.setName(groupRequest.getName());
+        }
 
         if (!groupRequest.getStudentsIds().isEmpty()) {
             group.setStudents(

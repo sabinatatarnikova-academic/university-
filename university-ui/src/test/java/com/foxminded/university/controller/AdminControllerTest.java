@@ -126,7 +126,6 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowEditUserForm() throws Exception {
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
         String userId = "1";
         UserFormRequest user = UserFormRequest.builder()
                 .id(userId)
@@ -268,7 +267,7 @@ class AdminControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/courses"));
 
-        verify(courseService, times(1)).updateCourse(any());
+        verify(courseService, times(1)).updateCourse((CourseRequest) any());
     }
 
     @Test

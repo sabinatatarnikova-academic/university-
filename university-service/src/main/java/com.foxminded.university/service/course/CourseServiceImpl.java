@@ -1,6 +1,7 @@
 package com.foxminded.university.service.course;
 
 import com.foxminded.university.model.dtos.request.CourseRequest;
+import com.foxminded.university.model.dtos.request.CourseTeacherRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.classes.StudyClass;
@@ -43,8 +44,24 @@ public class CourseServiceImpl implements CourseService {
     public void updateCourse(CourseRequest courseDTO) {
         Course course = findCourseById(courseDTO.getId());
         course.setName(courseDTO.getName());
-        courseDTO.getStudyClassesIds()
-                .stream()
+        List<String> studyClassesIds = courseDTO.getStudyClassesIds();
+        updateCourseStudyClasses(studyClassesIds, course);
+        courseRepository.save(course);
+        log.info("Updated course with id - {}, name - {}", course.getId(), course.getName());
+    }
+
+    @Override
+    public void updateCourse(CourseTeacherRequest courseDTO) {
+        Course course = findCourseById(courseDTO.getId());
+        List<String> studyClassesIds = courseDTO.getStudyClassesIds();
+        updateCourseStudyClasses(studyClassesIds, course);
+        courseRepository.save(course);
+        log.info("Updated course with id - {}, name - {}", course.getId(), course.getName());
+
+    }
+
+    private void updateCourseStudyClasses(List<String> studyClassesIds, Course course) {
+        studyClassesIds.stream()
                 .map(classId -> {
                     StudyClass studyClass = studyClassService.findClassById(classId);
                     studyClass.setCourse(course);
@@ -53,8 +70,6 @@ public class CourseServiceImpl implements CourseService {
                     return studyClass;
                 })
                 .collect(Collectors.toList());
-        courseRepository.save(course);
-        log.info("Updated course with id - {}, name - {}", course.getId(), course.getName());
     }
 
     @Override

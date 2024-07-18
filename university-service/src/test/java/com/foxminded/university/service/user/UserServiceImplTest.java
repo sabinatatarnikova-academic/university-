@@ -2,6 +2,7 @@ package com.foxminded.university.service.user;
 
 import com.foxminded.university.config.TestConfig;
 import com.foxminded.university.model.dtos.request.GroupFormation;
+import com.foxminded.university.model.dtos.request.users.TeacherClassUpdateRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
@@ -280,6 +281,25 @@ class UserServiceImplTest {
 
         assertEquals(teacherToSave.getFirstName(), actualTeacher.getFirstName());
         assertEquals(teacherToSave.getLastName(), actualTeacher.getLastName());
+        assertThat(actualTeacher.getStudyClasses(), containsInAnyOrder(onlineClass, offlineClass));
+    }
+
+    @Test
+    void updateTeacherWithStudyClasses() {
+        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(4));
+        UserResponse user = userService.findAllUsersWithPagination(page).toList().get(0);
+        String userId = user.getId();
+
+        StudyClassResponse onlineClassDTO = studyClassMapper.toDto(onlineClass);
+        StudyClassResponse offlineClassDTO = studyClassMapper.toDto(offlineClass);
+
+        TeacherClassUpdateRequest teacherToSave = TeacherClassUpdateRequest.builder()
+                .id(userId)
+                .studyClassesIds(List.of(onlineClassDTO.getId(), offlineClassDTO.getId()))
+                .build();
+
+        userService.updateTeacherWithStudyClasses(teacherToSave);
+        Teacher actualTeacher = (Teacher) userService.findUserById(userId);
         assertThat(actualTeacher.getStudyClasses(), containsInAnyOrder(onlineClass, offlineClass));
     }
 
