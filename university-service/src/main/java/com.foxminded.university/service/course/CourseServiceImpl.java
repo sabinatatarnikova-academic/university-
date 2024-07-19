@@ -57,7 +57,6 @@ public class CourseServiceImpl implements CourseService {
         updateCourseStudyClasses(studyClassesIds, course);
         courseRepository.save(course);
         log.info("Updated course with id - {}, name - {}", course.getId(), course.getName());
-
     }
 
     private void updateCourseStudyClasses(List<String> studyClassesIds, Course course) {

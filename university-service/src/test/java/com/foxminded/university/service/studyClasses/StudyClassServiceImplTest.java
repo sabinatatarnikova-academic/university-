@@ -45,6 +45,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
@@ -262,7 +263,7 @@ class StudyClassServiceImplTest {
 
     @Test
     void deleteClassById() {
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
+        RequestPage page = PageUtils.createPage(0, 2);
         StudyClassResponse studyClass = studyClassService.findAllClassesWithPagination(page).toList().get(1);
         String classId = studyClass.getId();
 
@@ -272,7 +273,7 @@ class StudyClassServiceImplTest {
 
     @Test
     void findAllClassesWithPagination() {
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
+        RequestPage page = PageUtils.createPage(0, 2);
         List<StudyClassResponse> expectedClasses = Arrays.asList(studyClassMapper.toDto(onlineClass), studyClassMapper.toDto(offlineClass));
         Page<StudyClassResponse> actualClasses = studyClassService.findAllClassesWithPagination(page);
         actualClasses.forEach(studyClass -> studyClass.setId(null));
@@ -322,7 +323,7 @@ class StudyClassServiceImplTest {
     @Test
     void testGetAllRequiredData() {
         String groupId = studyClassService.findAllClasses().getFirst().getGroupId();
-        RequestPage page = PageUtils.createPage("0", "10");
+        RequestPage page = PageUtils.createPage(0, 10);
 
 
         GroupEditResponse data = studyClassService.getAllRequiredDataForGroupEdit(groupId, page);
@@ -355,6 +356,7 @@ class StudyClassServiceImplTest {
         List<StudyClass> studyClassesList = new ArrayList<>();
         studyClassesList.add(studyClass);
         studyClass.getTeacher().setStudyClasses(studyClassesList);
+        assertThat(studyClass.getTeacher().getStudyClasses(), contains(studyClass));
 
         studyClassService.deleteTeacherFromStudyClass(id);
         assertEquals(studyClass.getTeacher(), null);

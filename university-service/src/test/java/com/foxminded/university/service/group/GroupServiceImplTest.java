@@ -4,7 +4,6 @@ import com.foxminded.university.config.TestConfig;
 import com.foxminded.university.model.dtos.request.GroupFormation;
 import com.foxminded.university.model.dtos.request.GroupRequest;
 import com.foxminded.university.model.dtos.response.GroupAssignResponse;
-import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
@@ -14,9 +13,6 @@ import com.foxminded.university.model.entity.classes.OnlineClass;
 import com.foxminded.university.model.entity.classes.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
-import com.foxminded.university.model.entity.users.User;
-import com.foxminded.university.repository.GroupRepository;
-import com.foxminded.university.repository.UserRepository;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
 import jakarta.persistence.EntityNotFoundException;
@@ -36,15 +32,11 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 @DataJpaTest
 @ActiveProfiles("h2")
@@ -225,7 +217,7 @@ class GroupServiceImplTest {
                 .build();
 
         List<GroupFormation> groups = Arrays.asList(groupA, groupB);
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(Integer.MAX_VALUE));
+        RequestPage page = PageUtils.createPage(0, 2);
         Page<GroupFormation> groupsActual = groupService.findAllGroupsWithPagination(page);
         groupsActual.forEach(course -> course.setId(null));
         assertThat(groupsActual.toList(), is(groups));
@@ -241,7 +233,7 @@ class GroupServiceImplTest {
                 .build();
 
         List<GroupAssignResponse> groups = Arrays.asList(groupA, groupB);
-        RequestPage page = PageUtils.createPage("0", "2");
+        RequestPage page = PageUtils.createPage(0, 2);
         Page<GroupAssignResponse> groupsActual = groupService.findAllGroupsResponsesWithPagination(page);
         groupsActual.forEach(course -> course.setId(null));
         assertThat(groupsActual.toList(), is(groups));

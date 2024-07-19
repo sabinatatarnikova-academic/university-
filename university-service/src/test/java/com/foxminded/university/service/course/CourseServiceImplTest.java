@@ -232,7 +232,7 @@ class CourseServiceImplTest {
                 .build();
 
         List<CourseDTO> courses = Arrays.asList(courseA, courseB);
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
+        RequestPage page = PageUtils.createPage(0, 2);
         Page<CourseDTO> coursesActual = courseService.findAllCoursesWithPagination(page);
         coursesActual.forEach(course -> course.setId(null));
         assertThat(coursesActual.toList(), is(courses));

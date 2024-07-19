@@ -15,6 +15,10 @@ public class PageUtils {
         return new RequestPage(page, size);
     }
 
+    public static RequestPage createPage(int page, int size) {
+        return new RequestPage(page, size);
+    }
+
     @Value("${app.pagination.default-page}")
     public void setDefaultPage(int defaultPage) {
         DEFAULT_PAGE_INDEX = defaultPage;

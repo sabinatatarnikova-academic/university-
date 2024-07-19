@@ -22,6 +22,9 @@ import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,11 +33,15 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.htmlunit.MockMvcWebClientBuilder;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -55,6 +62,8 @@ class TeacherControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    WebClient webClient;
+
     @MockBean
     private UserService userService;
 
@@ -66,10 +75,19 @@ class TeacherControllerTest {
 
     @MockBean
     private StudyClassService studyClassService;
+    @Autowired
+    private WebApplicationContext context;
+
+    @BeforeEach
+    void setup() {
+        this.webClient = MockMvcWebClientBuilder
+                .webAppContextSetup(context)
+                .build();
+    }
 
     @Test
     void testShowTeacherList() throws Exception {
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        RequestPage page = PageUtils.createPage(0, 10);
         Page<TeacherResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(TeacherResponse.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
@@ -81,11 +99,15 @@ class TeacherControllerTest {
                 .andExpect(view().name("teacher/teacher"))
                 .andExpect(model().attributeExists("teacherPage"))
                 .andExpect(model().attribute("teacherPage", pageDtoImpl));
+
+        HtmlPage htmlPage = webClient.getPage("http://localhost:8080/teacher");
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Bob"));
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Johnson"));
     }
 
     @Test
     void testShowAllCoursesList() throws Exception {
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        RequestPage page = PageUtils.createPage(0, 10);
         Page<CourseDTO> coursePage = new PageImpl<>(Collections.singletonList(CourseDTO.builder()
                 .name("Course A")
                 .build()));
@@ -97,11 +119,14 @@ class TeacherControllerTest {
                 .andExpect(view().name("teacher/teacher_courses"))
                 .andExpect(model().attributeExists("coursesPage"))
                 .andExpect(model().attribute("coursesPage", coursePage));
+
+        HtmlPage htmlPage = webClient.getPage("http://localhost:8080/teacher/courses");
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Course A"));
     }
 
     @Test
     void testShowAllGroupsList() throws Exception {
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        RequestPage page = PageUtils.createPage(0, 10);
         Page<GroupAssignResponse> groupPage = new PageImpl<>(Collections.singletonList(GroupAssignResponse.builder()
                 .name("Group A")
                 .build()));
@@ -113,6 +138,9 @@ class TeacherControllerTest {
                 .andExpect(view().name("teacher/teacher_groups"))
                 .andExpect(model().attributeExists("groupsPage"))
                 .andExpect(model().attribute("groupsPage", groupPage));
+
+        HtmlPage htmlPage = webClient.getPage("http://localhost:8080/teacher/groups");
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Group A"));
     }
 
     @Test
@@ -135,11 +163,25 @@ class TeacherControllerTest {
                 .lastName("Johnson")
                 .userType("TEACHER")
                 .build();
+
+        List<StudyClassResponse> studyClasses = List.of(
+                StudyClassResponse.builder()
+                        .id("1")
+                        .courseName("Course A")
+                        .groupName("Group A")
+                        .build()
+        );
+
         when(userService.findUserDTOById(userId)).thenReturn(user);
+        when(studyClassService.findAllClasses()).thenReturn(studyClasses);
 
         mockMvc.perform(get("/teacher/classes/add").param("id", userId).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("teacher/teacher_add-classes"));
+
+        HtmlPage htmlPage = webClient.getPage("http://localhost:8080/teacher/classes/add?id=1");
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Course A"));
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Group A"));
     }
 
     @Test
@@ -205,13 +247,18 @@ class TeacherControllerTest {
                 .id(groupId)
                 .name("ONLINE")
                 .build();
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        RequestPage page = PageUtils.createPage(0, 10);
         Page<StudentResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(StudentResponse.builder()
                 .firstName("Charlie")
                 .lastName("Williams")
                 .group(GroupFormation.builder().name("Group A").build())
                 .build()));
-        List<StudyClassResponse> studyClassResponses = new ArrayList<>(Collections.singletonList(StudyClassResponse.builder().build()));
+        List<StudyClassResponse> studyClassResponses = new ArrayList<>(Collections.singletonList(
+                StudyClassResponse.builder()
+                        .id("1")
+                        .courseName("Course A")
+                        .groupName("ONLINE")
+                        .build()));
         GroupEditResponse editResponse = GroupEditResponse.builder()
                 .group(group)
                 .students(pageDtoImpl)
@@ -225,6 +272,12 @@ class TeacherControllerTest {
                 .andExpect(view().name("teacher/teacher_groups-edit"))
                 .andExpect(model().attributeExists("students"))
                 .andExpect(model().attribute("students", pageDtoImpl));
+
+        HtmlPage htmlPage = webClient.getPage("http://localhost:8080/teacher/groups/edit?id=1");
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Charlie"));
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Williams"));
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Course A"));
+        assertThat(htmlPage.getBody().getTextContent(), containsString("ONLINE"));
     }
 
     @Test

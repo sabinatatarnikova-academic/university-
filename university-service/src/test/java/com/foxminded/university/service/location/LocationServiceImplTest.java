@@ -213,7 +213,7 @@ class LocationServiceImplTest {
                 .build();
 
         List<Location> locations = Arrays.asList(locationA, locationB);
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(2));
+        RequestPage page = PageUtils.createPage(0, 2);
         List<Location> locationsActual = locationService.findAllLocationsWithPagination(page);
         locationsActual.forEach(course -> course.setId(null));
         assertThat(locationsActual, is(locations));

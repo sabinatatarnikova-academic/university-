@@ -12,7 +12,7 @@ class PageUtilsTest {
     void testGetResultWhenValidCase() {
         int firstExpected = 5;
         int secondExpected = 15;
-        RequestPage result = PageUtils.createPage("5", "15");
+        RequestPage result = PageUtils.createPage(5, 15);
         assertEquals(firstExpected, result.getPageNumber());
         assertEquals(secondExpected, result.getPageSize());
     }
