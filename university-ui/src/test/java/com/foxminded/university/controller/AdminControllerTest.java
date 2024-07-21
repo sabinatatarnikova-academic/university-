@@ -87,7 +87,7 @@ class AdminControllerTest {
                 .firstName("Bob")
                 .lastName("Johnson")
                 .build()));
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        RequestPage page = PageUtils.createPage(0, 10);
         when(userService.findAllUsersWithPagination(page)).thenReturn(pageDtoImpl);
 
         mockMvc.perform(get("/admin/users").param("page", "0").param("size", "10"))
@@ -126,7 +126,6 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowEditUserForm() throws Exception {
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
         String userId = "1";
         UserFormRequest user = UserFormRequest.builder()
                 .id(userId)
@@ -200,7 +199,7 @@ class AdminControllerTest {
                 .name("Name")
                 .studyClasses(new ArrayList<>())
                 .build()));
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        RequestPage page = PageUtils.createPage(0, 10);
         when(courseService.findAllCoursesWithPagination(page)).thenReturn(pageDtoImpl);
 
         mockMvc.perform(get("/admin/courses").param("page", "0").param("size", "10"))
@@ -268,7 +267,7 @@ class AdminControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/courses"));
 
-        verify(courseService, times(1)).updateCourse(any());
+        verify(courseService, times(1)).updateCourse((CourseRequest) any());
     }
 
     @Test
@@ -292,7 +291,7 @@ class AdminControllerTest {
                 .classType("ONLINE")
                 .url("www.test.com")
                 .build()));
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        RequestPage page = PageUtils.createPage(0, 10);
         when(studyClassService.findAllClassesWithPagination(page)).thenReturn(pageDtoImpl);
 
         mockMvc.perform(get("/admin/classes").param("page", "0").param("size", "10"))
@@ -411,7 +410,7 @@ class AdminControllerTest {
         Page<GroupFormation> pageDtoImpl = new PageImpl<>(Collections.singletonList(GroupFormation.builder()
                 .name("Group")
                 .build()));
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        RequestPage page = PageUtils.createPage(0, 10);
         when(groupService.findAllGroupsWithPagination(page)).thenReturn(pageDtoImpl);
 
         mockMvc.perform(get("/admin/groups").param("page", "0").param("size", "10"))
@@ -491,7 +490,7 @@ class AdminControllerTest {
                 .id(groupId)
                 .name("ONLINE")
                 .build();
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        RequestPage page = PageUtils.createPage(0, 10);
         Page<StudentResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(StudentResponse.builder()
                 .firstName("Charlie")
                 .lastName("Williams")

@@ -6,7 +6,6 @@
     <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
           name="viewport">
     <meta content="ie=edge" http-equiv="X-UA-Compatible">
-    <!--<link  th:href="@{/static/css/bootstrap.min.css}" rel="stylesheet"/>-->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet"/>
 </head>
 <body>
@@ -14,11 +13,11 @@
     <div th:if="${param.error}">
         <p class="text-danger">Invalid username or password</p>
     </div>
-    <form th:action="@{/login}" method="post" style="max-width:350px; margin: 0 auto;">
+    <form id="login-form" method="post" style="max-width:350px; margin: 0 auto;" th:action="@{/login}">
         <h1>Login Page</h1>
         <input type="text" name="username" class="form-control" placeholder="Username" required autofocus>
         <input type="password" name="password" class="form-control" placeholder="Password" required>
-        <button type="submit" value="Login" class="btn btn-primary">Login</button>
+        <button class="btn btn-primary" name="submit" type="submit" value="Login">Login</button>
     </form>
 </div>
 </body>

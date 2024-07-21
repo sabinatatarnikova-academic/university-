@@ -21,6 +21,7 @@ import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.repository.CourseRepository;
 import com.foxminded.university.repository.StudyClassRepository;
+import com.foxminded.university.repository.UserRepository;
 import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.location.LocationService;
 import com.foxminded.university.service.user.UserService;
@@ -55,6 +56,7 @@ public class StudyClassServiceImpl implements StudyClassService {
     private final StudyClassMapper studyClassMapper;
     private final GroupService groupService;
     private final UserService userService;
+    private final UserRepository userRepository;
     private final LocationService locationService;
     private final CourseRepository courseRepository;
     private final CourseMapper courseMapper;
@@ -131,6 +133,18 @@ public class StudyClassServiceImpl implements StudyClassService {
     public void deleteClassById(String classId) {
         studyClassRepository.deleteById(classId);
         log.info("Deleted class with id - {}", classId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteTeacherFromStudyClass(String classId) {
+        StudyClass studyClass = findClassById(classId);
+        Teacher teacher = studyClass.getTeacher();
+        studyClass.setTeacher(null);
+        teacher.getStudyClasses().remove(studyClass);
+
+        userRepository.save(teacher);
+        studyClassRepository.save(studyClass);
     }
 
     @Override

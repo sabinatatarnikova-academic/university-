@@ -36,7 +36,7 @@ class StudentControllerTest {
 
     @Test
     void testShowStudentList() throws Exception {
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        RequestPage page = PageUtils.createPage(0, 10);
         Page<StudentResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(StudentResponse.builder()
                 .firstName("Charlie")
                 .lastName("Williams")
@@ -54,7 +54,7 @@ class StudentControllerTest {
 
     @Test
     void testShowAllCoursesList() throws Exception {
-        RequestPage page = PageUtils.createPage(String.valueOf(0), String.valueOf(10));
+        RequestPage page = PageUtils.createPage(0, 10);
         Page<CourseDTO> coursePage = new PageImpl<>(Collections.singletonList(CourseDTO.builder()
                 .name("Group A")
                 .build()));

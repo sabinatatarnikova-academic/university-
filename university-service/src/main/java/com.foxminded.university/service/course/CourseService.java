@@ -1,6 +1,7 @@
 package com.foxminded.university.service.course;
 
 import com.foxminded.university.model.dtos.request.CourseRequest;
+import com.foxminded.university.model.dtos.request.CourseTeacherRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.utils.RequestPage;
@@ -19,6 +20,8 @@ public interface CourseService {
     Course findCourseByName(String courseName);
 
     void updateCourse(CourseRequest course);
+
+    void updateCourse(CourseTeacherRequest course);
 
     void deleteCourseById(String courseId);
 

@@ -18,6 +18,7 @@
         <th th:text="#{group.name}"></th>
         <th th:text="#{group.student}"></th>
         <th th:text="#{group.class}"></th>
+        <th th:text="#{actions}"></th>
     </tr>
     </thead>
     <tbody>
@@ -35,6 +36,7 @@
                     th:text="${studyClass.classType + ': ' + studyClass.courseName + '; Start time:' + studyClass.getStartTime() + '; End time:' + studyClass.getEndTime() + '; Group: ' + studyClass.groupName}"></li>
             </ul>
         </td>
+        <td><a class="btn btn-primary" th:href="@{/teacher/groups/edit(id=${group.id})}" th:text="#{edit}"></a></td>
     </tr>
     </tbody>
 </table>

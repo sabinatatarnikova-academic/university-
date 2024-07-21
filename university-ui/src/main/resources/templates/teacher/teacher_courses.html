@@ -17,6 +17,7 @@
         <th th:text="#{id}"></th>
         <th th:text="#{courses.name}"></th>
         <th th:text="#{classes}"></th>
+        <th th:text="#{actions}"></th>
     </tr>
     </thead>
     <tbody>
@@ -25,7 +26,7 @@
         <td th:text="${course.name}"></td>
         <td>
             <ul>
-                <li th:each="studyClass : ${сourse.studyClasses}">
+                <li th:each="studyClass : ${course.studyClasses}">
                     <span>
                         <span th:text="${studyClass.classType + ': ' + studyClass.courseName}"></span>
                         <span class="convert-time" th:attr="data-utc=${studyClass.startTime}"></span>
@@ -36,6 +37,7 @@
                 </li>
             </ul>
         </td>
+        <td><a class="btn btn-primary" th:href="@{/teacher/courses/edit(id=${course.id})}" th:text="#{edit}"></a></td>
     </tr>
     </tbody>
 </table>
