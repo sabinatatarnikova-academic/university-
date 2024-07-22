@@ -75,6 +75,7 @@ class TeacherControllerTest {
 
     @MockBean
     private StudyClassService studyClassService;
+
     @Autowired
     private WebApplicationContext context;
 

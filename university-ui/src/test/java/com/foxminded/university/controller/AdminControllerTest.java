@@ -29,6 +29,9 @@ import com.foxminded.university.service.location.LocationService;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -38,6 +41,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.htmlunit.MockMvcWebClientBuilder;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -45,6 +50,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -80,6 +87,18 @@ class AdminControllerTest {
     @MockBean
     private LocationService locationService;
 
+    WebClient webClient;
+
+    @Autowired
+    private WebApplicationContext context;
+
+    @BeforeEach
+    void setup() {
+        this.webClient = MockMvcWebClientBuilder
+                .webAppContextSetup(context)
+                .build();
+    }
+
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowAllUsersList() throws Exception {
@@ -95,6 +114,10 @@ class AdminControllerTest {
                 .andExpect(view().name("admin/user/admin_users"))
                 .andExpect(model().attributeExists("usersPage"))
                 .andExpect(model().attribute("usersPage", pageDtoImpl));
+
+        HtmlPage htmlPage = webClient.getPage("http://localhost:8080/admin/users");
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Bob"));
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Johnson"));
     }
 
     @Test
@@ -110,7 +133,6 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testAddUser() throws Exception {
-
         mockMvc.perform(post("/admin/users/new")
                         .param("firstName", "John")
                         .param("lastName", "Doe")
@@ -207,6 +229,9 @@ class AdminControllerTest {
                 .andExpect(view().name("admin/course/admin_courses"))
                 .andExpect(model().attributeExists("coursesPage"))
                 .andExpect(model().attribute("coursesPage", pageDtoImpl));
+
+        HtmlPage htmlPage = webClient.getPage("http://localhost:8080/admin/courses");
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Name"));
     }
 
     @Test
@@ -222,7 +247,6 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testAddCourse() throws Exception {
-
         mockMvc.perform(post("/admin/courses/new")
                         .param("id", "id")
                         .param("name", "test")
@@ -299,6 +323,10 @@ class AdminControllerTest {
                 .andExpect(view().name("admin/studyClass/admin_class"))
                 .andExpect(model().attributeExists("studyClassPage"))
                 .andExpect(model().attribute("studyClassPage", pageDtoImpl));
+
+        HtmlPage htmlPage = webClient.getPage("http://localhost:8080/admin/classes");
+        assertThat(htmlPage.getBody().getTextContent(), containsString("ONLINE"));
+        assertThat(htmlPage.getBody().getTextContent(), containsString("www.test.com"));
     }
 
     @Test
@@ -418,6 +446,9 @@ class AdminControllerTest {
                 .andExpect(view().name("admin/group/admin_groups"))
                 .andExpect(model().attributeExists("groupsPage"))
                 .andExpect(model().attribute("groupsPage", pageDtoImpl));
+
+        HtmlPage htmlPage = webClient.getPage("http://localhost:8080/admin/groups");
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Group"));
     }
 
     @Test
@@ -426,7 +457,7 @@ class AdminControllerTest {
         Group group = Group.builder().id("1").name("test").build();
         List<StudentResponse> pageDtoImpl = Collections.singletonList(StudentResponse.builder()
                 .id("1")
-                .firstName("tEST")
+                .firstName("Test")
                 .build());
         when(groupService.findGroupById("1")).thenReturn(group);
         when(groupService.findAllStudentsAssignedToGroup("1")).thenReturn(pageDtoImpl);
@@ -438,6 +469,9 @@ class AdminControllerTest {
                 .andExpect(model().attributeExists("group"))
                 .andExpect(model().attribute("students", pageDtoImpl))
                 .andExpect(model().attribute("group", group));
+
+        HtmlPage htmlPage = webClient.getPage("http://localhost:8080/admin/groups/students?id=1");
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Test"));
     }
 
     @Test
@@ -446,6 +480,9 @@ class AdminControllerTest {
         Group group = Group.builder().id("1").name("test").build();
         List<StudyClassResponse> pageDtoImpl = Collections.singletonList(StudyClassResponse.builder()
                 .id("1")
+                .groupName("Group")
+                .courseName("Course")
+                .classType("ONLINE")
                 .build());
         when(groupService.findGroupById("1")).thenReturn(group);
         when(groupService.findAllStudyClassesAssignedToGroup("1")).thenReturn(pageDtoImpl);
@@ -457,6 +494,11 @@ class AdminControllerTest {
                 .andExpect(model().attributeExists("group"))
                 .andExpect(model().attribute("classes", pageDtoImpl))
                 .andExpect(model().attribute("group", group));
+
+        HtmlPage htmlPage = webClient.getPage("http://localhost:8080/admin/groups/classes?id=1");
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Group"));
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Course"));
+        assertThat(htmlPage.getBody().getTextContent(), containsString("ONLINE"));
     }
 
     @Test
@@ -496,7 +538,12 @@ class AdminControllerTest {
                 .lastName("Williams")
                 .group(GroupFormation.builder().name("Group A").build())
                 .build()));
-        List<StudyClassResponse> studyClassResponses = new ArrayList<>(Collections.singletonList(StudyClassResponse.builder().build()));
+        List<StudyClassResponse> studyClassResponses = new ArrayList<>(Collections.singletonList(
+                StudyClassResponse.builder()
+                        .id("1")
+                        .courseName("Course A")
+                        .groupName("ONLINE")
+                        .build()));
         GroupEditResponse editResponse = GroupEditResponse.builder()
                 .group(group)
                 .students(pageDtoImpl)
@@ -510,6 +557,12 @@ class AdminControllerTest {
                 .andExpect(view().name("admin/group/edit_group"))
                 .andExpect(model().attributeExists("students"))
                 .andExpect(model().attribute("students", pageDtoImpl));
+
+        HtmlPage htmlPage = webClient.getPage("http://localhost:8080/admin/groups/edit?id=1");
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Charlie"));
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Williams"));
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Course A"));
+        assertThat(htmlPage.getBody().getTextContent(), containsString("ONLINE"));
     }
 
     @Test
