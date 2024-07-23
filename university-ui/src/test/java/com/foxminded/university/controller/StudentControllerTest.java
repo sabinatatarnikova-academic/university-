@@ -7,6 +7,9 @@ import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -15,9 +18,13 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.htmlunit.MockMvcWebClientBuilder;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Collections;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -33,6 +40,18 @@ class StudentControllerTest {
 
     @MockBean
     private UserService userService;
+
+    WebClient webClient;
+
+    @Autowired
+    private WebApplicationContext context;
+
+    @BeforeEach
+    void setup() {
+        this.webClient = MockMvcWebClientBuilder
+                .webAppContextSetup(context)
+                .build();
+    }
 
     @Test
     void testShowStudentList() throws Exception {
@@ -50,6 +69,11 @@ class StudentControllerTest {
                 .andExpect(view().name("student/student"))
                 .andExpect(model().attributeExists("studentPage"))
                 .andExpect(model().attribute("studentPage", pageDtoImpl));
+
+        HtmlPage htmlPage = webClient.getPage("http://localhost:8080/student");
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Charlie"));
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Williams"));
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Group A"));
     }
 
     @Test
@@ -64,5 +88,8 @@ class StudentControllerTest {
         mockMvc.perform(get("/student/courses").param("coursePage", "0").param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("student/student_courses"));
+
+        HtmlPage htmlPage = webClient.getPage("http://localhost:8080/student/courses");
+        assertThat(htmlPage.getBody().getTextContent(), containsString("Group A"));
     }
 }
