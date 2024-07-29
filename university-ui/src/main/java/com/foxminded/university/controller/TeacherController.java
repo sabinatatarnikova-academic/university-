@@ -6,10 +6,12 @@ import com.foxminded.university.model.dtos.request.users.TeacherClassUpdateReque
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.GroupAssignResponse;
 import com.foxminded.university.model.dtos.response.GroupEditResponse;
+import com.foxminded.university.model.dtos.response.schedule.ScheduleViewResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.course.CourseService;
 import com.foxminded.university.service.group.GroupService;
+import com.foxminded.university.service.schedule.ScheduleService;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
@@ -25,6 +27,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
+
 @Controller
 @AllArgsConstructor
 @RequestMapping("teacher")
@@ -34,6 +38,7 @@ public class TeacherController {
     private final CourseService courseService;
     private final GroupService groupService;
     private final StudyClassService studyClassService;
+    private final ScheduleService scheduleService;
 
     @GetMapping()
     public String showTeachersList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
@@ -105,6 +110,25 @@ public class TeacherController {
     public String editGroup(@ModelAttribute GroupRequest groupRequest) {
         groupService.updateGroup(groupRequest);
         return "redirect:/teacher/groups";
+    }
+
+    @GetMapping("/schedule")
+    public String showScheduleClasses(@RequestParam String id,
+                                      @RequestParam(value = "userDate", required = false) LocalDate userDate,
+                                      Model model) {
+        if (userDate == null) {
+            userDate = LocalDate.now();
+        }
+
+        ScheduleViewResponse data = scheduleService.getAllRequiredDataForViewingSchedulesThatAssignedToTeacher(id, userDate);
+
+        model.addAttribute("times", data.getTimes());
+        model.addAttribute("days", data.getDays());
+        model.addAttribute("studyClasses", data.getScheduleByWeek());
+        model.addAttribute("weekStart", data.getWeekStart());
+        model.addAttribute("weekEnd", data.getWeekEnd());
+        model.addAttribute("userDate", userDate);
+        return "admin/schedule/schedule_view";
     }
 
 }

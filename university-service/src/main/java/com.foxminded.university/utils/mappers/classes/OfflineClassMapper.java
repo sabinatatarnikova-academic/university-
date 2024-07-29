@@ -3,7 +3,7 @@ package com.foxminded.university.utils.mappers.classes;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.OfflineClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
-import com.foxminded.university.model.entity.classes.OfflineClass;
+import com.foxminded.university.model.entity.classes.plainClasses.OfflineClass;
 import com.foxminded.university.utils.mappers.CourseMapper;
 import com.foxminded.university.utils.mappers.GroupMapper;
 import com.foxminded.university.utils.mappers.LocationMapper;

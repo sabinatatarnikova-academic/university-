@@ -1,7 +1,8 @@
-package com.foxminded.university.model.entity.classes;
+package com.foxminded.university.model.entity.classes.plainClasses;
 
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
+import com.foxminded.university.model.entity.classes.GlobalStudyClass;
 import com.foxminded.university.model.entity.users.Teacher;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -57,4 +58,8 @@ public class StudyClass {
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
+
+    @ManyToOne
+    @JoinColumn(name = "global_class_id")
+    private GlobalStudyClass globalStudyClass;
 }

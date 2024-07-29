@@ -33,6 +33,8 @@ public interface GroupService {
 
     List<GroupFormation> findAllGroups();
 
+    List<GroupFormation> findAllGroupsWithoutSchedule();
+
     List<StudentResponse> findAllStudentsAssignedToGroup(String groupId);
 
     List<StudyClassResponse> findAllStudyClassesAssignedToGroup(String groupId);

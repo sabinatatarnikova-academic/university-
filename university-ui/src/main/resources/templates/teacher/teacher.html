@@ -55,6 +55,7 @@
                 </ul>
             </td>
             <td>
+                <a class="btn btn-primary" th:href="@{teacher/schedule(id=${teacher.id})}" th:text="#{schedule}"></a>
                 <a class="btn btn-primary" th:href="@{/teacher/classes/add(id=${teacher.id})}"
                    th:text="#{classes.new}"></a>
             </td>

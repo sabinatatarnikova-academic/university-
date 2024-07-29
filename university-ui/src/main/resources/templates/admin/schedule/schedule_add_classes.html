@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{classes}">Classes</title>
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <link rel="stylesheet" th:href="@{/static/css/bootstrap.min.css}"/>
+    <script th:src="@{/static/js/script.js}"></script>
+    <script>
+        let formData = [];
+        let scheduleId;
+
+        function handleFormSave(container) {
+            const userZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const formObject = {
+                scheduleId: container.querySelector('input[name="scheduleId"]').value,
+                scheduleTime: container.querySelector('input[name="scheduleTime"]').value,
+                scheduleDay: container.querySelector('input[name="scheduleDay"]').value,
+                groupId: container.querySelector('input[name="groupId"]').value,
+                startDate: container.querySelector('input[name="startDate"]').value,
+                endDate: container.querySelector('input[name="endDate"]').value,
+                courseId: container.querySelector('select[name="courseId"]').value,
+                teacherId: container.querySelector('select[name="teacherId"]').value,
+                regularity: container.querySelector('select[name="regularity"]').value,
+                classType: container.querySelector('select[name="classType"]').value,
+                url: container.querySelector('input[name="url"]').value,
+                locationId: container.querySelector('select[name="locationId"]').value,
+                userZone: userZone
+            };
+            formData.push(formObject);
+            console.log(formData);
+
+            scheduleId = container.querySelector('input[name="scheduleId"]').value;
+            const courseSelect = container.querySelector('select[name="courseId"]');
+            const teacherSelect = container.querySelector('select[name="teacherId"]');
+            const typeSelect = container.querySelector('select[name="classType"]');
+            const selectedCourseName = courseSelect.options[courseSelect.selectedIndex].text;
+            const selectedTeacher = teacherSelect.options[teacherSelect.selectedIndex].text;
+            const selectedClassType = typeSelect.options[typeSelect.selectedIndex].text;
+
+            container.innerHTML = '';
+
+            const message = document.createElement('div');
+            const scheduleResult = `
+        <style>
+        .schedule{
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-direction: column;
+        }
+        </style>
+        <div class="schedule">
+                <h2 class="course">${selectedCourseName}</h2>
+                <div class="teacher">${selectedTeacher}</div>
+                <div class="class">${selectedClassType}</div>
+        </div>
+        `;
+            message.innerHTML = scheduleResult;
+            container.appendChild(message);
+        }
+
+        function toggleForm(button) {
+            const container = button.nextElementSibling;
+            if (container.style.display === "none" || container.style.display === "") {
+                container.style.display = "block";
+                button.style.display = "none";
+            } else {
+                container.style.display = "none";
+                button.style.display = "block";
+            }
+        }
+
+        function submitAllData() {
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/admin/schedule/classes/add?id=" + scheduleId, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    alert("Data successfully sent to the server");
+                } else if (xhr.readyState === 4) {
+                    alert("Error sending data to the server: " + xhr.status);
+                }
+            };
+            xhr.send(JSON.stringify(formData));
+        }
+    </script>
+</head>
+<body>
+<div class="container mt-4">
+    <h2 th:text="${groupName}"></h2>
+    <h2 th:text="#{startDate} + ': '+ ${startDate}"></h2>
+    <h2 th:text="#{endDate} + ': '+ ${endDate}"></h2>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th th:text="#{time}"></th>
+            <th th:text="#{monday}"></th>
+            <th th:text="#{tuesday}"></th>
+            <th th:text="#{wednesday}"></th>
+            <th th:text="#{thursday}"></th>
+            <th th:text="#{friday}"></th>
+            <th th:text="#{saturday}"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="timeSlot: ${times}">
+            <td th:text="${timeSlot.getStartTime() + '-' + timeSlot.getEndTime()}"></td>
+            <td th:each="day: ${days}">
+                <div>
+                    <button class="btn btn-success" onclick="toggleForm(this)" type="button">+</button>
+                    <div style="display:none;" th:object="${globalClass}">
+                        <input name="scheduleId" th:value="${scheduleId}" type="hidden">
+                        <input name="scheduleTime" th:value="${timeSlot.name()}" type="hidden">
+                        <input name="scheduleDay" th:value="${day.name()}" type="hidden">
+                        <input name="groupId" th:value="${groupId}" type="hidden">
+                        <input name="startDate" th:value="${startDate}" type="hidden">
+                        <input name="endDate" th:value="${endDate}" type="hidden">
+                        <div class="mb-3">
+                            <label class="form-label" for="course" th:text="#{courses.name}"></label>
+                            <select class="form-select" id="course" name="courseId" th:field="*{courseId}">
+                                <option th:text="#{choose}" th:value="null"></option>
+                                <option th:each="course : ${courses}" th:text="${course.getName()}"
+                                        th:value="${course.id}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="teacher" th:text="#{teacher}"></label>
+                            <select class="form-select" id="teacher" name="teacherId" th:field="*{teacherId}">
+                                <option th:text="#{choose}" th:value="null"></option>
+                                <option th:each="teacher : ${teachers}"
+                                        th:text="${teacher.getFirstName() + ' ' + teacher.getLastName()}"
+                                        th:value="${teacher.id}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="regularity" th:text="#{regularity}"></label>
+                            <select class="form-select" id="regularity" th:field="*{regularity}">
+                                <option th:text="#{choose}" th:value="null"></option>
+                                <option th:text="#{eachWeek}" th:value="EACH_WEEK"></option>
+                                <option th:text="#{everyOtherWeek}" th:value="EVERY_OTHER_WEEK"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="classType" th:text="#{type}"></label>
+                            <select class="form-select" id="classType" name="classType" th:field="*{classType}">
+                                <option th:text="#{choose}" th:value="null"></option>
+                                <option th:value="ONLINE">Online</option>
+                                <option th:value="OFFLINE">Offline</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="url" th:text="#{url}"></label>
+                            <input class="form-control" id="url" th:field="*{url}" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="location" th:text="#{location}"></label>
+                            <select class="form-select" id="location" th:field="*{locationId}">
+                                <option th:text="#{choose}" th:value="null"></option>
+                                <option th:each="location : ${locations}"
+                                        th:text="${location.department + location.classroom}"
+                                        th:value="${location.id}"></option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="handleFormSave(this.parentElement)" type="button" th:text="#{save}"></button>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-primary" onclick="submitAllData()" th:text="#{submitAllData}" type="button"></button>
+</div>
+</body>
+</html>

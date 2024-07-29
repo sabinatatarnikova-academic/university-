@@ -11,7 +11,7 @@
 </head>
 <body>
 <div th:insert="~{language :: language}"></div>
-<h2>Classes:</h2>
+<h2 th:text="#{classes}"></h2>
 <div class="mb-3">
     <a class="btn btn-success" href="/admin/classes/new" th:text="#{classes.new}"></a>
 </div>

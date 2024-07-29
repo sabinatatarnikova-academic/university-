@@ -8,9 +8,9 @@ import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
-import com.foxminded.university.model.entity.classes.OfflineClass;
-import com.foxminded.university.model.entity.classes.OnlineClass;
-import com.foxminded.university.model.entity.classes.StudyClass;
+import com.foxminded.university.model.entity.classes.plainClasses.OfflineClass;
+import com.foxminded.university.model.entity.classes.plainClasses.OnlineClass;
+import com.foxminded.university.model.entity.classes.plainClasses.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.utils.PageUtils;
@@ -146,6 +146,10 @@ class GroupServiceImplTest {
         groupA.setStudyClasses(new ArrayList<>(Arrays.asList(onlineClass)));
         groupA = entityManager.persist(groupA);
 
+        groupB.setStudents(new ArrayList<>(Arrays.asList(diana)));
+        groupB.setStudyClasses(new ArrayList<>(Arrays.asList(offlineClass)));
+        groupB = entityManager.persist(groupB);
+
         entityManager.flush();
     }
 
@@ -185,18 +189,20 @@ class GroupServiceImplTest {
     @Test
     void updateGroup() {
         GroupFormation group = groupService.findAllGroups().getFirst();
+        String studentId = groupService.findGroupById(groupService.findAllGroups().getLast().getId()).getStudents().getFirst().getId();
+        String classId = groupService.findGroupById(groupService.findAllGroups().getLast().getId()).getStudyClasses().getFirst().getId();
         String groupId = group.getId();
         GroupRequest groupToUpdate = GroupRequest.builder()
                 .id(groupId)
                 .name("Update name")
-                .studentsIds(new ArrayList<>())
-                .studyClassesIds(new ArrayList<>())
+                .studentsIds(Arrays.asList(studentId))
+                .studyClassesIds(Arrays.asList(classId))
                 .build();
         groupService.updateGroup(groupToUpdate);
         Group updatedGroup = groupService.findGroupById(groupId);
         assertEquals(groupToUpdate.getId(), updatedGroup.getId());
-        assertEquals(null, updatedGroup.getStudents());
-        assertEquals(null, updatedGroup.getStudyClasses());
+        assertEquals(studentId, updatedGroup.getStudents().getFirst().getId());
+        assertEquals(classId, updatedGroup.getStudyClasses().getFirst().getId());
     }
 
     @Test

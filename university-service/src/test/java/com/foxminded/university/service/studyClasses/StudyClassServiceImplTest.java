@@ -15,11 +15,15 @@ import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
-import com.foxminded.university.model.entity.classes.OfflineClass;
-import com.foxminded.university.model.entity.classes.OnlineClass;
-import com.foxminded.university.model.entity.classes.StudyClass;
+import com.foxminded.university.model.entity.classes.plainClasses.OfflineClass;
+import com.foxminded.university.model.entity.classes.plainClasses.OnlineClass;
+import com.foxminded.university.model.entity.classes.plainClasses.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
+import com.foxminded.university.model.enums.Regularity;
+import com.foxminded.university.model.enums.ScheduleDay;
+import com.foxminded.university.model.enums.ScheduleTime;
+import com.foxminded.university.service.classes.GlobalStudyClassesService;
 import com.foxminded.university.service.classes.StudyClassServiceImpl;
 import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.utils.PageUtils;
@@ -38,8 +42,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -69,6 +76,9 @@ class StudyClassServiceImplTest {
 
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    private GlobalStudyClassesService globalStudyClassesService;
 
     private Group groupA;
     private Group groupB;
@@ -361,4 +371,20 @@ class StudyClassServiceImplTest {
         studyClassService.deleteTeacherFromStudyClass(id);
         assertEquals(studyClass.getTeacher(), null);
     }
+
+    @Test
+    void test() {
+        LocalDate startDate = LocalDate.of(2024, 7, 1);
+        LocalDate endDate = LocalDate.of(2024, 7, 31);
+        DayOfWeek scheduleDay = ScheduleDay.MONDAY.getDayOfWeek();
+        ScheduleTime scheduleTime = ScheduleTime.FIRST_LECTURE;
+        Regularity regularity = Regularity.EACH_WEEK;
+        List<ZonedDateTime[]> schedule = globalStudyClassesService.generateSchedule(startDate, endDate, scheduleDay, scheduleTime, regularity);
+        schedule.forEach(times -> {
+            System.out.println("Start: " + times[0] + ", End: " + times[1]);
+        });
+
+
+    }
+
 }
