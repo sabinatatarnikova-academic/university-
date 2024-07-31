@@ -1,12 +1,12 @@
 package com.foxminded.university.model.dtos.response.schedule;
 
-import com.foxminded.university.model.enums.ScheduleDay;
-import com.foxminded.university.model.enums.ScheduleTime;
+import com.foxminded.university.model.entity.ScheduleTimes;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
 
 @Data
@@ -21,6 +21,6 @@ public class StudyClassScheduleResponse {
     private String groupName;
     private String teacherFirstName;
     private String teacherLastName;
-    private ScheduleTime scheduleTime;
-    private ScheduleDay scheduleDay;
+    private ScheduleTimes scheduleTime;
+    private DayOfWeek scheduleDay;
 }

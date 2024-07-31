@@ -1,13 +1,12 @@
 package com.foxminded.university.model.dtos.request.schedule;
 
 import com.foxminded.university.model.enums.Regularity;
-import com.foxminded.university.model.enums.ScheduleDay;
-import com.foxminded.university.model.enums.ScheduleTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 @Data
@@ -18,8 +17,8 @@ public class GlobalStudyClassRequest {
 
     private String id;
     private String scheduleId;
-    private ScheduleDay scheduleDay;
-    private ScheduleTime scheduleTime;
+    private DayOfWeek scheduleDay;
+    private String scheduleTimeId;
     private Regularity regularity;
     private LocalDate startDate;
     private LocalDate endDate;

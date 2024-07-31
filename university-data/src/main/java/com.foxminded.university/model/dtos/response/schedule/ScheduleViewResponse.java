@@ -1,12 +1,12 @@
 package com.foxminded.university.model.dtos.response.schedule;
 
-import com.foxminded.university.model.enums.ScheduleDay;
-import com.foxminded.university.model.enums.ScheduleTime;
+import com.foxminded.university.model.entity.ScheduleTimes;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -16,8 +16,8 @@ import java.util.List;
 @Builder
 public class ScheduleViewResponse {
 
-    private List<ScheduleTime> times;
-    private List<ScheduleDay> days;
+    private List<ScheduleTimes> times;
+    private List<DayOfWeek> days;
     private List<StudyClassScheduleResponse> scheduleByWeek;
     private LocalDate weekStart;
     private LocalDate weekEnd;

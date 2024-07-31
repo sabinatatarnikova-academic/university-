@@ -11,14 +11,18 @@ import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.GroupAssignResponse;
 import com.foxminded.university.model.dtos.response.GroupEditResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
+import com.foxminded.university.model.dtos.response.schedule.ScheduleViewResponse;
+import com.foxminded.university.model.dtos.response.schedule.StudyClassScheduleResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
+import com.foxminded.university.model.entity.ScheduleTimes;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.course.CourseService;
 import com.foxminded.university.service.group.GroupService;
+import com.foxminded.university.service.schedule.ScheduleService;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
@@ -36,13 +40,20 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.htmlunit.MockMvcWebClientBuilder;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -75,6 +86,9 @@ class TeacherControllerTest {
 
     @MockBean
     private StudyClassService studyClassService;
+
+    @MockBean
+    private ScheduleService scheduleService;
 
     @Autowired
     private WebApplicationContext context;
@@ -298,5 +312,55 @@ class TeacherControllerTest {
                 .andExpect(redirectedUrl("/teacher/groups"));
 
         verify(groupService, times(1)).updateGroup((GroupRequest) any());
+    }
+
+    @Test
+    void testShowScheduleClasses() throws Exception {
+        LocalDate userDate = LocalDate.of(2024, 7, 1);
+        LocalDate weekStart = userDate.with(DayOfWeek.MONDAY);
+        LocalDate weekEnd = weekStart.plusDays(6);
+
+        ScheduleTimes time = ScheduleTimes.builder()
+                .id("time")
+                .name("First Lecture")
+                .startTime(LocalTime.of(8, 0))
+                .endTime(LocalTime.of(9, 30))
+                .build();
+
+        ZonedDateTime startTime = ZonedDateTime.of(2024, 7, 1, 8, 0, 0, 0, ZoneId.of("UTC"));
+
+        StudyClassScheduleResponse scheduleResponse = StudyClassScheduleResponse.builder()
+                .id("scheduleResponse")
+                .startTime(startTime)
+                .courseName("Math 101")
+                .groupName("Group A")
+                .teacherFirstName("John")
+                .teacherLastName("Doe")
+                .scheduleTime(time)
+                .scheduleDay(DayOfWeek.MONDAY)
+                .build();
+
+        ScheduleViewResponse response = ScheduleViewResponse.builder()
+                .times(Arrays.asList(time))
+                .days(Arrays.asList(DayOfWeek.values()))
+                .scheduleByWeek(Arrays.asList(scheduleResponse))
+                .weekStart(weekStart)
+                .weekEnd(weekEnd)
+                .build();
+
+        when(scheduleService.getAllRequiredDataForViewingSchedulesThatAssignedToTeacher(anyString(), any(LocalDate.class)))
+                .thenReturn(response);
+
+        mockMvc.perform(get("/teacher/schedule")
+                        .param("id", "teacher1")
+                        .param("userDate", "2024-07-01"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("teacher/teacher_schedule"))
+                .andExpect(model().attribute("times", response.getTimes()))
+                .andExpect(model().attribute("days", response.getDays()))
+                .andExpect(model().attribute("studyClasses", response.getScheduleByWeek()))
+                .andExpect(model().attribute("weekStart", response.getWeekStart()))
+                .andExpect(model().attribute("weekEnd", response.getWeekEnd()))
+                .andExpect(model().attribute("userDate", userDate));
     }
 }

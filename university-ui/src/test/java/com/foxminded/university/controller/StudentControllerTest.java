@@ -3,7 +3,11 @@ package com.foxminded.university.controller;
 import com.foxminded.university.config.TestSecurityConfig;
 import com.foxminded.university.model.dtos.request.GroupFormation;
 import com.foxminded.university.model.dtos.response.CourseDTO;
+import com.foxminded.university.model.dtos.response.schedule.ScheduleViewResponse;
+import com.foxminded.university.model.dtos.response.schedule.StudyClassScheduleResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
+import com.foxminded.university.model.entity.ScheduleTimes;
+import com.foxminded.university.service.schedule.ScheduleService;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
@@ -21,10 +25,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.htmlunit.MockMvcWebClientBuilder;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -41,10 +52,14 @@ class StudentControllerTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private ScheduleService scheduleService;
+
     WebClient webClient;
 
     @Autowired
     private WebApplicationContext context;
+
 
     @BeforeEach
     void setup() {
@@ -91,5 +106,56 @@ class StudentControllerTest {
 
         HtmlPage htmlPage = webClient.getPage("http://localhost:8080/student/courses");
         assertThat(htmlPage.getBody().getTextContent(), containsString("Group A"));
+    }
+
+    @Test
+    void testShowScheduleClasses() throws Exception {
+        LocalDate userDate = LocalDate.of(2024, 7, 1);
+        LocalDate weekStart = userDate.with(DayOfWeek.MONDAY);
+        LocalDate weekEnd = weekStart.plusDays(6);
+
+        ScheduleTimes time = ScheduleTimes.builder()
+                .id("time")
+                .name("First Period")
+                .startTime(LocalTime.of(8, 0))
+                .endTime(LocalTime.of(9, 30))
+                .build();
+
+        ZonedDateTime startTime = ZonedDateTime.of(2024, 7, 1, 8, 0, 0, 0, ZoneId.of("UTC"));
+
+        StudyClassScheduleResponse studyClassScheduleResponse = StudyClassScheduleResponse.builder()
+                .id("studyClassScheduleResponse")
+                .startTime(startTime)
+                .courseName("Math 101")
+                .groupName("Group A")
+                .teacherFirstName("John")
+                .teacherLastName("Doe")
+                .scheduleTime(time)
+                .scheduleDay(DayOfWeek.MONDAY)
+                .build();
+
+        ScheduleViewResponse response = ScheduleViewResponse.builder()
+                .times(Arrays.asList(time))
+                .days(Arrays.asList(DayOfWeek.values()))
+                .scheduleByWeek(Arrays.asList(studyClassScheduleResponse))
+                .weekStart(weekStart)
+                .weekEnd(weekEnd)
+                .groupName("Group A")
+                .build();
+
+        when(scheduleService.getAllRequiredDataForViewingScheduleThatAssignedToStudent(any(LocalDate.class)))
+                .thenReturn(response);
+
+        mockMvc.perform(get("/student/schedule")
+                        .param("userDate", "2024-07-01"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("student/student_schedule"))
+                .andExpect(model().attribute("times", response.getTimes()))
+                .andExpect(model().attribute("days", response.getDays()))
+                .andExpect(model().attribute("studyClasses", response.getScheduleByWeek()))
+                .andExpect(model().attribute("groupName", response.getGroupName()))
+                .andExpect(model().attribute("weekStart", response.getWeekStart()))
+                .andExpect(model().attribute("weekEnd", response.getWeekEnd()))
+                .andExpect(model().attribute("userDate", userDate));
     }
 }

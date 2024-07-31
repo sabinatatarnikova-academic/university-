@@ -128,7 +128,7 @@ public class TeacherController {
         model.addAttribute("weekStart", data.getWeekStart());
         model.addAttribute("weekEnd", data.getWeekEnd());
         model.addAttribute("userDate", userDate);
-        return "admin/schedule/schedule_view";
+        return "teacher/teacher_schedule";
     }
 
 }

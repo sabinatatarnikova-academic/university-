@@ -14,7 +14,9 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,10 +35,12 @@ public class Schedule {
     private String id;
 
     @OneToMany(mappedBy = "schedule", cascade = {CascadeType.ALL})
+    @ToString.Exclude
     private List<GlobalStudyClass> globalStudyClasses;
 
     @OneToOne
     @JoinColumn(name = "group_id")
+    @EqualsAndHashCode.Exclude
     private Group group;
 
     @Column(name = "start_date")

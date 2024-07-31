@@ -1,12 +1,12 @@
 package com.foxminded.university.model.dtos.response.schedule;
 
 import com.foxminded.university.model.enums.Regularity;
-import com.foxminded.university.model.enums.ScheduleDay;
-import com.foxminded.university.model.enums.ScheduleTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.DayOfWeek;
 
 @Data
 @NoArgsConstructor
@@ -16,8 +16,8 @@ public class EditScheduleResponse {
 
     private String id;
     private String globalClassId;
-    private ScheduleTime scheduleTime;
-    private ScheduleDay scheduleDay;
+    private String scheduleTimeId;
+    private DayOfWeek scheduleDay;
     private String groupId;
     private String courseId;
     private String teacherId;

@@ -1,6 +1,6 @@
 package com.foxminded.university.model.entity;
 
-import com.foxminded.university.model.entity.classes.plainClasses.StudyClass;
+import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

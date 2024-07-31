@@ -1,4 +1,4 @@
-package com.foxminded.university.model.entity.classes.plainClasses;
+package com.foxminded.university.model.entity.classes.plainclasses;
 
 import com.foxminded.university.model.entity.Location;
 import jakarta.persistence.DiscriminatorValue;

@@ -5,9 +5,9 @@ import com.foxminded.university.model.dtos.response.classes.OfflineClassResponse
 import com.foxminded.university.model.dtos.response.classes.OnlineClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.schedule.StudyClassScheduleResponse;
-import com.foxminded.university.model.entity.classes.plainClasses.OfflineClass;
-import com.foxminded.university.model.entity.classes.plainClasses.OnlineClass;
-import com.foxminded.university.model.entity.classes.plainClasses.StudyClass;
+import com.foxminded.university.model.entity.classes.plainclasses.OfflineClass;
+import com.foxminded.university.model.entity.classes.plainclasses.OnlineClass;
+import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Builder;
 import org.mapstruct.InheritInverseConfiguration;

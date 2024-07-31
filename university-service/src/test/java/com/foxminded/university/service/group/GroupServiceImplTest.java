@@ -8,9 +8,9 @@ import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
-import com.foxminded.university.model.entity.classes.plainClasses.OfflineClass;
-import com.foxminded.university.model.entity.classes.plainClasses.OnlineClass;
-import com.foxminded.university.model.entity.classes.plainClasses.StudyClass;
+import com.foxminded.university.model.entity.classes.plainclasses.OfflineClass;
+import com.foxminded.university.model.entity.classes.plainclasses.OnlineClass;
+import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.utils.PageUtils;
@@ -227,6 +227,21 @@ class GroupServiceImplTest {
         Page<GroupFormation> groupsActual = groupService.findAllGroupsWithPagination(page);
         groupsActual.forEach(course -> course.setId(null));
         assertThat(groupsActual.toList(), is(groups));
+    }
+
+    @Test
+    void findAllGroupsWithoutSchedule() {
+        GroupFormation groupA = GroupFormation.builder()
+                .name("Group A")
+                .build();
+        GroupFormation groupB = GroupFormation.builder()
+                .name("Group B")
+                .build();
+
+        List<GroupFormation> groups = Arrays.asList(groupA, groupB);
+        List<GroupFormation> groupsActual = groupService.findAllGroupsWithoutSchedule();
+        groupsActual.forEach(course -> course.setId(null));
+        assertThat(groupsActual, is(groups));
     }
 
     @Test

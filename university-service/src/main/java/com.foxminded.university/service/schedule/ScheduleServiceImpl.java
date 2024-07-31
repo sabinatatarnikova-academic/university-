@@ -9,13 +9,12 @@ import com.foxminded.university.model.dtos.response.schedule.StudyClassScheduleR
 import com.foxminded.university.model.dtos.response.schedule.ViewScheduleResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.model.entity.Group;
+import com.foxminded.university.model.entity.ScheduleTimes;
 import com.foxminded.university.model.entity.classes.GlobalStudyClass;
 import com.foxminded.university.model.entity.classes.Schedule;
-import com.foxminded.university.model.entity.classes.plainClasses.StudyClass;
+import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
-import com.foxminded.university.model.enums.ScheduleDay;
-import com.foxminded.university.model.enums.ScheduleTime;
 import com.foxminded.university.repository.ScheduleRepository;
 import com.foxminded.university.repository.StudyClassRepository;
 import com.foxminded.university.service.course.CourseService;
@@ -37,6 +36,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +56,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final UserService userService;
     private final LocationService locationService;
     private final StudyClassRepository studyClassRepository;
+    private final ScheduleTimeService scheduleTimeService;
 
     @Override
     @Transactional
@@ -92,25 +93,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<StudyClassScheduleResponse> paginateScheduleByWeek(String id, LocalDate startDateOfWeek, LocalDate endDateOfWeek) {
-        Schedule schedule = findScheduleById(id);
-        List<GlobalStudyClass> globalStudyClasses = schedule.getGlobalStudyClasses();
-        globalStudyClasses.stream().map(globalStudyClass -> {
-            List<StudyClass> studyClasses = globalStudyClass.getStudyClasses();
-            return studyClasses;
-        }).collect(Collectors.toList());
-
-
-        List<StudyClass> studyClasses = schedule.getGlobalStudyClasses().stream()
-                .flatMap(globalStudyClass -> globalStudyClass.getStudyClasses().stream())
-                .filter(studyClass -> !studyClass.getStartTime().toLocalDate().isBefore(startDateOfWeek) &&
-                        !studyClass.getStartTime().toLocalDate().isAfter(endDateOfWeek))
-                .collect(Collectors.toList());
-
-        return studyClasses.stream().map(studyClassMapper::toScheduleDto).collect(Collectors.toList());
-    }
-
-    @Override
     public Page<ViewScheduleResponse> findAllSchedulesWithPagination(RequestPage requestPage) {
         int pageNumber = requestPage.getPageNumber();
         int pageSize = requestPage.getPageSize();
@@ -126,6 +108,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public void deleteSchedule(String id) {
+        findScheduleById(id).getGroup().setSchedule(null);
         scheduleRepository.deleteById(id);
         log.info("Schedule with id {} was deleted", id);
     }
@@ -134,8 +117,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Transactional
     public ScheduleClassesResponse getAllRequiredDataForAddingClassesToSchedule(String id) {
         Schedule schedule = findScheduleById(id);
-        List<ScheduleTime> times = Arrays.asList(ScheduleTime.values());
-        List<ScheduleDay> days = Arrays.asList(ScheduleDay.values());
+        List<ScheduleTimes> times = scheduleTimeService.findAllLectureTimes();
+        List<DayOfWeek> days = Arrays.asList(DayOfWeek.values());
         List<CourseDTO> courses = courseService.findAllCourses();
         List<TeacherResponse> teachers = userService.findAllTeachers();
         List<LocationDTO> locations = locationService.findAllLocations();
@@ -163,8 +146,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         LocalDate weekEnd = weekStart.plusDays(6);
 
         List<StudyClassScheduleResponse> scheduleByWeek = paginateScheduleByWeek(id, weekStart, weekEnd);
-        List<ScheduleTime> times = Arrays.asList(ScheduleTime.values());
-        List<ScheduleDay> days = Arrays.asList(ScheduleDay.values());
+        List<ScheduleTimes> times = scheduleTimeService.findAllLectureTimes();
+        List<DayOfWeek> days = Arrays.asList(DayOfWeek.values());
 
         return ScheduleViewResponse.builder()
                 .times(times)
@@ -199,8 +182,8 @@ public class ScheduleServiceImpl implements ScheduleService {
                         !studyClass.getStartTime().toLocalDate().isAfter(endDateOfWeek))
                 .collect(Collectors.toList());
 
-        List<ScheduleTime> times = Arrays.asList(ScheduleTime.values());
-        List<ScheduleDay> days = Arrays.asList(ScheduleDay.values());
+        List<ScheduleTimes> times = scheduleTimeService.findAllLectureTimes();
+        List<DayOfWeek> days = Arrays.asList(DayOfWeek.values());
 
         return ScheduleViewResponse.builder()
                 .times(times)
@@ -209,5 +192,23 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .weekStart(startDateOfWeek)
                 .weekEnd(endDateOfWeek)
                 .build();
+    }
+
+    private List<StudyClassScheduleResponse> paginateScheduleByWeek(String id, LocalDate startDateOfWeek, LocalDate endDateOfWeek) {
+        Schedule schedule = findScheduleById(id);
+        List<GlobalStudyClass> globalStudyClasses = schedule.getGlobalStudyClasses();
+        globalStudyClasses.stream().map(globalStudyClass -> {
+            List<StudyClass> studyClasses = globalStudyClass.getStudyClasses();
+            return studyClasses;
+        }).collect(Collectors.toList());
+
+
+        List<StudyClass> studyClasses = schedule.getGlobalStudyClasses().stream()
+                .flatMap(globalStudyClass -> globalStudyClass.getStudyClasses().stream())
+                .filter(studyClass -> !studyClass.getStartTime().toLocalDate().isBefore(startDateOfWeek) &&
+                        !studyClass.getStartTime().toLocalDate().isAfter(endDateOfWeek))
+                .collect(Collectors.toList());
+
+        return studyClasses.stream().map(studyClassMapper::toScheduleDto).collect(Collectors.toList());
     }
 }

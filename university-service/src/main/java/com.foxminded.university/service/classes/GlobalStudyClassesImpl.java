@@ -4,20 +4,20 @@ import com.foxminded.university.model.dtos.request.schedule.GlobalStudyClassRequ
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
+import com.foxminded.university.model.entity.ScheduleTimes;
 import com.foxminded.university.model.entity.classes.GlobalStudyClass;
 import com.foxminded.university.model.entity.classes.Schedule;
-import com.foxminded.university.model.entity.classes.plainClasses.OfflineClass;
-import com.foxminded.university.model.entity.classes.plainClasses.OnlineClass;
-import com.foxminded.university.model.entity.classes.plainClasses.StudyClass;
+import com.foxminded.university.model.entity.classes.plainclasses.OfflineClass;
+import com.foxminded.university.model.entity.classes.plainclasses.OnlineClass;
+import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.model.enums.Regularity;
-import com.foxminded.university.model.enums.ScheduleTime;
 import com.foxminded.university.repository.GlobalStudyClassRepository;
-import com.foxminded.university.repository.StudyClassRepository;
 import com.foxminded.university.service.course.CourseService;
 import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.service.location.LocationService;
 import com.foxminded.university.service.schedule.ScheduleService;
+import com.foxminded.university.service.schedule.ScheduleTimeService;
 import com.foxminded.university.service.user.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -43,12 +43,12 @@ import java.util.stream.Collectors;
 public class GlobalStudyClassesImpl implements GlobalStudyClassesService {
 
     private final GlobalStudyClassRepository globalStudyClassRepository;
-    private final StudyClassRepository studyClassRepository;
     private final UserService userService;
     private final GroupService groupService;
     private final CourseService courseService;
     private final LocationService locationService;
     private final ScheduleService scheduleService;
+    private final ScheduleTimeService scheduleTimeService;
 
     @Override
     @Transactional
@@ -69,8 +69,8 @@ public class GlobalStudyClassesImpl implements GlobalStudyClassesService {
 
         LocalDate startDate = request.getStartDate();
         LocalDate endDate = request.getEndDate();
-        DayOfWeek scheduleDay = request.getScheduleDay().getDayOfWeek();
-        ScheduleTime scheduleTime = request.getScheduleTime();
+        DayOfWeek scheduleDay = request.getScheduleDay();
+        ScheduleTimes scheduleTime = scheduleTimeService.findLectureTimeById(request.getScheduleTimeId());
         Regularity regularity = request.getRegularity();
         String userZone = request.getUserZone();
 
@@ -119,14 +119,13 @@ public class GlobalStudyClassesImpl implements GlobalStudyClassesService {
         return globalStudyClass;
     }
 
-    private List<ZonedDateTime[]> generateDatesForStudyClasses(LocalDate currentDate, LocalDate endDate, DayOfWeek targetDayOfWeek, ScheduleTime scheduleTime, Regularity regularity, String zone) {
+    private List<ZonedDateTime[]> generateDatesForStudyClasses(LocalDate currentDate, LocalDate endDate, DayOfWeek targetDayOfWeek, ScheduleTimes scheduleTime, Regularity regularity, String zone) {
         List<ZonedDateTime[]> dates = new ArrayList<>();
         ZoneId zoneId = ZoneId.of(zone);
         int interval = regularity == Regularity.EACH_WEEK ? 1 : 2;
         while (currentDate.getDayOfWeek() != targetDayOfWeek) {
             currentDate = currentDate.plusDays(1);
         }
-
         while (!currentDate.isAfter(endDate)) {
             ZonedDateTime startDateTimeUserZone = LocalDateTime.of(currentDate, scheduleTime.getStartTime()).atZone(zoneId);
             ZonedDateTime endDateTimeUserZone = LocalDateTime.of(currentDate, scheduleTime.getEndTime()).atZone(zoneId);

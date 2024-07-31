@@ -4,7 +4,7 @@ import com.foxminded.university.model.dtos.request.CourseRequest;
 import com.foxminded.university.model.dtos.request.CourseTeacherRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.entity.Course;
-import com.foxminded.university.model.entity.classes.plainClasses.StudyClass;
+import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import com.foxminded.university.repository.CourseRepository;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.utils.RequestPage;

@@ -1,7 +1,7 @@
 package com.foxminded.university.model.entity;
 
 import com.foxminded.university.model.entity.classes.Schedule;
-import com.foxminded.university.model.entity.classes.plainClasses.StudyClass;
+import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -23,7 +23,7 @@ import java.util.List;
 @Entity
 @Table(name = "groups")
 @Data
-@ToString(exclude = {"students", "studyClasses"})
+@ToString(exclude = {"students", "studyClasses", "schedule"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

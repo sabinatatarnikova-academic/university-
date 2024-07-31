@@ -54,6 +54,7 @@
             <th th:text="#{thursday}"></th>
             <th th:text="#{friday}"></th>
             <th th:text="#{saturday}"></th>
+            <th th:text="#{sunday}"></th>
         </tr>
         </thead>
         <tbody>
@@ -62,7 +63,7 @@
             <td th:each="day: ${days}">
                 <div th:each="class: ${studyClasses}">
                     <div class="classDate"
-                         th:if="${class.getScheduleTime().name() == timeSlot.name() && class.getScheduleDay().name() == day.name()}">
+                         th:if="${class.getScheduleTime().id == timeSlot.id && class.getScheduleDay().name() == day.name()}">
                         <p class="date"
                            th:text="${class.getStartTime().getDayOfMonth() + '.' + class.getStartTime().getMonthValue()}"></p>
                         <div class="wrapper">

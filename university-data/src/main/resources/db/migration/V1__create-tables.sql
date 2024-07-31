@@ -22,10 +22,19 @@ CREATE TABLE courses (
 );
 
 -- Global Classes table
+CREATE TABLE schedule
+(
+    schedule_id VARCHAR(255) PRIMARY KEY,
+    group_id    VARCHAR(255) REFERENCES groups (group_id) ON DELETE SET NULL,
+    start_date  DATE,
+    end_date    DATE
+);
+
+-- Study Classes table for both OnlineClass and OfflineClass
 CREATE TABLE global_classes
 (
     global_class_id VARCHAR(255) PRIMARY KEY,
-    group_id        VARCHAR(255) REFERENCES groups (group_id) ON DELETE SET NULL,
+    schedule_id VARCHAR(255) REFERENCES schedule (schedule_id) ON DELETE SET NULL,
     schedule_day    VARCHAR(50),
     schedule_time   VARCHAR(50),
     regularity      VARCHAR(50),
@@ -33,7 +42,6 @@ CREATE TABLE global_classes
     end_date        DATE
 );
 
--- Study Classes table for both OnlineClass and OfflineClass
 CREATE TABLE classes (
                          class_id VARCHAR(255) PRIMARY KEY,
                          start_time TIMESTAMP,
@@ -47,13 +55,6 @@ CREATE TABLE classes (
                          location_id VARCHAR(255) -- Only relevant for offline classes
 );
 
-CREATE TABLE schedule
-(
-    schedule_id VARCHAR(255) PRIMARY KEY,
-    group_id    VARCHAR(255) REFERENCES groups (group_id) ON DELETE SET NULL,
-    start_date  DATE,
-    end_date    DATE
-);
 
 -- Location table for OfflineClass
 CREATE TABLE locations (
@@ -87,10 +88,3 @@ ALTER TABLE classes
     ADD CONSTRAINT fk_global_class
         FOREIGN KEY (global_class_id)
             REFERENCES global_classes (global_class_id) ON DELETE SET NULL;
-
-ALTER TABLE global_classes
-    ADD schedule_id VARCHAR(255),
-    ADD CONSTRAINT fk_schedule
-        FOREIGN KEY (schedule_id)
-            REFERENCES schedule (schedule_id) ON DELETE SET NULL;
-

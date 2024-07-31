@@ -16,7 +16,7 @@
             const userZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             const formObject = {
                 scheduleId: container.querySelector('input[name="scheduleId"]').value,
-                scheduleTime: container.querySelector('input[name="scheduleTime"]').value,
+                scheduleTimeId: container.querySelector('input[name="scheduleTimeId"]').value,
                 scheduleDay: container.querySelector('input[name="scheduleDay"]').value,
                 groupId: container.querySelector('input[name="groupId"]').value,
                 startDate: container.querySelector('input[name="startDate"]').value,
@@ -103,6 +103,7 @@
             <th th:text="#{thursday}"></th>
             <th th:text="#{friday}"></th>
             <th th:text="#{saturday}"></th>
+            <th th:text="#{sunday}"></th>
         </tr>
         </thead>
         <tbody>
@@ -113,7 +114,7 @@
                     <button class="btn btn-success" onclick="toggleForm(this)" type="button">+</button>
                     <div style="display:none;" th:object="${globalClass}">
                         <input name="scheduleId" th:value="${scheduleId}" type="hidden">
-                        <input name="scheduleTime" th:value="${timeSlot.name()}" type="hidden">
+                        <input name="scheduleTimeId" th:value="${timeSlot.id}" type="hidden">
                         <input name="scheduleDay" th:value="${day.name()}" type="hidden">
                         <input name="groupId" th:value="${groupId}" type="hidden">
                         <input name="startDate" th:value="${startDate}" type="hidden">

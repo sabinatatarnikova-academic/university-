@@ -1,9 +1,8 @@
 package com.foxminded.university.model.entity.classes;
 
-import com.foxminded.university.model.entity.classes.plainClasses.StudyClass;
+import com.foxminded.university.model.entity.ScheduleTimes;
+import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import com.foxminded.university.model.enums.Regularity;
-import com.foxminded.university.model.enums.ScheduleDay;
-import com.foxminded.university.model.enums.ScheduleTime;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +19,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+import java.time.DayOfWeek;
 import java.util.List;
 
 @Entity
@@ -41,11 +42,11 @@ public class GlobalStudyClass {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "schedule_day")
-    private ScheduleDay scheduleDay;
+    private DayOfWeek scheduleDay;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "schedule_time")
-    private ScheduleTime scheduleTime;
+    @ManyToOne
+    @JoinColumn(name = "schedule_time")
+    private ScheduleTimes scheduleTime;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "regularity")
@@ -53,6 +54,7 @@ public class GlobalStudyClass {
 
     @ManyToOne
     @JoinColumn(name = "schedule_id")
+    @ToString.Exclude
     private Schedule schedule;
 
     public void setStudyClasses(List<StudyClass> studyClasses) {

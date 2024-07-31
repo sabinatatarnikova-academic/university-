@@ -272,14 +272,14 @@ public class AdminController {
     }
 
     @GetMapping("/schedule/new")
-    public String showAddSchedule(Model model) {
+    public String showAddScheduleForm(Model model) {
         model.addAttribute("schedule", new ScheduleCreateRequest());
         model.addAttribute("groups", groupService.findAllGroupsWithoutSchedule());
         return "admin/schedule/schedule_add";
     }
 
     @PostMapping("/schedule/new")
-    public String addSchedule(@ModelAttribute ScheduleCreateRequest globalStudyClassRequest) {
+    public String saveSchedule(@ModelAttribute ScheduleCreateRequest globalStudyClassRequest) {
         String id = scheduleService.addSchedule(globalStudyClassRequest);
         return "redirect:/admin/schedule/classes/add?id=" + id;
     }
