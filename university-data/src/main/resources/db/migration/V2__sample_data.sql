@@ -14,16 +14,13 @@ VALUES ('9f6cfb74-e71e-4d00-86e8-3307e8b6865e', 'John', 'Doe', 'TEACHER', null, 
        ('admin-id', 'Admin', 'Admin', 'ADMIN', null, 'admin',
         '$2a$12$auvXRvsX0KCioaLjD7TYSO5TRtDZSj179qOkuj6vmK/2OobS8B9k2');
 
-
 INSERT INTO courses (course_id, course_name)
 VALUES ('fd17d1ab-2c1f-46f7-8501-1a2129f0c933', 'Mathematics'),
        ('bc5b7198-af0d-42d5-8b5b-83427cf9ba1d', 'History');
 
-
 INSERT INTO locations (location_id, department, classroom)
 VALUES ('34af61d9-5a22-4636-bef3-c0a5e73036c6', 'ICS', '101'),
        ('abccddee-1234-5678-90ab-cdef12345678', 'HPF', '202');
-
 
 INSERT INTO classes (class_id, start_time, end_time, course_id, user_id, group_id, class_type, url, location_id)
 VALUES ('4f88890b-cf58-4ae4-aada-08f12881740f', '2023-09-01T09:00:00', '2023-09-01T10:00:00',

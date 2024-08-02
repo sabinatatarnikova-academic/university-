@@ -5,53 +5,74 @@ import com.foxminded.university.model.dtos.request.GroupFormation;
 import com.foxminded.university.model.dtos.request.GroupRequest;
 import com.foxminded.university.model.dtos.request.classes.CreateStudyClassRequest;
 import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
+import com.foxminded.university.model.dtos.request.schedule.GlobalStudyClassRequest;
+import com.foxminded.university.model.dtos.request.schedule.ScheduleCreateRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.GroupEditResponse;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.EditStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
+import com.foxminded.university.model.dtos.response.schedule.ScheduleClassesResponse;
+import com.foxminded.university.model.dtos.response.schedule.ScheduleViewResponse;
+import com.foxminded.university.model.dtos.response.schedule.ViewScheduleResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.UserResponse;
 import com.foxminded.university.model.entity.Group;
+import com.foxminded.university.service.classes.GlobalStudyClassesService;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.course.CourseService;
 import com.foxminded.university.service.group.GroupService;
+import com.foxminded.university.service.schedule.ScheduleService;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.ZoneId;
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
 @AllArgsConstructor
 @RequestMapping("/admin")
+@Validated
 public class AdminController {
 
     private final UserService userService;
     private final GroupService groupService;
     private final StudyClassService studyClassService;
     private final CourseService courseService;
+    private final GlobalStudyClassesService globalStudyClassesService;
+    private final ScheduleService scheduleService;
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<String> handleResourceNotFoundException(EntityNotFoundException e) {
         return new ResponseEntity<>("Resource not found: " + e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public String handleConstraintViolationException(ConstraintViolationException e, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("errorMessage", "Validation error: " + e.getMessage());
+        return "redirect:/admin/schedule/new";
     }
 
     @GetMapping()
@@ -251,5 +272,108 @@ public class AdminController {
     public String deleteGroup(@PathVariable("id") String id) {
         groupService.deleteGroupById(id);
         return "redirect:/admin/groups";
+    }
+
+    @GetMapping("/schedule")
+    public String showSchedulesList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
+        RequestPage page = PageUtils.createPage(pageStr, sizeStr);
+        Page<ViewScheduleResponse> schedules = scheduleService.findAllSchedulesWithPagination(page);
+        model.addAttribute("schedulesPage", schedules);
+        return "admin/schedule/schedules_list";
+    }
+
+    @GetMapping("/schedule/new")
+    public String showAddScheduleForm(Model model) {
+        model.addAttribute("schedule", new ScheduleCreateRequest());
+        model.addAttribute("groups", groupService.findAllGroupsWithoutSchedule());
+        return "admin/schedule/schedule_add";
+    }
+
+    @PostMapping("/schedule/new")
+    public String saveSchedule(@Valid @ModelAttribute ScheduleCreateRequest globalStudyClassRequest) {
+        String id = scheduleService.addSchedule(globalStudyClassRequest);
+        return "redirect:/admin/schedule/classes/add?id=" + id;
+    }
+
+    @GetMapping("/schedule/classes/add")
+    public String showAddScheduleClasses(@RequestParam String id, Model model) {
+        ScheduleClassesResponse data = scheduleService.getAllRequiredDataForAddingClassesToSchedule(id);
+
+        model.addAttribute("times", data.getTimes());
+        model.addAttribute("days", data.getDays());
+        model.addAttribute("globalClass", new GlobalStudyClassRequest());
+        model.addAttribute("scheduleId", data.getScheduleId());
+        model.addAttribute("groupId", data.getGroupId());
+        model.addAttribute("groupName", data.getGroupName());
+        model.addAttribute("startDate", data.getDateRange().getStartDate());
+        model.addAttribute("endDate", data.getDateRange().getEndDate());
+        model.addAttribute("courses", data.getCourses());
+        model.addAttribute("teachers", data.getTeachers());
+        model.addAttribute("locations", data.getLocations());
+        return "admin/schedule/schedule_add_classes";
+    }
+
+    @PostMapping("/schedule/classes/add")
+    public String addSchedule(@RequestParam String id, @RequestBody List<GlobalStudyClassRequest> globalStudyClassRequests) {
+        globalStudyClassesService.parseScheduleListToGlobalClasses(globalStudyClassRequests);
+        return "redirect:/admin/schedule";
+    }
+
+    @GetMapping("/schedule/view")
+    public String showScheduleClasses(@RequestParam String id,
+                                      @RequestParam(value = "userDate", required = false) LocalDate userDate,
+                                      Model model) {
+        if (userDate == null) {
+            userDate = LocalDate.now();
+        }
+
+        ScheduleViewResponse data = scheduleService.getAllRequiredDataForViewingSchedule(id, userDate);
+
+        model.addAttribute("times", data.getTimes());
+        model.addAttribute("days", data.getDays());
+        model.addAttribute("studyClasses", data.getScheduleByWeek());
+        model.addAttribute("groupName", data.getGroupName());
+        model.addAttribute("weekStart", data.getWeekStart());
+        model.addAttribute("weekEnd", data.getWeekEnd());
+        model.addAttribute("userDate", userDate);
+        model.addAttribute("scheduleId", id);
+        return "admin/schedule/schedule_view";
+    }
+
+    @GetMapping("/schedule/edit")
+    public String showEditScheduleClassesForm(@RequestParam String id, Model model) {
+        ScheduleClassesResponse data = scheduleService.getAllRequiredDataForAddingClassesToSchedule(id);
+
+        model.addAttribute("times", data.getTimes());
+        model.addAttribute("days", data.getDays());
+        model.addAttribute("globalClasses", data.getGlobalStudyClasses());
+        model.addAttribute("globalClass", new GlobalStudyClassRequest());
+        model.addAttribute("scheduleId", data.getScheduleId());
+        model.addAttribute("groupId", data.getGroupId());
+        model.addAttribute("groupName", data.getGroupName());
+        model.addAttribute("startDate", data.getDateRange().getStartDate());
+        model.addAttribute("endDate", data.getDateRange().getEndDate());
+        model.addAttribute("courses", data.getCourses());
+        model.addAttribute("teachers", data.getTeachers());
+        model.addAttribute("locations", data.getLocations());
+        return "admin/schedule/schedule_edit";
+    }
+
+    @PostMapping("/schedule/edit")
+    public String editSchedule(@RequestParam String id, @RequestBody List<GlobalStudyClassRequest> globalStudyClassRequests) {
+        globalStudyClassesService.parseScheduleListToGlobalClasses(globalStudyClassRequests);
+        return "redirect:/admin/schedule";
+    }
+
+    @DeleteMapping("/schedule/delete/{id}")
+    public String deleteSchedule(@PathVariable("id") String id) {
+        scheduleService.deleteSchedule(id);
+        return "redirect:/admin/schedule";
+    }
+
+    @DeleteMapping("/schedule/class/delete")
+    public String deleteGlobalClass(@RequestParam String id, @RequestParam String scheduleId) {
+        globalStudyClassesService.deleteGlobalClass(id);
+        return "redirect:/admin/schedule/edit?id=" + scheduleId;
     }
 }

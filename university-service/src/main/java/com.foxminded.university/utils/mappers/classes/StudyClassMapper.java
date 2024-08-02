@@ -4,9 +4,10 @@ import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.response.classes.OfflineClassResponse;
 import com.foxminded.university.model.dtos.response.classes.OnlineClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
-import com.foxminded.university.model.entity.classes.OfflineClass;
-import com.foxminded.university.model.entity.classes.OnlineClass;
-import com.foxminded.university.model.entity.classes.StudyClass;
+import com.foxminded.university.model.dtos.response.schedule.StudyClassScheduleResponse;
+import com.foxminded.university.model.entity.classes.plainclasses.OfflineClass;
+import com.foxminded.university.model.entity.classes.plainclasses.OnlineClass;
+import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Builder;
 import org.mapstruct.InheritInverseConfiguration;
@@ -65,4 +66,12 @@ public interface StudyClassMapper {
     @Mapping(source = "startTime", target = "startTime", qualifiedByName = "localToZoned")
     @Mapping(source = "endTime", target = "endTime", qualifiedByName = "localToZoned")
     StudyClass toEntity(StudyClassRequest studyClassRequest);
+
+    @Mapping(target = "courseName", source = "course.name")
+    @Mapping(target = "groupName", source = "group.name")
+    @Mapping(target = "teacherFirstName", source = "teacher.firstName")
+    @Mapping(target = "teacherLastName", source = "teacher.lastName")
+    @Mapping(target = "scheduleTime", source = "globalStudyClass.scheduleTime")
+    @Mapping(target = "scheduleDay", source = "globalStudyClass.scheduleDay")
+    StudyClassScheduleResponse toScheduleDto(StudyClass studyClass);
 }

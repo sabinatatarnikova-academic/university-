@@ -6,7 +6,7 @@ import com.foxminded.university.model.dtos.response.GroupAssignResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.entity.Group;
-import com.foxminded.university.model.entity.classes.StudyClass;
+import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.repository.GroupRepository;
@@ -191,6 +191,15 @@ public class GroupServiceImpl implements GroupService {
         List<GroupFormation> groupFormations = groups.stream().map(groupMapper::toDto).collect(Collectors.toList());
         log.info("Found {} groups", groups.size());
         return groupFormations;
+    }
+
+    @Override
+    public List<GroupFormation> findAllGroupsWithoutSchedule() {
+        List<Group> groups = groupRepository.findAll();
+        return groups.stream()
+                .filter(group -> group.getSchedule() == null)
+                .map(groupMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override

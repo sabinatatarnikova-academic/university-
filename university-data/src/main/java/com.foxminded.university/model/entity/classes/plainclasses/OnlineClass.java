@@ -1,10 +1,8 @@
-package com.foxminded.university.model.entity.classes;
+package com.foxminded.university.model.entity.classes.plainclasses;
 
-import com.foxminded.university.model.entity.Location;
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,14 +11,13 @@ import lombok.experimental.SuperBuilder;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@DiscriminatorValue("OFFLINE")
+@DiscriminatorValue("ONLINE")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class OfflineClass extends StudyClass {
+public class OnlineClass extends StudyClass {
 
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    private Location location;
+    @Column(name = "url")
+    private String url;
 }

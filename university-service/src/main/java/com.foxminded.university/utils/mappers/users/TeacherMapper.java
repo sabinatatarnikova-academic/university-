@@ -3,7 +3,7 @@ package com.foxminded.university.utils.mappers.users;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.model.dtos.response.users.UserResponse;
-import com.foxminded.university.model.entity.classes.StudyClass;
+import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
 import org.mapstruct.InheritInverseConfiguration;

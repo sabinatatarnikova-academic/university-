@@ -15,11 +15,12 @@ import com.foxminded.university.model.dtos.response.users.TeacherResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
-import com.foxminded.university.model.entity.classes.OfflineClass;
-import com.foxminded.university.model.entity.classes.OnlineClass;
-import com.foxminded.university.model.entity.classes.StudyClass;
+import com.foxminded.university.model.entity.classes.plainclasses.OfflineClass;
+import com.foxminded.university.model.entity.classes.plainclasses.OnlineClass;
+import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
+import com.foxminded.university.service.classes.GlobalStudyClassesService;
 import com.foxminded.university.service.classes.StudyClassServiceImpl;
 import com.foxminded.university.service.group.GroupService;
 import com.foxminded.university.utils.PageUtils;
@@ -69,6 +70,9 @@ class StudyClassServiceImplTest {
 
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    private GlobalStudyClassesService globalStudyClassesService;
 
     private Group groupA;
     private Group groupB;
