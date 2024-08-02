@@ -19,8 +19,10 @@
                 scheduleTimeId: container.querySelector('input[name="scheduleTimeId"]').value,
                 scheduleDay: container.querySelector('input[name="scheduleDay"]').value,
                 groupId: container.querySelector('input[name="groupId"]').value,
-                startDate: container.querySelector('input[name="startDate"]').value,
-                endDate: container.querySelector('input[name="endDate"]').value,
+                dateRange: {
+                    startDate: container.querySelector('input[name="startDate"]').value,
+                    endDate: container.querySelector('input[name="endDate"]').value
+                },
                 courseId: container.querySelector('select[name="courseId"]').value,
                 teacherId: container.querySelector('select[name="teacherId"]').value,
                 regularity: container.querySelector('select[name="regularity"]').value,

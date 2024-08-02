@@ -10,5 +10,7 @@ import org.mapstruct.ReportingPolicy;
 public interface ScheduleMapper {
 
     @Mapping(target = "groupName", source = "group.name")
+    @Mapping(target = "dateRange.startDate", source = "startDate")
+    @Mapping(target = "dateRange.endDate", source = "endDate")
     ViewScheduleResponse toDto(Schedule schedule);
 }

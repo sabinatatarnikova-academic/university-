@@ -1,11 +1,11 @@
 package com.foxminded.university.model.dtos.request.schedule;
 
+import com.foxminded.university.model.dtos.DateRange;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -14,7 +14,8 @@ import java.time.LocalDate;
 public class ScheduleCreateRequest {
 
     private String id;
-    private LocalDate startDate;
-    private LocalDate endDate;
+
+    @Valid
+    private DateRange dateRange;
     private String groupId;
 }

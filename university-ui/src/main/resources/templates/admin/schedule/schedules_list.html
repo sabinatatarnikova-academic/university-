@@ -26,8 +26,8 @@
     <tbody>
     <tr th:each="schedule : ${schedulesPage}">
         <td th:text="${schedule.getGroupName()}"></td>
-        <td th:text="${schedule.getStartDate()}"></td>
-        <td th:text="${schedule.getEndDate()}"></td>
+        <td th:text="${schedule.dateRange.getStartDate()}"></td>
+        <td th:text="${schedule.dateRange.getEndDate()}"></td>
         <td>
             <a class="btn btn-primary" th:href="@{/admin/schedule/view(id=${schedule.id})}" th:text="#{view}"></a>
             <a class="btn btn-primary" th:href="@{/admin/schedule/edit(id=${schedule.id})}" th:text="#{edit}"></a>

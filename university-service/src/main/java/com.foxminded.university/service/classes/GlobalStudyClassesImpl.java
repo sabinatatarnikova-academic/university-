@@ -67,8 +67,8 @@ public class GlobalStudyClassesImpl implements GlobalStudyClassesService {
         Group group = groupService.findGroupById(request.getGroupId());
         Schedule schedule = scheduleService.findScheduleById(request.getScheduleId());
 
-        LocalDate startDate = request.getStartDate();
-        LocalDate endDate = request.getEndDate();
+        LocalDate startDate = request.getDateRange().getStartDate();
+        LocalDate endDate = request.getDateRange().getEndDate();
         DayOfWeek scheduleDay = request.getScheduleDay();
         ScheduleTimes scheduleTime = scheduleTimeService.findLectureTimeById(request.getScheduleTimeId());
         Regularity regularity = request.getRegularity();

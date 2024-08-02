@@ -202,7 +202,6 @@ public class GroupServiceImpl implements GroupService {
                 .collect(Collectors.toList());
     }
 
-
     @Override
     public List<StudentResponse> findAllStudentsAssignedToGroup(String groupId) {
         Group group = findGroupById(groupId);

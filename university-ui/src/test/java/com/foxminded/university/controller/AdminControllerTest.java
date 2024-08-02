@@ -3,6 +3,7 @@ package com.foxminded.university.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foxminded.university.config.AdminControllerConfig;
 import com.foxminded.university.config.TestSecurityConfig;
+import com.foxminded.university.model.dtos.DateRange;
 import com.foxminded.university.model.dtos.request.CourseRequest;
 import com.foxminded.university.model.dtos.request.GroupFormation;
 import com.foxminded.university.model.dtos.request.GroupRequest;
@@ -657,8 +658,9 @@ class AdminControllerTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowSchedulesList() throws Exception {
         Page<ViewScheduleResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(ViewScheduleResponse.builder()
-                .startDate(LocalDate.of(2024, 10, 1))
-                .endDate(LocalDate.of(2024, 12, 1))
+                .dateRange(DateRange.builder()
+                        .startDate(LocalDate.of(2024, 10, 1))
+                        .endDate(LocalDate.of(2024, 12, 1)).build())
                 .groupName("Group A")
                 .build()));
         RequestPage page = PageUtils.createPage(0, 10);
@@ -681,9 +683,13 @@ class AdminControllerTest {
         };
         when(groupService.findAllGroupsWithoutSchedule()).thenReturn(groupFormationList);
 
+        ScheduleCreateRequest expectedScheduleCreateRequest = ScheduleCreateRequest.builder()
+                .dateRange(new DateRange())
+                .build();
+
         mockMvc.perform(get("/admin/schedule/new"))
                 .andExpect(model().attributeExists("schedule"))
-                .andExpect(model().attribute("schedule", new ScheduleCreateRequest()))
+                .andExpect(model().attribute("schedule", expectedScheduleCreateRequest))
                 .andExpect(model().attributeExists("groups"))
                 .andExpect(model().attribute("groups", groupFormationList))
                 .andExpect(status().isOk())
@@ -693,15 +699,8 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testSaveSchedule() throws Exception {
-
-        ScheduleCreateRequest request = ScheduleCreateRequest.builder()
-                .startDate(LocalDate.of(2024, 7, 1))
-                .endDate(LocalDate.of(2024, 8, 11))
-                .groupId("d15b0018-47e9-4281-9dc8-a5aaf2bdf951")
-                .build();
-
         String scheduleId = "new-schedule-id";
-        when(scheduleService.addSchedule(request)).thenReturn(scheduleId);
+        when(scheduleService.addSchedule(any(ScheduleCreateRequest.class))).thenReturn(scheduleId);
 
         mockMvc.perform(post("/admin/schedule/new")
                         .param("startDate", "2024-07-01")
@@ -728,8 +727,9 @@ class AdminControllerTest {
                 .scheduleId("schedule1")
                 .groupId("group1")
                 .groupName("Group A")
-                .startDate(LocalDate.of(2024, 7, 1))
-                .endDate(LocalDate.of(2024, 8, 11))
+                .dateRange(DateRange.builder()
+                        .startDate(LocalDate.of(2024, 7, 1))
+                        .endDate(LocalDate.of(2024, 8, 11)).build())
                 .courses(Arrays.asList(new CourseDTO("course1", "Mathematics", null)))
                 .teachers(Arrays.asList(new TeacherResponse()))
                 .locations(Arrays.asList(new LocationDTO("location1", "Main Building", "Room 101")))
@@ -747,8 +747,8 @@ class AdminControllerTest {
                 .andExpect(model().attribute("scheduleId", response.getScheduleId()))
                 .andExpect(model().attribute("groupId", response.getGroupId()))
                 .andExpect(model().attribute("groupName", response.getGroupName()))
-                .andExpect(model().attribute("startDate", response.getStartDate()))
-                .andExpect(model().attribute("endDate", response.getEndDate()))
+                .andExpect(model().attribute("startDate", response.getDateRange().getStartDate()))
+                .andExpect(model().attribute("endDate", response.getDateRange().getEndDate()))
                 .andExpect(model().attribute("courses", response.getCourses()))
                 .andExpect(model().attribute("teachers", response.getTeachers()))
                 .andExpect(model().attribute("locations", response.getLocations()));
@@ -763,8 +763,9 @@ class AdminControllerTest {
                 .scheduleDay(DayOfWeek.MONDAY)
                 .scheduleTimeId("time1")
                 .regularity(Regularity.EACH_WEEK)
-                .startDate(LocalDate.of(2024, 7, 1))
-                .endDate(LocalDate.of(2024, 8, 11))
+                .dateRange(DateRange.builder()
+                        .startDate(LocalDate.of(2024, 7, 1))
+                        .endDate(LocalDate.of(2024, 8, 11)).build())
                 .courseId("course1")
                 .teacherId("teacher1")
                 .groupName("Group A")
@@ -781,8 +782,9 @@ class AdminControllerTest {
                 .scheduleDay(DayOfWeek.WEDNESDAY)
                 .scheduleTimeId("time2")
                 .regularity(Regularity.EACH_WEEK)
-                .startDate(LocalDate.of(2024, 7, 1))
-                .endDate(LocalDate.of(2024, 8, 11))
+                .dateRange(DateRange.builder()
+                        .startDate(LocalDate.of(2024, 7, 1))
+                        .endDate(LocalDate.of(2024, 8, 11)).build())
                 .courseId("course2")
                 .teacherId("teacher2")
                 .groupName("Group B")
@@ -905,8 +907,9 @@ class AdminControllerTest {
                 .scheduleId("schedule1")
                 .groupId("group1")
                 .groupName("Group A")
-                .startDate(LocalDate.of(2024, 7, 1))
-                .endDate(LocalDate.of(2024, 8, 11))
+                .dateRange(DateRange.builder()
+                        .startDate(LocalDate.of(2024, 7, 1))
+                        .endDate(LocalDate.of(2024, 8, 11)).build())
                 .courses(Arrays.asList(course))
                 .teachers(Arrays.asList(teacher))
                 .locations(Arrays.asList(location))
@@ -926,8 +929,8 @@ class AdminControllerTest {
                 .andExpect(model().attribute("scheduleId", response.getScheduleId()))
                 .andExpect(model().attribute("groupId", response.getGroupId()))
                 .andExpect(model().attribute("groupName", response.getGroupName()))
-                .andExpect(model().attribute("startDate", response.getStartDate()))
-                .andExpect(model().attribute("endDate", response.getEndDate()))
+                .andExpect(model().attribute("startDate", response.getDateRange().getStartDate()))
+                .andExpect(model().attribute("endDate", response.getDateRange().getEndDate()))
                 .andExpect(model().attribute("courses", response.getCourses()))
                 .andExpect(model().attribute("teachers", response.getTeachers()))
                 .andExpect(model().attribute("locations", response.getLocations()));
@@ -942,8 +945,9 @@ class AdminControllerTest {
                 .scheduleDay(DayOfWeek.MONDAY)
                 .scheduleTimeId("time1")
                 .regularity(Regularity.EACH_WEEK)
-                .startDate(LocalDate.of(2024, 7, 1))
-                .endDate(LocalDate.of(2024, 8, 11))
+                .dateRange(DateRange.builder()
+                        .startDate(LocalDate.of(2024, 7, 1))
+                        .endDate(LocalDate.of(2024, 8, 11)).build())
                 .courseId("course1")
                 .teacherId("teacher1")
                 .groupName("Group A")
@@ -960,8 +964,9 @@ class AdminControllerTest {
                 .scheduleDay(DayOfWeek.WEDNESDAY)
                 .scheduleTimeId("time2")
                 .regularity(Regularity.EACH_WEEK)
-                .startDate(LocalDate.of(2024, 7, 1))
-                .endDate(LocalDate.of(2024, 8, 11))
+                .dateRange(DateRange.builder()
+                        .startDate(LocalDate.of(2024, 7, 1))
+                        .endDate(LocalDate.of(2024, 8, 11)).build())
                 .courseId("course2")
                 .teacherId("teacher2")
                 .groupName("Group B")

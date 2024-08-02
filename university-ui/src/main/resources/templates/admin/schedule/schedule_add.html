@@ -11,6 +11,9 @@
 <body>
 <div class="container mt-4">
     <h1 th:text="#{schedule.add}"></h1>
+    <div class="alert alert-danger" role="alert" th:if="${errorMessage}">
+        <span th:text="${errorMessage}"></span>
+    </div>
     <form method="post" th:action="@{/admin/schedule/new}" th:object="${schedule}">
         <div class="mb-3">
             <label class="form-label" for="group" th:text="#{group}"></label>
@@ -21,11 +24,11 @@
         </div>
         <div class="mb-3">
             <label class="form-label" for="startDate" th:text="#{startDate}"></label>
-            <input class="form-control" id="startDate" th:field="*{startDate}" type="date">
+            <input class="form-control" id="startDate" th:field="*{dateRange.startDate}" type="date">
         </div>
         <div class="mb-3">
             <label class="form-label" for="endDate" th:text="#{endDate}"></label>
-            <input class="form-control" id="endDate" th:field="*{endDate}" type="date">
+            <input class="form-control" id="endDate" th:field="*{dateRange.endDate}" type="date">
         </div>
         <button class="btn btn-success" th:text="#{classes.new}" type="submit"></button>
     </form>

@@ -28,12 +28,15 @@ import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,6 +46,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -50,6 +54,7 @@ import java.util.List;
 @Controller
 @AllArgsConstructor
 @RequestMapping("/admin")
+@Validated
 public class AdminController {
 
     private final UserService userService;
@@ -62,6 +67,12 @@ public class AdminController {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<String> handleResourceNotFoundException(EntityNotFoundException e) {
         return new ResponseEntity<>("Resource not found: " + e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public String handleConstraintViolationException(ConstraintViolationException e, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("errorMessage", "Validation error: " + e.getMessage());
+        return "redirect:/admin/schedule/new";
     }
 
     @GetMapping()
@@ -279,7 +290,7 @@ public class AdminController {
     }
 
     @PostMapping("/schedule/new")
-    public String saveSchedule(@ModelAttribute ScheduleCreateRequest globalStudyClassRequest) {
+    public String saveSchedule(@Valid @ModelAttribute ScheduleCreateRequest globalStudyClassRequest) {
         String id = scheduleService.addSchedule(globalStudyClassRequest);
         return "redirect:/admin/schedule/classes/add?id=" + id;
     }
@@ -294,8 +305,8 @@ public class AdminController {
         model.addAttribute("scheduleId", data.getScheduleId());
         model.addAttribute("groupId", data.getGroupId());
         model.addAttribute("groupName", data.getGroupName());
-        model.addAttribute("startDate", data.getStartDate());
-        model.addAttribute("endDate", data.getEndDate());
+        model.addAttribute("startDate", data.getDateRange().getStartDate());
+        model.addAttribute("endDate", data.getDateRange().getEndDate());
         model.addAttribute("courses", data.getCourses());
         model.addAttribute("teachers", data.getTeachers());
         model.addAttribute("locations", data.getLocations());
@@ -340,8 +351,8 @@ public class AdminController {
         model.addAttribute("scheduleId", data.getScheduleId());
         model.addAttribute("groupId", data.getGroupId());
         model.addAttribute("groupName", data.getGroupName());
-        model.addAttribute("startDate", data.getStartDate());
-        model.addAttribute("endDate", data.getEndDate());
+        model.addAttribute("startDate", data.getDateRange().getStartDate());
+        model.addAttribute("endDate", data.getDateRange().getEndDate());
         model.addAttribute("courses", data.getCourses());
         model.addAttribute("teachers", data.getTeachers());
         model.addAttribute("locations", data.getLocations());

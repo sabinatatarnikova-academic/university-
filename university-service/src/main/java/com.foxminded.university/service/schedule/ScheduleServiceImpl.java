@@ -1,5 +1,6 @@
 package com.foxminded.university.service.schedule;
 
+import com.foxminded.university.model.dtos.DateRange;
 import com.foxminded.university.model.dtos.request.LocationDTO;
 import com.foxminded.university.model.dtos.request.schedule.ScheduleCreateRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
@@ -62,8 +63,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Transactional
     public String addSchedule(ScheduleCreateRequest request) {
         Group group = groupService.findGroupById(request.getGroupId());
-        LocalDate startDate = request.getStartDate();
-        LocalDate endDate = request.getEndDate();
+        LocalDate startDate = request.getDateRange().getStartDate();
+        LocalDate endDate = request.getDateRange().getEndDate();
 
         Schedule schedule = Schedule.builder()
                 .startDate(startDate)
@@ -129,8 +130,10 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .scheduleId(id)
                 .groupId(schedule.getGroup().getId())
                 .groupName(schedule.getGroup().getName())
-                .startDate(schedule.getStartDate())
-                .endDate(schedule.getEndDate())
+                .dateRange(DateRange.builder()
+                        .startDate(schedule.getStartDate())
+                        .endDate(schedule.getEndDate())
+                        .build())
                 .courses(courses)
                 .teachers(teachers)
                 .locations(locations)

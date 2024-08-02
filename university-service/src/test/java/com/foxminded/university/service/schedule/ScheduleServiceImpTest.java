@@ -1,6 +1,7 @@
 package com.foxminded.university.service.schedule;
 
 import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.model.dtos.DateRange;
 import com.foxminded.university.model.dtos.request.schedule.ScheduleCreateRequest;
 import com.foxminded.university.model.dtos.response.schedule.ScheduleClassesResponse;
 import com.foxminded.university.model.dtos.response.schedule.ScheduleViewResponse;
@@ -229,8 +230,9 @@ class ScheduleServiceImpTest {
         LocalDate endDate = LocalDate.of(2024, 12, 15);
 
         ScheduleCreateRequest createRequest = ScheduleCreateRequest.builder()
-                .startDate(startDate)
-                .endDate(endDate)
+                .dateRange(DateRange.builder()
+                        .startDate(startDate)
+                        .endDate(endDate).build())
                 .groupId(groupId)
                 .build();
 
@@ -286,8 +288,10 @@ class ScheduleServiceImpTest {
                 .scheduleId(scheduleId)
                 .groupId(schedule.getGroup().getId())
                 .groupName(schedule.getGroup().getName())
-                .startDate(schedule.getStartDate())
-                .endDate(schedule.getEndDate())
+                .dateRange(DateRange.builder()
+                        .startDate(schedule.getStartDate())
+                        .endDate(schedule.getEndDate())
+                        .build())
                 .courses(courseService.findAllCourses())
                 .teachers(userService.findAllTeachers())
                 .locations(locationService.findAllLocations())

@@ -1,5 +1,6 @@
 package com.foxminded.university.model.dtos.response.schedule;
 
+import com.foxminded.university.model.dtos.DateRange;
 import com.foxminded.university.model.dtos.request.LocationDTO;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
@@ -12,7 +13,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -29,8 +29,7 @@ public class ScheduleClassesResponse {
     private String scheduleId;
     private String groupId;
     private String groupName;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private DateRange dateRange;
     private List<CourseDTO> courses;
     private List<TeacherResponse> teachers;
     private List<LocationDTO> locations;

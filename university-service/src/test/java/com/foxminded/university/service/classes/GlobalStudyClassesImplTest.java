@@ -1,6 +1,7 @@
 package com.foxminded.university.service.classes;
 
 import com.foxminded.university.config.TestConfig;
+import com.foxminded.university.model.dtos.DateRange;
 import com.foxminded.university.model.dtos.request.schedule.GlobalStudyClassRequest;
 import com.foxminded.university.model.entity.classes.GlobalStudyClass;
 import com.foxminded.university.model.entity.classes.Schedule;
@@ -100,8 +101,9 @@ class GlobalStudyClassesImplTest {
                 .courseId("fd17d1ab-2c1f-46f7-8501-1a2129f0c933")
                 .groupId("d15b0018-47e9-4281-9dc8-a5aaf2bdf951")
                 .scheduleId("27936573-c9b3-4403-b479-56440de97a78")
-                .startDate(LocalDate.of(2024, 7, 1))
-                .endDate(LocalDate.of(2024, 8, 11))
+                .dateRange(DateRange.builder()
+                        .startDate(LocalDate.of(2024, 7, 1))
+                        .endDate(LocalDate.of(2024, 8, 11)).build())
                 .scheduleDay(DayOfWeek.MONDAY)
                 .scheduleTimeId("FIRST_LECTURE")
                 .regularity(Regularity.EACH_WEEK)
@@ -115,8 +117,9 @@ class GlobalStudyClassesImplTest {
                 .courseId("bc5b7198-af0d-42d5-8b5b-83427cf9ba1d")
                 .groupId("99e56438-c880-41ba-87aa-080b7413ad34")
                 .scheduleId("27936573-c9b3-4403-b479-56440de97a78")
-                .startDate(LocalDate.of(2024, 7, 3))
-                .endDate(LocalDate.of(2024, 8, 11))
+                .dateRange(DateRange.builder()
+                        .startDate(LocalDate.of(2024, 7, 3))
+                        .endDate(LocalDate.of(2024, 8, 11)).build())
                 .scheduleDay(DayOfWeek.WEDNESDAY)
                 .scheduleTimeId("THIRD_LECTURE")
                 .regularity(Regularity.EACH_WEEK)
@@ -147,8 +150,9 @@ class GlobalStudyClassesImplTest {
                 .courseId("fd17d1ab-2c1f-46f7-8501-1a2129f0c933")
                 .groupId("d15b0018-47e9-4281-9dc8-a5aaf2bdf951")
                 .scheduleId("27936573-c9b3-4403-b479-56440de97a78")
-                .startDate(LocalDate.of(2024, 7, 1))
-                .endDate(LocalDate.of(2024, 8, 11))
+                .dateRange(DateRange.builder()
+                        .startDate(LocalDate.of(2024, 7, 1))
+                        .endDate(LocalDate.of(2024, 8, 11)).build())
                 .scheduleDay(DayOfWeek.MONDAY)
                 .scheduleTimeId("FIRST_LECTURE")
                 .regularity(Regularity.EACH_WEEK)
