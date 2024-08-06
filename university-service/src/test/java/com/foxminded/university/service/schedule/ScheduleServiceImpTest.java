@@ -237,10 +237,10 @@ class ScheduleServiceImpTest {
                 .build();
 
         String createdScheduleId = scheduleService.addSchedule(createRequest);
-        Schedule schedule = scheduleService.findScheduleById(createdScheduleId);
-        assertEquals(schedule.getGroup().getId(), groupId);
-        assertEquals(schedule.getStartDate(), startDate);
-        assertEquals(schedule.getEndDate(), endDate);
+        Schedule scheduleById = scheduleService.findScheduleById(createdScheduleId);
+        assertEquals(scheduleById.getGroup().getId(), groupId);
+        assertEquals(scheduleById.getStartDate(), startDate);
+        assertEquals(scheduleById.getEndDate(), endDate);
     }
 
     @Test

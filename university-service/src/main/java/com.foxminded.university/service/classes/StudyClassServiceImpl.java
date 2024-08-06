@@ -43,7 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -113,8 +112,8 @@ public class StudyClassServiceImpl implements StudyClassService {
         Group group = groupService.findGroupById(studyClassRequest.getGroupId());
         studyClass.setGroup(group);
 
-        if (studyClass instanceof OnlineClass) {
-            ((OnlineClass) studyClass).setUrl(studyClassRequest.getUrl());
+        if (studyClass instanceof OnlineClass onlineClass) {
+            onlineClass.setUrl(studyClassRequest.getUrl());
         } else {
             Location location = locationService.findLocationById(studyClassRequest.getLocationId());
             ((OfflineClass) studyClass).setLocation(location);
@@ -153,7 +152,7 @@ public class StudyClassServiceImpl implements StudyClassService {
         int pageSize = pageRequest.getPageSize();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<StudyClass> studyClasses = studyClassRepository.findAll(pageable);
-        List<StudyClassResponse> studyClassResponses = studyClasses.stream().map(studyClassMapper::toDto).collect(Collectors.toList());
+        List<StudyClassResponse> studyClassResponses = studyClasses.stream().map(studyClassMapper::toDto).toList();
         log.info("Found {} classes", studyClassResponses.size());
         return new PageImpl<>(studyClassResponses, pageable, studyClasses.getTotalElements());
     }
@@ -162,7 +161,7 @@ public class StudyClassServiceImpl implements StudyClassService {
     public List<StudyClassResponse> findAllClasses() {
         List<StudyClass> studyClasses = studyClassRepository.findAll();
         log.info("Found {} classes", studyClasses.size());
-        List<StudyClassResponse> studyClassResponses = studyClasses.stream().map(studyClassMapper::toDto).collect(Collectors.toList());
+        List<StudyClassResponse> studyClassResponses = studyClasses.stream().map(studyClassMapper::toDto).toList();
         return studyClassResponses;
     }
 
@@ -170,7 +169,7 @@ public class StudyClassServiceImpl implements StudyClassService {
     @Transactional
     public EditStudyClassResponse getAllRequiredDataForStudyClassEdit() {
         List<Course> courses = courseRepository.findAll();
-        List<CourseDTO> courseResponses = courses.stream().map(courseMapper::toDto).collect(Collectors.toList());
+        List<CourseDTO> courseResponses = courses.stream().map(courseMapper::toDto).toList();
         List<GroupFormation> groups = groupService.findAllGroups();
         List<TeacherResponse> teachers = userService.findAllTeachers();
         List<LocationDTO> locations = locationService.findAllLocations();

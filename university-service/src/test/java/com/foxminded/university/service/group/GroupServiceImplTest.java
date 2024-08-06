@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -142,13 +143,13 @@ class GroupServiceImplTest {
         entityManager.persist(onlineClass);
         entityManager.persist(offlineClass);
 
-        groupA.setStudents(new ArrayList<>(Arrays.asList(charlie)));
-        groupA.setStudyClasses(new ArrayList<>(Arrays.asList(onlineClass)));
-        groupA = entityManager.persist(groupA);
+        groupA.setStudents(new ArrayList<>(Collections.singletonList(charlie)));
+        groupA.setStudyClasses(new ArrayList<>(Collections.singletonList(onlineClass)));
+        entityManager.persist(groupA);
 
-        groupB.setStudents(new ArrayList<>(Arrays.asList(diana)));
-        groupB.setStudyClasses(new ArrayList<>(Arrays.asList(offlineClass)));
-        groupB = entityManager.persist(groupB);
+        groupB.setStudents(new ArrayList<>(Collections.singletonList(diana)));
+        groupB.setStudyClasses(new ArrayList<>(Collections.singletonList(offlineClass)));
+        entityManager.persist(groupB);
 
         entityManager.flush();
     }

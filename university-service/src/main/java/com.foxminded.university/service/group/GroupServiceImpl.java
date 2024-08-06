@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -79,16 +78,14 @@ public class GroupServiceImpl implements GroupService {
             group.setStudents(
                     groupRequest.getStudentsIds().stream()
                             .map(studentId -> assignStudentToGroup(group.getId(), studentId))
-                            .collect(Collectors.toList())
-            );
+                            .toList());
         }
 
         if (!groupRequest.getStudyClassesIds().isEmpty()) {
             group.setStudyClasses(
                     groupRequest.getStudyClassesIds().stream()
                             .map(studyClassId -> assignClassToGroup(group.getId(), studyClassId))
-                            .collect(Collectors.toList())
-            );
+                            .toList());
         }
 
         groupRepository.save(group);
@@ -180,7 +177,7 @@ public class GroupServiceImpl implements GroupService {
         int pageSize = pageRequest.getPageSize();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Group> groups = groupRepository.findAll(pageable);
-        List<GroupAssignResponse> groupRespons = groups.stream().map(groupMapper::toDtoResponse).collect(Collectors.toList());
+        List<GroupAssignResponse> groupRespons = groups.stream().map(groupMapper::toDtoResponse).toList();
         log.info("Found {} groups", groupRespons.size());
         return new PageImpl<>(groupRespons, pageable, groups.getTotalElements());
     }
@@ -188,7 +185,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public List<GroupFormation> findAllGroups() {
         List<Group> groups = groupRepository.findAll();
-        List<GroupFormation> groupFormations = groups.stream().map(groupMapper::toDto).collect(Collectors.toList());
+        List<GroupFormation> groupFormations = groups.stream().map(groupMapper::toDto).toList();
         log.info("Found {} groups", groups.size());
         return groupFormations;
     }
@@ -199,7 +196,7 @@ public class GroupServiceImpl implements GroupService {
         return groups.stream()
                 .filter(group -> group.getSchedule() == null)
                 .map(groupMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -213,7 +210,7 @@ public class GroupServiceImpl implements GroupService {
             studentQuantity = students.size();
         }
         log.info("Find {} students in group - {}", studentQuantity, group.getName());
-        return students != null ? students.stream().map(studentMapper::toDto).collect(Collectors.toList()) : Collections.emptyList();
+        return students != null ? students.stream().map(studentMapper::toDto).toList() : Collections.emptyList();
     }
 
     @Override
@@ -225,7 +222,7 @@ public class GroupServiceImpl implements GroupService {
                 (studyClasses == null ? Collections.<StudyClass>emptyList() : studyClasses)
                         .stream()
                         .map(studyClassMapper::toDto)
-                        .collect(Collectors.toList());
+                        .toList();
 
         int studyClassQuantity = studyClassResponses.size();
 

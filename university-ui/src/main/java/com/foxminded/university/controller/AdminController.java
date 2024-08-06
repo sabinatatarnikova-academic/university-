@@ -57,6 +57,20 @@ import java.util.List;
 @Validated
 public class AdminController {
 
+    private static final String GROUPS_ATTRIBUTE = "groups";
+    private static final String GROUP_ATTRIBUTE = "group";
+    private static final String GROUP_NAME_ATTRIBUTE = "groupName";
+    private static final String TEACHERS_ATTRIBUTE = "teachers";
+    private static final String LOCATIONS_ATTRIBUTE = "locations";
+    private static final String TIMES_ATTRIBUTE = "times";
+    private static final String COURSES_ATTRIBUTE = "courses";
+    private static final String SCHEDULE_ID_ATTRIBUTE = "scheduleId";
+    private static final String GROUPS_VIEW_REDIRECT = "redirect:/admin/groups";
+    private static final String USERS_VIEW_REDIRECT = "redirect:/admin/users";
+    private static final String COURSES_VIEW_REDIRECT = "redirect:/admin/courses";
+    private static final String CLASSES_VIEW_REDIRECT = "redirect:/admin/classes";
+    private static final String SCHEDULE_VIEW_REDIRECT = "redirect:/admin/schedule";
+
     private final UserService userService;
     private final GroupService groupService;
     private final StudyClassService studyClassService;
@@ -97,13 +111,13 @@ public class AdminController {
     @PostMapping("/users/new")
     public String addUser(@ModelAttribute UserResponse user) {
         userService.saveUser(user);
-        return "redirect:/admin/users";
+        return USERS_VIEW_REDIRECT;
     }
 
     @GetMapping("/users/edit")
     public String showEditUserForm(@RequestParam String id, Model model) {
         model.addAttribute("user", userService.findUserDTOById(id));
-        model.addAttribute("groups", groupService.findAllGroups());
+        model.addAttribute(GROUPS_ATTRIBUTE, groupService.findAllGroups());
         model.addAttribute("allStudyClasses", studyClassService.findAllClasses());
         return "admin/user/edit-user";
     }
@@ -111,13 +125,13 @@ public class AdminController {
     @PostMapping("/users/edit")
     public String editUser(@ModelAttribute UserFormRequest userFormRequest) {
         userService.updateUser(userFormRequest);
-        return "redirect:/admin/users";
+        return USERS_VIEW_REDIRECT;
     }
 
     @DeleteMapping("/users/delete/{id}")
     public String deleteUser(@PathVariable("id") String id) {
         userService.deleteUserById(id);
-        return "redirect:/admin/users";
+        return USERS_VIEW_REDIRECT;
     }
 
     @GetMapping("/courses")
@@ -137,7 +151,7 @@ public class AdminController {
     @PostMapping("/courses/new")
     public String addCourse(@ModelAttribute CourseDTO course) {
         courseService.saveCourse(course);
-        return "redirect:/admin/courses";
+        return COURSES_VIEW_REDIRECT;
     }
 
     @GetMapping("/courses/edit")
@@ -150,13 +164,13 @@ public class AdminController {
     @PostMapping("/courses/edit")
     public String editCourse(@ModelAttribute CourseRequest courseRequest) {
         courseService.updateCourse(courseRequest);
-        return "redirect:/admin/courses";
+        return COURSES_VIEW_REDIRECT;
     }
 
     @DeleteMapping("/courses/delete/{id}")
     public String deleteCourse(@PathVariable("id") String id) {
         courseService.deleteCourseById(id);
-        return "redirect:/admin/courses";
+        return COURSES_VIEW_REDIRECT;
     }
 
     @GetMapping("/classes")
@@ -176,30 +190,30 @@ public class AdminController {
     @PostMapping("/classes/new")
     public String addClass(@ModelAttribute CreateStudyClassResponse studyClass) {
         studyClassService.saveStudyClass(studyClass);
-        return "redirect:/admin/classes";
+        return CLASSES_VIEW_REDIRECT;
     }
 
     @GetMapping("/classes/edit")
     public String showEditStudyClassForm(@RequestParam String id, Model model) {
         EditStudyClassResponse data = studyClassService.getAllRequiredDataForStudyClassEdit();
         model.addAttribute("class", studyClassService.findClassDTOById(id));
-        model.addAttribute("courses", data.getCourses());
-        model.addAttribute("groups", data.getGroups());
-        model.addAttribute("teachers", data.getTeachers());
-        model.addAttribute("locations", data.getLocations());
+        model.addAttribute(COURSES_ATTRIBUTE, data.getCourses());
+        model.addAttribute(GROUPS_ATTRIBUTE, data.getGroups());
+        model.addAttribute(TEACHERS_ATTRIBUTE, data.getTeachers());
+        model.addAttribute(LOCATIONS_ATTRIBUTE, data.getLocations());
         return "admin/studyClass/edit_class";
     }
 
     @PostMapping("/classes/edit")
     public String editStudyClass(@ModelAttribute StudyClassRequest studyClass) {
         studyClassService.updateStudyClass(studyClass);
-        return "redirect:/admin/classes";
+        return CLASSES_VIEW_REDIRECT;
     }
 
     @DeleteMapping("/classes/delete/{id}")
     public String deleteStudyClass(@PathVariable("id") String id) {
         studyClassService.deleteClassById(id);
-        return "redirect:/admin/classes";
+        return CLASSES_VIEW_REDIRECT;
     }
 
     @GetMapping("/groups")
@@ -215,14 +229,14 @@ public class AdminController {
         Group group = groupService.findGroupById(id);
         List<StudentResponse> studentsAssignedToGroup = groupService.findAllStudentsAssignedToGroup(id);
         model.addAttribute("students", studentsAssignedToGroup);
-        model.addAttribute("group", group);
+        model.addAttribute(GROUP_ATTRIBUTE, group);
         return "admin/group/group_students";
     }
 
     @DeleteMapping("/groups/students/delete/{id}")
     public String deleteStudentFromGroup(@PathVariable("id") String id) {
         groupService.deleteStudentFromGroupById(id);
-        return "redirect:/admin/groups";
+        return GROUPS_VIEW_REDIRECT;
     }
 
     @GetMapping("/groups/classes")
@@ -230,33 +244,33 @@ public class AdminController {
         Group group = groupService.findGroupById(id);
         List<StudyClassResponse> classesAssignedToGroup = groupService.findAllStudyClassesAssignedToGroup(id);
         model.addAttribute("classes", classesAssignedToGroup);
-        model.addAttribute("group", group);
+        model.addAttribute(GROUP_ATTRIBUTE, group);
         return "admin/group/group_classes";
     }
 
     @DeleteMapping("/groups/classes/delete/{id}")
     public String deleteStudyClassFromGroup(@PathVariable("id") String id) {
         groupService.deleteStudyClassFromGroupById(id);
-        return "redirect:/admin/groups";
+        return GROUPS_VIEW_REDIRECT;
     }
 
     @GetMapping("/groups/new")
     public String showAddGroupForm(Model model) {
-        model.addAttribute("group", new GroupFormation());
+        model.addAttribute(GROUP_ATTRIBUTE, new GroupFormation());
         return "admin/group/add_group";
     }
 
     @PostMapping("/groups/new")
     public String addGroup(@ModelAttribute GroupFormation groupFormation) {
         groupService.saveGroup(groupFormation);
-        return "redirect:/admin/groups";
+        return GROUPS_VIEW_REDIRECT;
     }
 
     @GetMapping("/groups/edit")
     public String showEditGroupForm(@RequestParam String id, Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
         RequestPage page = PageUtils.createPage(pageStr, sizeStr);
         GroupEditResponse data = studyClassService.getAllRequiredDataForGroupEdit(id, page);
-        model.addAttribute("group", data.getGroup());
+        model.addAttribute(GROUP_ATTRIBUTE, data.getGroup());
         model.addAttribute("students", data.getStudents());
         model.addAttribute("studyClasses", data.getStudyClasses());
         return "admin/group/edit_group";
@@ -265,13 +279,13 @@ public class AdminController {
     @PostMapping("/groups/edit")
     public String editGroup(@ModelAttribute GroupRequest groupRequest) {
         groupService.updateGroup(groupRequest);
-        return "redirect:/admin/groups";
+        return GROUPS_VIEW_REDIRECT;
     }
 
     @DeleteMapping("/groups/delete/{id}")
     public String deleteGroup(@PathVariable("id") String id) {
         groupService.deleteGroupById(id);
-        return "redirect:/admin/groups";
+        return GROUPS_VIEW_REDIRECT;
     }
 
     @GetMapping("/schedule")
@@ -285,7 +299,7 @@ public class AdminController {
     @GetMapping("/schedule/new")
     public String showAddScheduleForm(Model model) {
         model.addAttribute("schedule", new ScheduleCreateRequest());
-        model.addAttribute("groups", groupService.findAllGroupsWithoutSchedule());
+        model.addAttribute(GROUPS_ATTRIBUTE, groupService.findAllGroupsWithoutSchedule());
         return "admin/schedule/schedule_add";
     }
 
@@ -299,24 +313,24 @@ public class AdminController {
     public String showAddScheduleClasses(@RequestParam String id, Model model) {
         ScheduleClassesResponse data = scheduleService.getAllRequiredDataForAddingClassesToSchedule(id);
 
-        model.addAttribute("times", data.getTimes());
+        model.addAttribute(TIMES_ATTRIBUTE, data.getTimes());
         model.addAttribute("days", data.getDays());
         model.addAttribute("globalClass", new GlobalStudyClassRequest());
-        model.addAttribute("scheduleId", data.getScheduleId());
+        model.addAttribute(SCHEDULE_ID_ATTRIBUTE, data.getScheduleId());
         model.addAttribute("groupId", data.getGroupId());
-        model.addAttribute("groupName", data.getGroupName());
+        model.addAttribute(GROUP_NAME_ATTRIBUTE, data.getGroupName());
         model.addAttribute("startDate", data.getDateRange().getStartDate());
         model.addAttribute("endDate", data.getDateRange().getEndDate());
-        model.addAttribute("courses", data.getCourses());
-        model.addAttribute("teachers", data.getTeachers());
-        model.addAttribute("locations", data.getLocations());
+        model.addAttribute(COURSES_ATTRIBUTE, data.getCourses());
+        model.addAttribute(TEACHERS_ATTRIBUTE, data.getTeachers());
+        model.addAttribute(LOCATIONS_ATTRIBUTE, data.getLocations());
         return "admin/schedule/schedule_add_classes";
     }
 
     @PostMapping("/schedule/classes/add")
     public String addSchedule(@RequestParam String id, @RequestBody List<GlobalStudyClassRequest> globalStudyClassRequests) {
         globalStudyClassesService.parseScheduleListToGlobalClasses(globalStudyClassRequests);
-        return "redirect:/admin/schedule";
+        return SCHEDULE_VIEW_REDIRECT;
     }
 
     @GetMapping("/schedule/view")
@@ -329,14 +343,14 @@ public class AdminController {
 
         ScheduleViewResponse data = scheduleService.getAllRequiredDataForViewingSchedule(id, userDate);
 
-        model.addAttribute("times", data.getTimes());
+        model.addAttribute(TIMES_ATTRIBUTE, data.getTimes());
         model.addAttribute("days", data.getDays());
         model.addAttribute("studyClasses", data.getScheduleByWeek());
-        model.addAttribute("groupName", data.getGroupName());
+        model.addAttribute(GROUP_NAME_ATTRIBUTE, data.getGroupName());
         model.addAttribute("weekStart", data.getWeekStart());
         model.addAttribute("weekEnd", data.getWeekEnd());
         model.addAttribute("userDate", userDate);
-        model.addAttribute("scheduleId", id);
+        model.addAttribute(SCHEDULE_ID_ATTRIBUTE, id);
         return "admin/schedule/schedule_view";
     }
 
@@ -344,31 +358,30 @@ public class AdminController {
     public String showEditScheduleClassesForm(@RequestParam String id, Model model) {
         ScheduleClassesResponse data = scheduleService.getAllRequiredDataForAddingClassesToSchedule(id);
 
-        model.addAttribute("times", data.getTimes());
+        model.addAttribute(TIMES_ATTRIBUTE, data.getTimes());
         model.addAttribute("days", data.getDays());
         model.addAttribute("globalClasses", data.getGlobalStudyClasses());
         model.addAttribute("globalClass", new GlobalStudyClassRequest());
-        model.addAttribute("scheduleId", data.getScheduleId());
+        model.addAttribute(SCHEDULE_ID_ATTRIBUTE, data.getScheduleId());
         model.addAttribute("groupId", data.getGroupId());
-        model.addAttribute("groupName", data.getGroupName());
+        model.addAttribute(GROUP_NAME_ATTRIBUTE, data.getGroupName());
         model.addAttribute("startDate", data.getDateRange().getStartDate());
         model.addAttribute("endDate", data.getDateRange().getEndDate());
-        model.addAttribute("courses", data.getCourses());
-        model.addAttribute("teachers", data.getTeachers());
-        model.addAttribute("locations", data.getLocations());
+        model.addAttribute(COURSES_ATTRIBUTE, data.getCourses());
+        model.addAttribute(TEACHERS_ATTRIBUTE, data.getTeachers());
+        model.addAttribute(LOCATIONS_ATTRIBUTE, data.getLocations());
         return "admin/schedule/schedule_edit";
     }
 
     @PostMapping("/schedule/edit")
     public String editSchedule(@RequestParam String id, @RequestBody List<GlobalStudyClassRequest> globalStudyClassRequests) {
-        globalStudyClassesService.parseScheduleListToGlobalClasses(globalStudyClassRequests);
-        return "redirect:/admin/schedule";
+        return addSchedule(id, globalStudyClassRequests);
     }
 
     @DeleteMapping("/schedule/delete/{id}")
     public String deleteSchedule(@PathVariable("id") String id) {
         scheduleService.deleteSchedule(id);
-        return "redirect:/admin/schedule";
+        return SCHEDULE_VIEW_REDIRECT;
     }
 
     @DeleteMapping("/schedule/class/delete")

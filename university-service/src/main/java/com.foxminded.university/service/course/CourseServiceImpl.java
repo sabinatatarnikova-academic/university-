@@ -112,7 +112,7 @@ public class CourseServiceImpl implements CourseService {
         int pageSize = pageRequest.getPageSize();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Course> courses = courseRepository.findAll(pageable);
-        List<CourseDTO> courseResponses = courses.stream().map(courseMapper::toDto).collect(Collectors.toList());
+        List<CourseDTO> courseResponses = courses.stream().map(courseMapper::toDto).toList();
         Page<CourseDTO> pageResult = new PageImpl<>(courseResponses, pageable, courses.getTotalElements());
         log.info("Found {} courses", pageResult.getTotalPages());
         return pageResult;
@@ -121,7 +121,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<CourseDTO> findAllCourses() {
         List<Course> courses = courseRepository.findAll();
-        List<CourseDTO> courseResponses = courses.stream().map(courseMapper::toDto).collect(Collectors.toList());
+        List<CourseDTO> courseResponses = courses.stream().map(courseMapper::toDto).toList();
         log.info("Found {} courses", courseResponses.size());
         return courseResponses;
     }

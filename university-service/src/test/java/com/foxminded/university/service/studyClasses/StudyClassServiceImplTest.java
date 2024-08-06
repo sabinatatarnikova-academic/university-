@@ -363,6 +363,6 @@ class StudyClassServiceImplTest {
         assertThat(studyClass.getTeacher().getStudyClasses(), contains(studyClass));
 
         studyClassService.deleteTeacherFromStudyClass(id);
-        assertEquals(studyClass.getTeacher(), null);
+        assertEquals(null, studyClass.getTeacher());
     }
 }
