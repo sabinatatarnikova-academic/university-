@@ -94,7 +94,7 @@ class GlobalStudyClassesImplTest {
 
     @Test
     @Transactional
-    public void testParseScheduleListToGlobalClasses() {
+    void testParseScheduleListToGlobalClasses() {
         List<GlobalStudyClassRequest> globalClasses = new ArrayList<>();
         globalClasses.add(GlobalStudyClassRequest.builder()
                 .teacherId("9f6cfb74-e71e-4d00-86e8-3307e8b6865e")
@@ -189,7 +189,7 @@ class GlobalStudyClassesImplTest {
 
         assertEquals(actual.getId(), globalClassId);
         assertEquals(actual.getStudyClasses().getFirst(), studyClassService.findClassById("38485358-ea71-4d3e-a718-f1ce6c6202c5"));
-        assertEquals(actual.getScheduleDay(), DayOfWeek.MONDAY);
+        assertEquals(DayOfWeek.MONDAY, actual.getScheduleDay());
         assertEquals(actual.getScheduleTime(), scheduleTimeService.findLectureTimeById("FIRST_LECTURE"));
     }
 

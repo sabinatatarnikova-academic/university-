@@ -12,8 +12,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Mapper (unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring", uses = StudyClassMapper.class)
@@ -35,7 +35,7 @@ public interface TeacherMapper {
     @Named("mapStudyClasses")
     default List<StudyClass> mapStudyClasses(List<String> studyClassIds) {
         if (studyClassIds == null) {
-            return null;
+            return Collections.emptyList();
         }
         return studyClassIds.stream()
                 .map(id -> {
@@ -43,6 +43,6 @@ public interface TeacherMapper {
                     studyClass.setId(id);
                     return studyClass;
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 }

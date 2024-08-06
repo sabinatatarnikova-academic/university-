@@ -16,7 +16,7 @@ public class DefaultController {
 
     @GetMapping("/")
     public String getWelcomePage(Model model) {
-        model.addAttribute("locale", new Locale("en"));
+        model.addAttribute("locale", Locale.ENGLISH);
         return "index";
     }
 

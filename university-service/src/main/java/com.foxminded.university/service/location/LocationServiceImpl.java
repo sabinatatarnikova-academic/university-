@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -72,7 +71,7 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public List<LocationDTO> findAllLocations() {
         List<Location> locations = locationRepository.findAll();
-        List<LocationDTO> locationDTOS = locations.stream().map(locationMapper::toDto).collect(Collectors.toList());
+        List<LocationDTO> locationDTOS = locations.stream().map(locationMapper::toDto).toList();
         log.info("Found {} locations", locationDTOS.size());
         return locationDTOS;
     }

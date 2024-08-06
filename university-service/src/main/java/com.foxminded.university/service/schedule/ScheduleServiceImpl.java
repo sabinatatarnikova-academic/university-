@@ -42,7 +42,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -101,7 +100,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         Page<Schedule> schedulePage = scheduleRepository.findAll(pageable);
         List<ViewScheduleResponse> scheduleViewRespons = schedulePage.stream()
                 .map(scheduleMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
         Page<ViewScheduleResponse> pageResult = new PageImpl<>(scheduleViewRespons, pageable, schedulePage.getTotalElements());
         log.info("Found {} users", pageResult.getTotalPages());
         return pageResult;
@@ -180,10 +179,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         LocalDate endDateOfWeek = startDateOfWeek.plusDays(6);
 
         Teacher teacher = (Teacher) userService.findUserById(teacherId);
-        List<StudyClass> studyClassesWithTeacher = studyClassRepository.findAll().stream().filter(studyClass -> studyClass.getTeacher().equals(teacher)).collect(Collectors.toList());
+        List<StudyClass> studyClassesWithTeacher = studyClassRepository.findAll().stream().filter(studyClass -> studyClass.getTeacher().equals(teacher)).toList();
         List<StudyClass> studyClassesByWeek = studyClassesWithTeacher.stream().filter(studyClass -> !studyClass.getStartTime().toLocalDate().isBefore(startDateOfWeek) &&
                         !studyClass.getStartTime().toLocalDate().isAfter(endDateOfWeek))
-                .collect(Collectors.toList());
+                .toList();
 
         List<ScheduleTimes> times = scheduleTimeService.findAllLectureTimes();
         List<DayOfWeek> days = Arrays.asList(DayOfWeek.values());
@@ -191,7 +190,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         return ScheduleViewResponse.builder()
                 .times(times)
                 .days(days)
-                .scheduleByWeek(studyClassesByWeek.stream().map(studyClassMapper::toScheduleDto).collect(Collectors.toList()))
+                .scheduleByWeek(studyClassesByWeek.stream().map(studyClassMapper::toScheduleDto).toList())
                 .weekStart(startDateOfWeek)
                 .weekEnd(endDateOfWeek)
                 .build();
@@ -203,15 +202,15 @@ public class ScheduleServiceImpl implements ScheduleService {
         globalStudyClasses.stream().map(globalStudyClass -> {
             List<StudyClass> studyClasses = globalStudyClass.getStudyClasses();
             return studyClasses;
-        }).collect(Collectors.toList());
+        }).toList();
 
 
         List<StudyClass> studyClasses = schedule.getGlobalStudyClasses().stream()
                 .flatMap(globalStudyClass -> globalStudyClass.getStudyClasses().stream())
                 .filter(studyClass -> !studyClass.getStartTime().toLocalDate().isBefore(startDateOfWeek) &&
                         !studyClass.getStartTime().toLocalDate().isAfter(endDateOfWeek))
-                .collect(Collectors.toList());
+                .toList();
 
-        return studyClasses.stream().map(studyClassMapper::toScheduleDto).collect(Collectors.toList());
+        return studyClasses.stream().map(studyClassMapper::toScheduleDto).toList();
     }
 }

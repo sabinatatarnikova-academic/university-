@@ -32,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -126,7 +125,7 @@ public class UserServiceImpl implements UserService {
     private List<StudyClass> updateStudyClassesAssignedToTeacher(List<String> studyClassesIds, Teacher teacher) {
         return studyClassesIds.stream()
                 .map(studyClassId -> assignTeacherToClass(teacher.getId(), studyClassId))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private StudyClass assignTeacherToClass(String teacherId, String classId) {
@@ -157,7 +156,7 @@ public class UserServiceImpl implements UserService {
         Page<User> usersPage = userRepository.findAll(pageable);
         List<UserResponse> userResponses = usersPage.stream()
                 .map(userMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
         Page<UserResponse> pageResult = new PageImpl<>(userResponses, pageable, usersPage.getTotalElements());
         log.info("Found {} users", pageResult.getTotalPages());
         return pageResult;
@@ -171,7 +170,7 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Student> students = userRepository.findAllStudents(pageable);
         log.info("Found all students");
-        List<StudentResponse> studentResponses = students.stream().map(studentMapper::toDto).collect(Collectors.toList());
+        List<StudentResponse> studentResponses = students.stream().map(studentMapper::toDto).toList();
         return new PageImpl<>(studentResponses, pageable, students.getTotalElements());
     }
 
@@ -182,14 +181,14 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         List<Teacher> teachers = userRepository.findAllTeachers();
         log.info("Found all teachers");
-        List<TeacherResponse> teacherResponses = teachers.stream().map(teacherMapper::toDto).collect(Collectors.toList());
+        List<TeacherResponse> teacherResponses = teachers.stream().map(teacherMapper::toDto).toList();
         return new PageImpl<>(teacherResponses, pageable, teacherResponses.size());
     }
 
     @Override
     public List<TeacherResponse> findAllTeachers() {
         List<Teacher> teachers = userRepository.findAllTeachers();
-        List<TeacherResponse> teacherResponses = teachers.stream().map(teacherMapper::toDto).collect(Collectors.toList());
+        List<TeacherResponse> teacherResponses = teachers.stream().map(teacherMapper::toDto).toList();
         log.info("Found all teachers");
         return teacherResponses;
     }
@@ -219,9 +218,7 @@ public class UserServiceImpl implements UserService {
         List<CourseDTO> courses = student.getGroup()
                 .getStudyClasses()
                 .stream()
-                .map(studyClass -> {
-                    return courseMapper.toDto(studyClass.getCourse());
-                }).collect(Collectors.toList());
+                .map(studyClass -> courseMapper.toDto(studyClass.getCourse())).toList();
         int classesCount = courses.size();
 
         log.info("Count of courses that assigned to student - {} is {}", student.getId(), classesCount);
