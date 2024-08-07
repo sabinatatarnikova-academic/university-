@@ -139,11 +139,6 @@
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.htmlunit</groupId>-->
-        <!--            <artifactId>htmlunit</artifactId>-->
-        <!--            <version>${html-unit.version}</version>-->
-        <!--        </dependency>-->
         <dependency>
             <groupId>net.sourceforge.htmlunit</groupId>
             <artifactId>htmlunit</artifactId>
