@@ -29,3 +29,10 @@ VALUES ('4f88890b-cf58-4ae4-aada-08f12881740f', '2023-09-01T09:00:00', '2023-09-
        ('5b71186d-36d1-4b57-ac5b-3f1f7aa78542', '2023-09-01T11:00:00', '2023-09-01T12:00:00',
         'bc5b7198-af0d-42d5-8b5b-83427cf9ba1d', 'f7d448d4-0423-4a65-8576-9846a1b5e694',
         '99e56438-c880-41ba-87aa-080b7413ad34', 'OFFLINE', NULL, '34af61d9-5a22-4636-bef3-c0a5e73036c6');
+
+INSERT INTO schedule_times (schedule_time_id, schedule_time_name, start_time, end_time)
+VALUES ('FIRST_LECTURE', 'First Lecture', '08:00:00', '09:30:00'),
+       ('SECOND_LECTURE', 'Second Lecture', '09:50:00', '11:20:00'),
+       ('THIRD_LECTURE', 'Third Lecture', '11:40:00', '13:10:00'),
+       ('FOURTH_LECTURE', 'Fourth Lecture', '13:30:00', '15:00:00'),
+       ('FIFTH_LECTURE', 'Fifth Lecture', '15:20:00', '16:50:00');

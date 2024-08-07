@@ -1,0 +1,22 @@
+ALTER TABLE classes
+    DROP CONSTRAINT IF EXISTS fk_course;
+
+ALTER TABLE classes
+    DROP CONSTRAINT IF EXISTS fk_user;
+
+ALTER TABLE classes
+    DROP CONSTRAINT IF EXISTS fk_group;
+
+ALTER TABLE classes
+    DROP CONSTRAINT IF EXISTS fk_location;
+
+ALTER TABLE classes
+    DROP CONSTRAINT IF EXISTS fk_global_class;
+
+DROP TABLE IF EXISTS classes;
+DROP TABLE IF EXISTS global_classes;
+DROP TABLE IF EXISTS schedule;
+DROP TABLE IF EXISTS courses;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS groups;
+DROP TABLE IF EXISTS locations;

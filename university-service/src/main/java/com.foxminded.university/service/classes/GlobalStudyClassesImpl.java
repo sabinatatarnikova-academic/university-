@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,7 +54,7 @@ public class GlobalStudyClassesImpl implements GlobalStudyClassesService {
     @Transactional
     public void parseScheduleListToGlobalClasses(List<GlobalStudyClassRequest> globalClasses) {
         Schedule schedule = scheduleService.findScheduleById(globalClasses.get(0).getScheduleId());
-        List<GlobalStudyClass> globalStudyClasses = globalClasses.stream().map(this::parseGlobalClassToStudyClasses).toList();
+        List<GlobalStudyClass> globalStudyClasses = globalClasses.stream().map(this::parseGlobalClassToStudyClasses).collect(Collectors.toList());
         schedule.setGlobalStudyClasses(globalStudyClasses);
         scheduleService.saveSchedule(schedule);
     }

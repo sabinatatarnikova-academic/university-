@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -78,14 +79,14 @@ public class GroupServiceImpl implements GroupService {
             group.setStudents(
                     groupRequest.getStudentsIds().stream()
                             .map(studentId -> assignStudentToGroup(group.getId(), studentId))
-                            .toList());
+                            .collect(Collectors.toList()));
         }
 
         if (!groupRequest.getStudyClassesIds().isEmpty()) {
             group.setStudyClasses(
                     groupRequest.getStudyClassesIds().stream()
                             .map(studyClassId -> assignClassToGroup(group.getId(), studyClassId))
-                            .toList());
+                            .collect(Collectors.toList()));
         }
 
         groupRepository.save(group);
