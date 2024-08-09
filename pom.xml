@@ -201,6 +201,7 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
+                                            <!--TODO add additional test for test coverage 95%-->
                                             <minimum>0.80</minimum>
                                         </limit>
                                     </limits>
