@@ -3,6 +3,7 @@ package com.foxminded.university.service.user;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.users.Student;
+import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.repository.StudyClassRepository;
 import com.foxminded.university.repository.UserRepository;
 import com.foxminded.university.utils.mappers.users.StudentMapper;
@@ -15,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -47,7 +50,7 @@ class UserServiceImlMockTest {
     private UserServiceImpl userService;
 
     @Test
-    void testUpdateUser() {
+    void testUpdateUserWhenTypeIsStudent() {
         UserFormRequest student = UserFormRequest.builder()
                 .firstName("Police")
                 .lastName("Smith")
@@ -64,5 +67,26 @@ class UserServiceImlMockTest {
         userService.updateUser(student);
 
         verify(userService, times(1)).updateStudent(student);
+    }
+
+    @Test
+    void testUpdateUserWhenTypeIsTeacher() {
+        UserFormRequest teacher = UserFormRequest.builder()
+                .firstName("Police")
+                .lastName("Smith")
+                .userType("TEACHER")
+                .studyClassesIds(new ArrayList<>())
+                .build();
+
+        Teacher teacherToReturn = Teacher.builder()
+                .firstName("Police")
+                .lastName("Smith")
+                .studyClasses(new ArrayList<>())
+                .build();
+
+        when(teacherMapper.toEntity(any(UserFormRequest.class))).thenReturn(teacherToReturn);
+        userService.updateUser(teacher);
+
+        verify(userService, times(1)).updateTeacher(teacher);
     }
 }

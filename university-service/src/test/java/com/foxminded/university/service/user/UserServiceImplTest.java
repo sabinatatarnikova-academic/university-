@@ -223,11 +223,16 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findUserByName() {
+    void findUserByUsername() {
         RequestPage page = PageUtils.createPage(0, 4);
         UserResponse user = userService.findAllUsersWithPagination(page).toList().get(3);
         String username = user.getUsername();
         assertEquals(user, studentMapper.toDto((Student) userService.findUserByUsername(username)));
+    }
+
+    @Test
+    void findUserByUsernameThrowsException() {
+        assertThrows(EntityNotFoundException.class, () -> userService.findUserByUsername("1"));
     }
 
     @Test
@@ -301,6 +306,20 @@ class UserServiceImplTest {
         userService.updateTeacherWithStudyClasses(teacherToSave);
         Teacher actualTeacher = (Teacher) userService.findUserById(userId);
         assertThat(actualTeacher.getStudyClasses(), containsInAnyOrder(onlineClass, offlineClass));
+    }
+
+    @Test
+    void updateTeacherWithStudyClassesThrowsException() {
+        RequestPage page = PageUtils.createPage(0, 4);
+        UserResponse user = userService.findAllUsersWithPagination(page).toList().get(0);
+        String userId = user.getId();
+
+        TeacherClassUpdateRequest teacherToSave = TeacherClassUpdateRequest.builder()
+                .id(userId)
+                .studyClassesIds(List.of("1"))
+                .build();
+
+        assertThrows(EntityNotFoundException.class, () -> userService.updateTeacherWithStudyClasses(teacherToSave));
     }
 
     @Test

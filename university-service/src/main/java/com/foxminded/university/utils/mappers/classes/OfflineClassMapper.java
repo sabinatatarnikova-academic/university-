@@ -18,8 +18,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-@Mapper (unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring", uses = {CourseMapper.class, TeacherMapper.class, GroupMapper.class, LocationMapper.class})
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring", uses = {CourseMapper.class, TeacherMapper.class, GroupMapper.class, LocationMapper.class})
 public interface OfflineClassMapper {
+
+    @Named("localToZoned")
+    static ZonedDateTime localToZoned(LocalDateTime localDateTime) {
+        return localDateTime != null ? localDateTime.atZone(ZoneId.systemDefault()) : null;
+    }
 
     OfflineClassResponse toDto(OfflineClass offlineClass);
 
@@ -31,9 +36,4 @@ public interface OfflineClassMapper {
     @Mapping(source = "startTime", target = "startTime", qualifiedByName = "localToZoned")
     @Mapping(source = "endTime", target = "endTime", qualifiedByName = "localToZoned")
     OfflineClass toEntity(CreateStudyClassResponse offlineClassDTO);
-
-    @Named("localToZoned")
-    static ZonedDateTime localToZoned(LocalDateTime localDateTime) {
-        return localDateTime != null ? localDateTime.atZone(ZoneId.systemDefault()) : null;
-    }
 }

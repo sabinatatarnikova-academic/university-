@@ -4,6 +4,7 @@ import com.foxminded.university.config.TestConfig;
 import com.foxminded.university.model.dtos.request.GroupFormation;
 import com.foxminded.university.model.dtos.request.GroupRequest;
 import com.foxminded.university.model.dtos.response.GroupAssignResponse;
+import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
@@ -207,6 +208,21 @@ class GroupServiceImplTest {
     }
 
     @Test
+    void assignStudentToGroupThrowsException() {
+        GroupFormation group = groupService.findAllGroups().getFirst();
+        String groupId = group.getId();
+        assertThrows(EntityNotFoundException.class, () -> groupService.updateGroup(GroupRequest.builder().id(groupId).studentsIds(Arrays.asList("1", "2")).build()));
+    }
+
+    @Test
+    void assignClassToGroupThrowsException() {
+        GroupFormation group = groupService.findAllGroups().getFirst();
+        String studentId = groupService.findGroupById(groupService.findAllGroups().getLast().getId()).getStudents().getFirst().getId();
+        String groupId = group.getId();
+        assertThrows(EntityNotFoundException.class, () -> groupService.updateGroup(GroupRequest.builder().id(groupId).studentsIds(Collections.singletonList(studentId)).studyClassesIds(Collections.singletonList("1")).build()));
+    }
+
+    @Test
     void deleteGroupById() {
         GroupFormation group = groupService.findAllGroups().getFirst();
         String groupId = group.getId();
@@ -287,6 +303,14 @@ class GroupServiceImplTest {
     }
 
     @Test
+    void findAllStudentsAssignedToGroupWhenStudentsEqualNull() {
+        groupService.saveGroup(GroupFormation.builder().name("test group").build());
+        String testGroupId = groupService.findAllGroups().getLast().getId();
+
+        assertEquals(groupService.findAllStudentsAssignedToGroup(testGroupId), Arrays.asList());
+    }
+
+    @Test
     void  deleteStudentFromGroupById(){
         String groupId = groupService.findAllGroups().getFirst().getId();
         Group group = groupService.findGroupById(groupId);
@@ -298,6 +322,16 @@ class GroupServiceImplTest {
         groupService.deleteStudentFromGroupById(studentId);
         List<Student> actualStudents = groupService.findGroupById(groupId).getStudents();
         assertEquals(expectedStudents, actualStudents);
+    }
+
+    @Test
+    void deleteStudentFromGroupByIdThrowsException() {
+        assertThrows(EntityNotFoundException.class, () -> groupService.deleteStudentFromGroupById("1"));
+    }
+
+    @Test
+    void deleteStudyClassFromGroupByIdThrowsException() {
+        assertThrows(EntityNotFoundException.class, () -> groupService.deleteStudyClassFromGroupById("1"));
     }
 
     @Test
@@ -314,6 +348,13 @@ class GroupServiceImplTest {
         assertEquals(expectedStudyClasses, actualStudyClass);
     }
 
+    @Test
+    void findAllStudyClassesAssignedToGroup() {
+        GroupFormation group = groupService.findAllGroups().getFirst();
+        String groupId = group.getId();
 
+        List<StudyClassResponse> studyClasses = groupService.findAllStudyClassesAssignedToGroup(groupId);
+        assertEquals(studyClasses.getFirst().getGroupId(), groupId);
+    }
 
 }

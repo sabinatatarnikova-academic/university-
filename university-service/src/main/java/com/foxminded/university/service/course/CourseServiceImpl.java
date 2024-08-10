@@ -73,7 +73,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course findCourseById(String courseId) {
-        Optional <Course> course = courseRepository.findById(courseId);
+        Optional<Course> course = courseRepository.findById(courseId);
         if (!course.isPresent()) {
             log.error("Course with id {} not found", courseId);
             throw new EntityNotFoundException();
@@ -91,7 +91,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course findCourseByName(String courseName) {
-        Optional <Course> course = courseRepository.findCourseByName(courseName);
+        Optional<Course> course = courseRepository.findCourseByName(courseName);
         if (!course.isPresent()) {
             log.error("Course with id {} not found", courseName);
             throw new EntityNotFoundException();

@@ -22,12 +22,6 @@ public class PageUtils {
         return new RequestPage(page, size);
     }
 
-    @PostConstruct
-    private void init() {
-        defaultPageIndex = defaultPageIndexProperty;
-        defaultPageSize = defaultPageSizeProperty;
-    }
-
     public static RequestPage createPage(int page, int size) {
         return new RequestPage(page, size);
     }
@@ -38,5 +32,11 @@ public class PageUtils {
         } catch (NumberFormatException e) {
             return defaultValue;
         }
+    }
+
+    @PostConstruct
+    private void init() {
+        defaultPageIndex = defaultPageIndexProperty;
+        defaultPageSize = defaultPageSizeProperty;
     }
 }

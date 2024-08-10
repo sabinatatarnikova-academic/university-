@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-@Mapper (unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring", uses = StudyClassMapper.class)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring", uses = StudyClassMapper.class)
 public interface TeacherMapper {
 
     @Mapping(target = "studyClasses", source = "studyClasses")
