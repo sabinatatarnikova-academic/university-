@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -125,7 +126,7 @@ public class UserServiceImpl implements UserService {
     private List<StudyClass> updateStudyClassesAssignedToTeacher(List<String> studyClassesIds, Teacher teacher) {
         return studyClassesIds.stream()
                 .map(studyClassId -> assignTeacherToClass(teacher.getId(), studyClassId))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private StudyClass assignTeacherToClass(String teacherId, String classId) {
