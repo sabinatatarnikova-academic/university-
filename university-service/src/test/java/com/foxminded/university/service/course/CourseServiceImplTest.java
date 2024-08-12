@@ -2,6 +2,7 @@ package com.foxminded.university.service.course;
 
 import com.foxminded.university.config.TestConfig;
 import com.foxminded.university.model.dtos.request.CourseRequest;
+import com.foxminded.university.model.dtos.request.CourseTeacherRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.entity.Course;
@@ -30,6 +31,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -211,6 +213,22 @@ class CourseServiceImplTest {
         courseService.updateCourse(courseToUpdate);
         Course updatedCourse = courseService.findCourseByName("Update name");
         assertEquals("Update name", updatedCourse.getName());
+    }
+
+    @Test
+    void updateCourseWithTeacherRequest() {
+        List<StudyClassResponse> classes = studyClassService.findAllClasses();
+        List<String> classesIds = classes.stream().map(studyClass -> studyClass.getId()).collect(Collectors.toList());
+        String courseId = courseService.findAllCourses().getFirst().getId();
+        CourseTeacherRequest courseToUpdate = CourseTeacherRequest.builder()
+                .id(courseId)
+                .studyClassesIds(classesIds)
+                .build();
+        courseService.updateCourse(courseToUpdate);
+        Course updatedCourse = courseService.findCourseById(courseId);
+        for (int i = 0; i < classesIds.size(); i++) {
+            assertEquals(updatedCourse.getStudyClasses().get(i).getId(), classesIds.get(i));
+        }
     }
 
     @Test

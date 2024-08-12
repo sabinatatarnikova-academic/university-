@@ -5,6 +5,7 @@ import com.foxminded.university.model.dtos.DateRange;
 import com.foxminded.university.model.dtos.request.schedule.GlobalStudyClassRequest;
 import com.foxminded.university.model.entity.classes.GlobalStudyClass;
 import com.foxminded.university.model.entity.classes.Schedule;
+import com.foxminded.university.model.entity.classes.plainclasses.OfflineClass;
 import com.foxminded.university.model.entity.classes.plainclasses.OnlineClass;
 import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import com.foxminded.university.model.enums.Regularity;
@@ -69,6 +70,8 @@ class GlobalStudyClassesImplTest {
         entityManager.createNativeQuery("INSERT INTO courses (course_id, course_name) VALUES ('fd17d1ab-2c1f-46f7-8501-1a2129f0c933', 'Mathematics')").executeUpdate();
         entityManager.createNativeQuery("INSERT INTO courses (course_id, course_name) VALUES ('bc5b7198-af0d-42d5-8b5b-83427cf9ba1d', 'History')").executeUpdate();
 
+        entityManager.createNativeQuery("INSERT INTO locations (location_id, department, classroom) VALUES ('34af61d9-5a22-4636-bef3-c0a5e73036c6', 'ICS', '101')").executeUpdate();
+
         entityManager.createNativeQuery("INSERT INTO schedule_times (schedule_time_id, schedule_time_name, start_time, end_time) VALUES ('THIRD_LECTURE', 'Third Lecture', '11:40:00', '13:10:00')").executeUpdate();
         entityManager.createNativeQuery("INSERT INTO schedule_times (schedule_time_id, schedule_time_name, start_time, end_time) VALUES ('SECOND_LECTURE', 'Second Lecture', '09:50:00', '11:20:00')").executeUpdate();
         entityManager.createNativeQuery("INSERT INTO schedule_times (schedule_time_id, schedule_time_name, start_time, end_time) VALUES ('FOURTH_LECTURE', 'Fourth Lecture', '13:30:00', '15:00:00')").executeUpdate();
@@ -80,6 +83,8 @@ class GlobalStudyClassesImplTest {
         entityManager.createNativeQuery("INSERT INTO global_classes (global_class_id, schedule_id, schedule_day, schedule_time, regularity, start_date, end_date) VALUES ('de7d65ad-974e-46d5-ac4a-95b558389857', '27936573-c9b3-4403-b479-56440de97a78', 'MONDAY', 'FIRST_LECTURE', 'EACH_WEEK', null, null)").executeUpdate();
         entityManager.createNativeQuery("INSERT INTO global_classes (global_class_id, schedule_id, schedule_day, schedule_time, regularity, start_date, end_date) VALUES ('8c31d98a-b434-4a45-ace6-3d72495a626e', '27936573-c9b3-4403-b479-56440de97a78', 'WEDNESDAY', 'THIRD_LECTURE', 'EACH_WEEK', null, null)").executeUpdate();
 
+        entityManager.createNativeQuery("INSERT INTO global_classes (global_class_id, schedule_id, schedule_day, schedule_time, regularity, start_date, end_date) VALUES ('1c31d98a-b434-4a45-ace6-3d72495a626e', '27936573-c9b3-4403-b479-56440de97a78', 'TUESDAY', 'THIRD_LECTURE', 'EACH_WEEK', null, null)").executeUpdate();
+
         entityManager.createNativeQuery("INSERT INTO public.users (user_id, first_name, last_name, user_type, group_id, username, password) VALUES ('9f6cfb74-e71e-4d00-86e8-3307e8b6865e', 'John', 'Doe', 'TEACHER', null, 'teacher', '$2a$12$auvXRvsX0KCioaLjD7TYSO5TRtDZSj179qOkuj6vmK/2OobS8B9k2')").executeUpdate();
 
         entityManager.createNativeQuery("INSERT INTO classes (class_id, start_time, end_time, course_id, user_id, group_id, global_class_id, class_type, url, location_id) VALUES ('38485358-ea71-4d3e-a718-f1ce6c6202c5', '2024-07-01 05:00:00.000000', '2024-07-01 06:30:00.000000', 'fd17d1ab-2c1f-46f7-8501-1a2129f0c933', '9f6cfb74-e71e-4d00-86e8-3307e8b6865e', 'd15b0018-47e9-4281-9dc8-a5aaf2bdf951', 'de7d65ad-974e-46d5-ac4a-95b558389857', 'ONLINE', 'wwww', null)").executeUpdate();
@@ -87,7 +92,8 @@ class GlobalStudyClassesImplTest {
         entityManager.createNativeQuery("INSERT INTO classes (class_id, start_time, end_time, course_id, user_id, group_id, global_class_id, class_type, url, location_id) VALUES ('95ea1e55-d617-4922-9af8-400c731b21aa', '2024-07-15 05:00:00.000000', '2024-07-15 06:30:00.000000', 'fd17d1ab-2c1f-46f7-8501-1a2129f0c933', '9f6cfb74-e71e-4d00-86e8-3307e8b6865e', 'd15b0018-47e9-4281-9dc8-a5aaf2bdf951', 'de7d65ad-974e-46d5-ac4a-95b558389857', 'ONLINE', 'wwww', null)").executeUpdate();
         entityManager.createNativeQuery("INSERT INTO classes (class_id, start_time, end_time, course_id, user_id, group_id, global_class_id, class_type, url, location_id) VALUES ('72f6311d-6d96-4162-9b75-3def674875c1', '2024-07-22 05:00:00.000000', '2024-07-22 06:30:00.000000', 'fd17d1ab-2c1f-46f7-8501-1a2129f0c933', '9f6cfb74-e71e-4d00-86e8-3307e8b6865e', 'd15b0018-47e9-4281-9dc8-a5aaf2bdf951', 'de7d65ad-974e-46d5-ac4a-95b558389857', 'ONLINE', 'wwww', null)").executeUpdate();
         entityManager.createNativeQuery("INSERT INTO classes (class_id, start_time, end_time, course_id, user_id, group_id, global_class_id, class_type, url, location_id) VALUES ('06181b25-2845-4f20-8482-5d0e1f8a9ae6', '2024-07-29 05:00:00.000000', '2024-07-29 06:30:00.000000', 'fd17d1ab-2c1f-46f7-8501-1a2129f0c933', '9f6cfb74-e71e-4d00-86e8-3307e8b6865e', 'd15b0018-47e9-4281-9dc8-a5aaf2bdf951', 'de7d65ad-974e-46d5-ac4a-95b558389857', 'ONLINE', 'wwww', null)").executeUpdate();
-        entityManager.createNativeQuery("INSERT INTO classes (class_id, start_time, end_time, course_id, user_id, group_id, global_class_id, class_type, url, location_id) VALUES ('0b59c6c5-f637-4c6e-822f-91c9b788e3c0', '2024-08-05 05:00:00.000000', '2024-08-05 06:30:00.000000', 'fd17d1ab-2c1f-46f7-8501-1a2129f0c933', '9f6cfb74-e71e-4d00-86e8-3307e8b6865e', 'd15b0018-47e9-4281-9dc8-a5aaf2bdf951', 'de7d65ad-974e-46d5-ac4a-95b558389857', 'ONLINE', 'wwww', null)").executeUpdate();
+
+        entityManager.createNativeQuery("INSERT INTO classes (class_id, start_time, end_time, course_id, user_id, group_id, global_class_id, class_type, url, location_id) VALUES ('0b59c6c5-f637-4c6e-822f-91c9b788e3c0', '2024-08-05 05:00:00.000000', '2024-08-05 06:30:00.000000', 'fd17d1ab-2c1f-46f7-8501-1a2129f0c933', '9f6cfb74-e71e-4d00-86e8-3307e8b6865e', 'd15b0018-47e9-4281-9dc8-a5aaf2bdf951', '1c31d98a-b434-4a45-ace6-3d72495a626e', 'OFFLINE', null, '34af61d9-5a22-4636-bef3-c0a5e73036c6')").executeUpdate();
 
         entityManager.flush();
     }
@@ -144,7 +150,7 @@ class GlobalStudyClassesImplTest {
     }
 
     @Test
-    void testParseGlobalClassToStudyClasses() {
+    void testParseGlobalClassToOnlineStudyClasses() {
         GlobalStudyClassRequest request = GlobalStudyClassRequest.builder()
                 .teacherId("9f6cfb74-e71e-4d00-86e8-3307e8b6865e")
                 .courseId("fd17d1ab-2c1f-46f7-8501-1a2129f0c933")
@@ -160,7 +166,6 @@ class GlobalStudyClassesImplTest {
                 .url("wwww")
                 .userZone("UTC")
                 .build();
-
 
         GlobalStudyClass globalStudyClass = globalStudyClassesService.parseGlobalClassToStudyClasses(request);
 
@@ -179,6 +184,44 @@ class GlobalStudyClassesImplTest {
             assertEquals("d15b0018-47e9-4281-9dc8-a5aaf2bdf951", studyClass.getGroup().getId());
             assertEquals(globalStudyClass, studyClass.getGlobalStudyClass());
             assertEquals("wwww", ((OnlineClass) studyClass).getUrl());
+        }
+    }
+
+    @Test
+    void testParseGlobalClassToOfflineStudyClasses() {
+        GlobalStudyClassRequest request = GlobalStudyClassRequest.builder()
+                .teacherId("9f6cfb74-e71e-4d00-86e8-3307e8b6865e")
+                .courseId("fd17d1ab-2c1f-46f7-8501-1a2129f0c933")
+                .groupId("d15b0018-47e9-4281-9dc8-a5aaf2bdf951")
+                .scheduleId("27936573-c9b3-4403-b479-56440de97a78")
+                .dateRange(DateRange.builder()
+                        .startDate(LocalDate.of(2024, 7, 1))
+                        .endDate(LocalDate.of(2024, 8, 11)).build())
+                .scheduleDay(DayOfWeek.TUESDAY)
+                .scheduleTimeId("THIRD_LECTURE")
+                .regularity(Regularity.EACH_WEEK)
+                .classType("OFFLINE")
+                .locationId("34af61d9-5a22-4636-bef3-c0a5e73036c6")
+                .userZone("UTC")
+                .build();
+
+        GlobalStudyClass globalStudyClass = globalStudyClassesService.parseGlobalClassToStudyClasses(request);
+
+        assertEquals(Regularity.EACH_WEEK, globalStudyClass.getRegularity());
+        assertEquals("THIRD_LECTURE", globalStudyClass.getScheduleTime().getId());
+        assertEquals(DayOfWeek.TUESDAY, globalStudyClass.getScheduleDay());
+        assertEquals("27936573-c9b3-4403-b479-56440de97a78", globalStudyClass.getSchedule().getId());
+
+        List<StudyClass> studyClasses = globalStudyClass.getStudyClasses();
+        assertEquals(6, studyClasses.size());
+
+        for (StudyClass studyClass : studyClasses) {
+            assertEquals("OFFLINE", studyClass.getClassType());
+            assertEquals("9f6cfb74-e71e-4d00-86e8-3307e8b6865e", studyClass.getTeacher().getId());
+            assertEquals("fd17d1ab-2c1f-46f7-8501-1a2129f0c933", studyClass.getCourse().getId());
+            assertEquals("d15b0018-47e9-4281-9dc8-a5aaf2bdf951", studyClass.getGroup().getId());
+            assertEquals(globalStudyClass, studyClass.getGlobalStudyClass());
+            assertEquals("34af61d9-5a22-4636-bef3-c0a5e73036c6", ((OfflineClass) studyClass).getLocation().getId());
         }
     }
 

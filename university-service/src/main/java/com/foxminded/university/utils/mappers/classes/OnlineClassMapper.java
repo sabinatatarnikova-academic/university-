@@ -20,6 +20,11 @@ import java.time.ZonedDateTime;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring", uses = {CourseMapper.class, TeacherMapper.class, GroupMapper.class})
 public interface OnlineClassMapper {
 
+    @Named("localToZoned")
+    static ZonedDateTime localToZoned(LocalDateTime localDateTime) {
+        return localDateTime != null ? localDateTime.atZone(ZoneId.systemDefault()) : null;
+    }
+
     OnlineClassResponse toDto(OnlineClass onlineClass);
 
     @InheritInverseConfiguration
@@ -31,9 +36,4 @@ public interface OnlineClassMapper {
     @Mapping(source = "startTime", target = "startTime", qualifiedByName = "localToZoned")
     @Mapping(source = "endTime", target = "endTime", qualifiedByName = "localToZoned")
     OnlineClass toEntity(CreateStudyClassResponse studyClassResponse);
-
-    @Named("localToZoned")
-    static ZonedDateTime localToZoned(LocalDateTime localDateTime) {
-        return localDateTime != null ? localDateTime.atZone(ZoneId.systemDefault()) : null;
-    }
 }

@@ -50,7 +50,7 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public void updateLocation(Location location) {
         locationRepository.save(location);
-        log.info("Updated location with id {}, department - {}, classroom - {}, classes - {}", location.getId(),location.getDepartment(), location.getClassroom(), location.getStudyClass());
+        log.info("Updated location with id {}, department - {}, classroom - {}, classes - {}", location.getId(), location.getDepartment(), location.getClassroom(), location.getStudyClass());
     }
 
     @Override

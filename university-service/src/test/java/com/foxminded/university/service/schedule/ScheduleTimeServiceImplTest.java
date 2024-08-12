@@ -2,6 +2,7 @@ package com.foxminded.university.service.schedule;
 
 import com.foxminded.university.config.TestConfig;
 import com.foxminded.university.model.entity.ScheduleTimes;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 @DataJpaTest
 @ActiveProfiles("h2")
@@ -85,5 +87,10 @@ class ScheduleTimeServiceImplTest {
         String id = firstLecture.getId();
         ScheduleTimes lectureTimeById = scheduleTimeService.findLectureTimeById(id);
         assertEquals(firstLecture, lectureTimeById);
+    }
+
+    @Test
+    void findLectureTimeByIdTestThrowsException() {
+        assertThrows(EntityNotFoundException.class, () -> scheduleTimeService.findLectureTimeById("1"));
     }
 }
