@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{classes}"></title>
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <link rel="stylesheet" th:href="@{/static/css/bootstrap.min.css}"/>
+    <script th:src="@{/static/js/script.js}"></script>
+</head>
+<body>
+<div th:insert="~{language :: language}"></div>
+<h2 th:text="#{classes}"></h2>
+<div class="mb-3">
+    <a class="btn btn-success" href="/admin/classes/new" th:text="#{classes.new}"></a>
+</div>
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th th:text="#{id}"></th>
+        <th th:text="#{type}"></th>
+        <th th:text="#{startTime}"></th>
+        <th th:text="#{endTime}"></th>
+        <th th:text="#{courses.name}"></th>
+        <th th:text="#{group}"></th>
+        <th th:text="#{teacher}"></th>
+        <th th:text="#{location}"></th>
+        <th th:text="#{actions}"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="class : ${studyClassPage}">
+        <td th:text="${class.id}"></td>
+        <td th:text="${class.classType}"></td>
+        <td class="convert-time" th:attr="data-utc=${class.startTime}"></td>
+        <td class="convert-time" th:attr="data-utc=${class.endTime}"></td>
+        <td th:text="${class.courseName}"></td>
+        <td th:text="${class.groupName}"></td>
+        <td th:text="${class.teacherFirstName + ' ' + class.teacherLastName}"></td>
+        <td>
+            <span th:if="${class.classType} == 'ONLINE'" th:text="${class.url}"></span>
+            <span th:text="${class.location == null ? '-' : (class.location.department + ' ' + class.location.classroom)}"
+                  th:unless="${class.classType} == 'ONLINE'"></span>
+        </td>
+        <td>
+            <a class="btn btn-primary" th:href="@{/admin/classes/edit(id=${class.id})}" th:text="#{edit}"></a>
+            <form method="post" style="display:inline-block;"
+                  th:action="@{/admin/classes/delete/{id}(id=${class.id})}">
+                <input name="_method" type="hidden" value="DELETE"/>
+                <button class="btn btn-danger" th:text="#{delete}" type="submit"></button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div th:if="${studyClassPage!= null}">
+    <ul class="pagination">
+        <li class="page-item" th:each="i : ${#numbers.sequence(0, studyClassPage.totalPages - 1)}">
+            <a class="page-link" th:href="@{/admin/classes(page=${i}, size=${studyClassPage.size})}"
+               th:text="${i + 1}"></a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

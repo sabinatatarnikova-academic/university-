@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <title th:text="#{classes.edit}"></title>
+    <link rel="stylesheet" th:href="@{/static/css/bootstrap.min.css}"/>
+</head>
+<body>
+<div class="container mt-4">
+    <h1 th:text="#{classes.edit}"></h1>
+    <form method="post" th:action="@{/admin/classes/edit}" th:object="${class}">
+        <input th:field="*{id}" type="hidden">
+        <div class="mb-3">
+            <label class="form-label" for="startTime" th:text="#{startTime}"></label>
+            <input class="form-control" id="startTime" th:field="*{startTime}" type="datetime-local">
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="endTime" th:text="#{endTime}"></label>
+            <input class="form-control" id="endTime" th:field="*{endTime}" type="datetime-local">
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="course" th:text="#{courses.name}"></label>
+            <select class="form-select" id="course" th:field="*{courseId}">
+                <option th:each="course : ${courses}" th:text="${course.getName()}"
+                        th:value="${course.id}"></option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="group" th:text="#{group}"></label>
+            <select class="form-select" id="group" th:field="*{groupId}">
+                <option th:each="group : ${groups}" th:text="${group.getName()}"
+                        th:value="${group.id}"></option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="teacher" th:text="#{teacher}"></label>
+            <select class="form-select" id="teacher" th:field="*{teacherId}">
+                <option th:each="teacher : ${teachers}"
+                        th:text="${teacher.getFirstName()+ ' ' + teacher.getLastName()}"
+                        th:value="${teacher.id}"></option>
+            </select>
+        </div>
+        <div class="mb-3" th:if="${class.classType} == 'ONLINE'">
+            <label class="form-label" for="url" th:text="#{url}"></label>
+            <input class="form-control" id="url" th:field="*{url}" type="text">
+        </div>
+        <div class="mb-3" th:if="${class.classType} == 'OFFLINE'">
+            <label class="form-label" for="location" th:text="#{location}"></label>
+            <select class="form-select" id="location" th:field="*{locationId}">
+                <option th:each="locationDTO : ${locations}"
+                        th:text="${locationDTO.department + locationDTO.classroom}"
+                        th:value="${locationDTO.id}"></option>
+            </select>
+        </div>
+        <button class="btn btn-primary" type="submit">Save Changes</button>
+    </form>
+</div>
+</body>
+</html>

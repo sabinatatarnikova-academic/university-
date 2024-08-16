@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: university-postgres
+    environment:
+      POSTGRES_USER: common_university_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: university
+    volumes:
+      - ./src/main/resources/db/migration:/docker-entrypoint-initdb.d/
+    ports:
+      - "5432:5432"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: university-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://university-postgres:5432/university
+      SPRING_DATASOURCE_USERNAME: common_university_user
+      SPRING_DATASOURCE_PASSWORD: password
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
