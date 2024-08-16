@@ -18,7 +18,7 @@ import java.util.Locale;
 
 @Controller
 @AllArgsConstructor
-public class DefaultController {
+public class LandingController {
 
     private final CourseService courseService;
 
