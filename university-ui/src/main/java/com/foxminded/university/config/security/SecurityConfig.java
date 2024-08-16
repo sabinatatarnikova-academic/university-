@@ -28,13 +28,14 @@ public class SecurityConfig  {
                                 .requestMatchers("/admin").hasRole("ADMIN")
                                 .requestMatchers("/teacher").hasRole("TEACHER")
                                 .requestMatchers("/student").hasRole("STUDENT")
+                                .requestMatchers("/").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
                 .formLogin((form -> form
                         .loginPage("/login")
                         .permitAll()
-                        .defaultSuccessUrl("/", true)
+                        .successHandler(new CustomAuthenticationSuccessHandler())
                         .failureUrl("/login?error=true")))
                 .csrf(csrf -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/admin/schedule/classes/add")))
                 .csrf(csrf -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/admin/schedule/edit")));
