@@ -16,7 +16,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 @RequiredArgsConstructor
 @Import(ServiceConfig.class)
-public class SecurityConfig  {
+public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
 
