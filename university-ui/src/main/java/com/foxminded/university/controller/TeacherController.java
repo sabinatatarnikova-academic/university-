@@ -130,5 +130,4 @@ public class TeacherController {
         model.addAttribute("userDate", userDate);
         return "teacher/teacher_schedule";
     }
-
 }
