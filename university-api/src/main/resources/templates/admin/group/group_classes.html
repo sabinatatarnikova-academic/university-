@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{groups}"></title>
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <link rel="stylesheet" th:href="@{/static/css/bootstrap.min.css}"/>
+    <script th:src="@{/static/js/script.js}"></script>
+</head>
+<body>
+<div th:insert="~{language :: language}"></div>
+<h2 th:text="#{group} + ' ' + ${group.name}"></h2>
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th th:text="#{classes}"></th>
+        <th th:text="#{actions}"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="studyClass : ${classes}">
+        <td>
+            <span>
+                <span th:text="${studyClass.classType + ': ' + studyClass.courseName}"></span>
+                <span class="convert-time" th:attr="data-utc=${studyClass.startTime}"></span>
+                <span th:text="' to '"></span>
+                <span class="convert-time" th:attr="data-utc=${studyClass.endTime}"></span>
+                <span th:text="${' ' + studyClass.groupName}"></span>
+            </span>
+        </td>
+        <td>
+            <form method="post" style="display:inline-block;"
+                  th:action="@{/admin/groups/classes/delete/{id}(id=${studyClass.id})}">
+                <input name="_method" type="hidden" value="DELETE"/>
+                <button class="btn btn-danger" th:text="#{delete}" type="submit"></button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

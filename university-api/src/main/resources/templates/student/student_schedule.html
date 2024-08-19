@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{schedule}"></title>
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <link rel="stylesheet" th:href="@{/static/css/bootstrap.min.css}"/>
+    <script>
+        function getUserDate() {
+            var now = new Date();
+            var userDate = now.toISOString().split('T')[0];
+            const userZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            var url = new URL(window.location.href);
+            if (!url.searchParams.has('userDate') && !url.searchParams.has('userZone')) {
+                url.searchParams.set('userDate', userDate);
+                url.searchParams.set('userZone', userZone);
+                window.location.href = url.toString();
+            }
+        }
+
+        window.onload = getUserDate;
+    </script>
+    <style>
+        .classDate {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: space-between;
+            align-items: flex-end;
+
+            .date {
+                margin-bottom: 0;
+            }
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <h1 th:text="${groupName}"></h1>
+    <div th:insert="~{schedule :: schedule}"></div>
+</div>
+<div>
+    <ul class="pagination d-flex justify-content-center">
+        <li class="page-item">
+            <a class="page-link"
+               th:href="@{/student/schedule(userDate=${weekStart.minusDays(7)})}"
+               th:text="#{previousWeek}"></a>
+        </li>
+        <li class="page-item">
+            <a class="page-link"
+               th:href="@{/student/schedule(userDate=${weekStart.plusDays(7)})}"
+               th:text="#{nextWeek}"></a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

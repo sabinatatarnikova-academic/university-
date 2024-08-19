@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{courses}"></title>
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <link rel="stylesheet" th:href="@{/static/css/bootstrap.min.css}"/>
+    <script th:src="@{/static/js/script.js}"></script>
+</head>
+<body>
+<div th:insert="~{language :: language}"></div>
+<h2 th:text="#{courses}"></h2>
+<div class="mb-3">
+    <a class="btn btn-success" href="/admin/courses/new" th:text="#{course.add}"></a>
+</div>
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th th:text="#{id}"></th>
+        <th th:text="#{courses.name}"></th>
+        <th th:text="#{classes}"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="course : ${coursesPage}">
+        <td th:text="${course.id}"></td>
+        <td th:text="${course.name}"></td>
+        <td>
+            <ul>
+                <li th:each="studyClass : ${course.studyClasses}">
+                    <span>
+                        <span th:text="${studyClass.classType + ': ' + studyClass.courseName}"></span>
+                        <span class="convert-time" th:attr="data-utc=${studyClass.startTime}"></span>
+                        <span th:text="' to '"></span>
+                        <span class="convert-time" th:attr="data-utc=${studyClass.endTime}"></span>
+                        <span th:text="${' ' + studyClass.groupName}"></span>
+                    </span>
+                </li>
+            </ul>
+        </td>
+        <td>
+            <a class="btn btn-primary" th:href="@{/admin/courses/edit(id=${course.id})}" th:text="#{edit}"></a>
+            <form method="post" style="display:inline-block;"
+                  th:action="@{/admin/courses/delete/{id}(id=${course.id})}">
+                <input name="_method" type="hidden" value="DELETE"/>
+                <button class="btn btn-danger" th:text="#{delete}" type="submit"></button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div>
+    <ul class="pagination">
+        <li class="page-item" th:each="i : ${#numbers.sequence(0, coursesPage.totalPages - 1)}">
+            <a class="page-link" th:href="@{/admin/courses(page=${i}, size=${coursesPage.size})}"
+               th:text="${i + 1}"></a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
