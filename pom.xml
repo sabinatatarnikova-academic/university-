@@ -19,7 +19,6 @@
         <module>university-data</module>
         <module>university-service</module>
         <module>university-ui</module>
-        <module>university-api</module>
     </modules>
 
     <properties>
