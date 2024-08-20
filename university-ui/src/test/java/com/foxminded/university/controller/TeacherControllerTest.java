@@ -1,5 +1,6 @@
 package com.foxminded.university.controller;
 
+import com.foxminded.university.config.TeacherControllerConfig;
 import com.foxminded.university.config.TestSecurityConfig;
 import com.foxminded.university.model.dtos.request.CourseRequest;
 import com.foxminded.university.model.dtos.request.CourseTeacherRequest;
@@ -33,9 +34,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.htmlunit.MockMvcWebClientBuilder;
 import org.springframework.web.context.WebApplicationContext;
@@ -67,7 +68,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @WebMvcTest(TeacherController.class)
-@Import(TestSecurityConfig.class)
+@ContextConfiguration(classes = {TestSecurityConfig.class, TeacherControllerConfig.class})
 class TeacherControllerTest {
 
     @Autowired
@@ -148,7 +149,7 @@ class TeacherControllerTest {
 
         when(groupService.findAllGroupsResponsesWithPagination(page)).thenReturn(groupPage);
 
-        mockMvc.perform(get("/teacher/groups").param("groupsPage", "0").param("size", "10"))
+        mockMvc.perform(get("/teacher/groups").param("page", "0").param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("teacher/teacher_groups"))
                 .andExpect(model().attributeExists("groupsPage"))

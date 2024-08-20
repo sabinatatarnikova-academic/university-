@@ -1,4 +1,4 @@
-package com.foxminded.university.controller;
+package com.foxminded.university.restcontroller;
 
 import com.foxminded.university.model.dtos.request.CourseTeacherRequest;
 import com.foxminded.university.model.dtos.request.GroupRequest;
@@ -30,13 +30,13 @@ import java.time.LocalDate;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/teacher")
-public class TeacherController {
+@RequestMapping("/api/v1/teacher")
+public class TeacherRestController {
 
     private final UserService userService;
-    private final CourseService courseService;
     private final GroupService groupService;
     private final StudyClassService studyClassService;
+    private final CourseService courseService;
     private final ScheduleService scheduleService;
 
     @GetMapping()

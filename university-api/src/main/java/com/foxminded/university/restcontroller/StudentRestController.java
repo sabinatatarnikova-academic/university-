@@ -1,4 +1,4 @@
-package com.foxminded.university.controller;
+package com.foxminded.university.restcontroller;
 
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.schedule.ScheduleViewResponse;
@@ -9,8 +9,6 @@ import com.foxminded.university.utils.PageUtils;
 import com.foxminded.university.utils.RequestPage;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,8 +18,8 @@ import java.time.LocalDate;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/student")
-public class StudentController {
+@RequestMapping("/api/v1/student")
+public class StudentRestController {
 
     private final UserService userService;
     private final ScheduleService scheduleService;

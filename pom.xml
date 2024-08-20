@@ -19,6 +19,7 @@
         <module>university-data</module>
         <module>university-service</module>
         <module>university-ui</module>
+        <module>university-api</module>
     </modules>
 
     <properties>
@@ -140,6 +141,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>com.foxminded</groupId>
+            <artifactId>university-ui</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>net.sourceforge.htmlunit</groupId>
             <artifactId>htmlunit</artifactId>
             <version>2.70.0</version>
@@ -212,6 +219,7 @@
                 <configuration>
                     <excludes>
                         <exclude>**/mappers/**</exclude>
+                        <exclude>**/config/**</exclude>
                         <exclude>**/model/**</exclude>
                         <exclude>**/DemoApplication.class/**</exclude>
                         <exclude>**/DataSourceConfig.class/**</exclude>

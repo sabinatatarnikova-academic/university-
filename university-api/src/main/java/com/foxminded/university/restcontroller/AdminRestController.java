@@ -1,4 +1,4 @@
-package com.foxminded.university.controller;
+package com.foxminded.university.restcontroller;
 
 import com.foxminded.university.model.dtos.request.CourseRequest;
 import com.foxminded.university.model.dtos.request.GroupFormation;
@@ -9,7 +9,6 @@ import com.foxminded.university.model.dtos.request.schedule.GlobalStudyClassRequ
 import com.foxminded.university.model.dtos.request.schedule.ScheduleCreateRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
-import com.foxminded.university.model.dtos.response.GroupEditResponse;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.schedule.ScheduleClassesResponse;
@@ -31,13 +30,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -51,9 +47,9 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/admin")
+@RequestMapping("/api/v1/admin")
 @Validated
-public class AdminController {
+public class AdminRestController {
 
     private final UserService userService;
     private final GroupService groupService;
@@ -79,7 +75,7 @@ public class AdminController {
     }
 
     @GetMapping("/users/new")
-    public UserResponse showAddUserForm(Model model) {
+    public UserResponse showAddUserForm() {
         return new UserResponse();
     }
 
@@ -169,7 +165,6 @@ public class AdminController {
     @GetMapping("/groups/new")
     public GroupFormation showAddGroupForm() {
         return new GroupFormation();
-
     }
 
     @PostMapping("/groups/new")
@@ -204,7 +199,7 @@ public class AdminController {
     }
 
     @PostMapping("/schedule/classes/add")
-    public void addSchedule(@RequestParam String id, @RequestBody List<GlobalStudyClassRequest> globalStudyClassRequests) {
+    public void addSchedule(@RequestBody List<GlobalStudyClassRequest> globalStudyClassRequests) {
         globalStudyClassesService.parseScheduleListToGlobalClasses(globalStudyClassRequests);
     }
 
@@ -223,8 +218,8 @@ public class AdminController {
     }
 
     @PostMapping("/schedule/edit")
-    public void editSchedule(@RequestParam String id, @RequestBody List<GlobalStudyClassRequest> globalStudyClassRequests) {
-        addSchedule(id, globalStudyClassRequests);
+    public void editSchedule(@RequestBody List<GlobalStudyClassRequest> globalStudyClassRequests) {
+        addSchedule(globalStudyClassRequests);
     }
 
     @DeleteMapping("/schedule/delete/{id}")

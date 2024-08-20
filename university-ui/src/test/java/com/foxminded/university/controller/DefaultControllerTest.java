@@ -1,5 +1,6 @@
 package com.foxminded.university.controller;
 
+import com.foxminded.university.config.LandingControllerConfig;
 import com.foxminded.university.config.TestSecurityConfig;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.service.course.CourseService;
@@ -9,9 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @WebMvcTest(LandingController.class)
-@Import(TestSecurityConfig.class)
+@ContextConfiguration(classes = {TestSecurityConfig.class, LandingControllerConfig.class})
 class DefaultControllerTest {
 
     @Autowired

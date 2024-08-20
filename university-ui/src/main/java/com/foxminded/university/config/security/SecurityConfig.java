@@ -6,9 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -25,12 +27,13 @@ public class SecurityConfig  {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/admin").hasRole("ADMIN")
-                                .requestMatchers("/teacher").hasRole("TEACHER")
-                                .requestMatchers("/student").hasRole("STUDENT")
-                                .requestMatchers("/").permitAll()
+                                .requestMatchers("/admin", "/api/v1/admin").hasRole("ADMIN")
+                                .requestMatchers("/teacher", "/api/v1/teacher").hasRole("TEACHER")
+                                .requestMatchers("/student", "/api/v1/student").hasRole("STUDENT")
+                                .requestMatchers("/", "/api/v1/").permitAll()
                                 .anyRequest().authenticated()
                 )
+                .httpBasic(Customizer.withDefaults())
                 .userDetailsService(userDetailsService)
                 .formLogin((form -> form
                         .loginPage("/login")
@@ -38,7 +41,8 @@ public class SecurityConfig  {
                         .successHandler(new CustomAuthenticationSuccessHandler())
                         .failureUrl("/login?error=true")))
                 .csrf(csrf -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/admin/schedule/classes/add")))
-                .csrf(csrf -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/admin/schedule/edit")));
+                .csrf(csrf -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/admin/schedule/edit")))
+                .csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
