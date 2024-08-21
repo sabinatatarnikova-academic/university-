@@ -1,6 +1,7 @@
-package com.foxminded.university.config.security;
+package com.foxminded.university.security;
 
 import com.foxminded.university.config.ServiceConfig;
+import com.foxminded.university.config.security.CustomAuthenticationSuccessHandler;
 import com.foxminded.university.service.user.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -11,26 +12,38 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 @Import(ServiceConfig.class)
-public class SecurityConfig  {
+public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry.requestMatchers("/**").authenticated())
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(new AuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+
+    @Bean
+    public SecurityFilterChain uiFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/admin", "/api/v1/admin").hasRole("ADMIN")
-                                .requestMatchers("/teacher", "/api/v1/teacher").hasRole("TEACHER")
-                                .requestMatchers("/student", "/api/v1/student").hasRole("STUDENT")
-                                .requestMatchers("/", "/api/v1/").permitAll()
+                                .requestMatchers("/admin").hasRole("ADMIN")
+                                .requestMatchers("/teacher").hasRole("TEACHER")
+                                .requestMatchers("/student").hasRole("STUDENT")
+                                .requestMatchers("/").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())

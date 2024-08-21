@@ -5,7 +5,7 @@ import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
-import com.foxminded.university.model.dtos.response.users.UserResponse;
+import com.foxminded.university.model.dtos.response.users.UserDTO;
 import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.utils.RequestPage;
 import org.springframework.data.domain.Page;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface UserService {
 
-    void saveUser(UserResponse userResponse);
+    void saveUser(UserDTO userResponse);
 
     <U extends User> U findUserById(String userId);
 
@@ -30,7 +30,7 @@ public interface UserService {
 
     void deleteUserById(String userId);
 
-    Page<UserResponse> findAllUsersWithPagination(RequestPage requestPage);
+    Page<UserDTO> findAllUsersWithPagination(RequestPage requestPage);
 
     Page<StudentResponse> findAllStudentsWithPagination(RequestPage requestPage);
 

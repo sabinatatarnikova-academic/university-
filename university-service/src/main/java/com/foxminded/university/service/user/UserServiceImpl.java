@@ -5,7 +5,7 @@ import com.foxminded.university.model.dtos.request.users.UserFormRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
-import com.foxminded.university.model.dtos.response.users.UserResponse;
+import com.foxminded.university.model.dtos.response.users.UserDTO;
 import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.model.entity.users.Teacher;
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void saveUser(UserResponse userResponse) {
+    public void saveUser(UserDTO userResponse) {
         userResponse.setPassword(passwordEncoder.encode(userResponse.getPassword()));
         if (userResponse.getUserType().equals("STUDENT")) {
             Student student = studentMapper.toEntity(userResponse);
@@ -150,15 +150,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserResponse> findAllUsersWithPagination(RequestPage requestPage) {
+    public Page<UserDTO> findAllUsersWithPagination(RequestPage requestPage) {
         int pageNumber = requestPage.getPageNumber();
         int pageSize = requestPage.getPageSize();
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<User> usersPage = userRepository.findAll(pageable);
-        List<UserResponse> userResponses = usersPage.stream()
+        List<UserDTO> userResponses = usersPage.stream()
                 .map(userMapper::toDto)
                 .toList();
-        Page<UserResponse> pageResult = new PageImpl<>(userResponses, pageable, usersPage.getTotalElements());
+        Page<UserDTO> pageResult = new PageImpl<>(userResponses, pageable, usersPage.getTotalElements());
         log.info("Found {} users", pageResult.getTotalPages());
         return pageResult;
     }

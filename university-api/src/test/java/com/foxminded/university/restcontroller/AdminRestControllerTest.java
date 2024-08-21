@@ -17,7 +17,7 @@ import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.schedule.ScheduleClassesResponse;
 import com.foxminded.university.model.dtos.response.schedule.ScheduleViewResponse;
 import com.foxminded.university.model.dtos.response.schedule.ViewScheduleResponse;
-import com.foxminded.university.model.dtos.response.users.UserResponse;
+import com.foxminded.university.model.dtos.response.users.UserDTO;
 import com.foxminded.university.service.classes.GlobalStudyClassesService;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.course.CourseService;
@@ -92,7 +92,7 @@ class AdminRestControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowAllUsersList() throws Exception {
-        Page<UserResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(UserResponse.builder()
+        Page<UserDTO> pageDtoImpl = new PageImpl<>(Collections.singletonList(UserDTO.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .build()));
@@ -110,7 +110,7 @@ class AdminRestControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testAddUser() throws Exception {
-        UserResponse userResponse = UserResponse.builder()
+        UserDTO userResponse = UserDTO.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .build();

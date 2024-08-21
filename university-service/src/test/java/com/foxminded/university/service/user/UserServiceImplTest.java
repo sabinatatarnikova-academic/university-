@@ -8,7 +8,7 @@ import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
-import com.foxminded.university.model.dtos.response.users.UserResponse;
+import com.foxminded.university.model.dtos.response.users.UserDTO;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
@@ -186,7 +186,7 @@ class UserServiceImplTest {
 
     @Test
     void saveUser() {
-        UserResponse userToSave = UserResponse.builder()
+        UserDTO userToSave = UserDTO.builder()
                 .firstName("Test")
                 .lastName("Test")
                 .userType("TEACHER")
@@ -196,8 +196,8 @@ class UserServiceImplTest {
 
         userService.saveUser(userToSave);
         RequestPage page = PageUtils.createPage(0, 5);
-        List<UserResponse> users = userService.findAllUsersWithPagination(page).toList();
-        UserResponse actualUser = users.get(4);
+        List<UserDTO> users = userService.findAllUsersWithPagination(page).toList();
+        UserDTO actualUser = users.get(4);
 
         assertEquals(userToSave.getFirstName(), actualUser.getFirstName());
         assertEquals(userToSave.getLastName(), actualUser.getLastName());
@@ -208,7 +208,7 @@ class UserServiceImplTest {
     @Test
     void findUserById() {
         RequestPage page = PageUtils.createPage(0, 4);
-        UserResponse user = userService.findAllUsersWithPagination(page).toList().get(3);
+        UserDTO user = userService.findAllUsersWithPagination(page).toList().get(3);
         String userId = user.getId();
         assertEquals(user, studentMapper.toDto((Student) userService.findUserById(userId)));
     }
@@ -216,7 +216,7 @@ class UserServiceImplTest {
     @Test
     void findUserDTOById() {
         RequestPage page = PageUtils.createPage(0, 4);
-        UserResponse user = userService.findAllUsersWithPagination(page).toList().get(3);
+        UserDTO user = userService.findAllUsersWithPagination(page).toList().get(3);
         String userId = user.getId();
         UserFormRequest dto = userService.findUserDTOById(userId);
         assertEquals(user.getId(), dto.getId());
@@ -225,7 +225,7 @@ class UserServiceImplTest {
     @Test
     void findUserByUsername() {
         RequestPage page = PageUtils.createPage(0, 4);
-        UserResponse user = userService.findAllUsersWithPagination(page).toList().get(3);
+        UserDTO user = userService.findAllUsersWithPagination(page).toList().get(3);
         String username = user.getUsername();
         assertEquals(user, studentMapper.toDto((Student) userService.findUserByUsername(username)));
     }
@@ -243,7 +243,7 @@ class UserServiceImplTest {
     @Test
     void updateStudent() {
         RequestPage page = PageUtils.createPage(0, 4);
-        UserResponse user = userService.findAllUsersWithPagination(page).toList().get(3);
+        UserDTO user = userService.findAllUsersWithPagination(page).toList().get(3);
         String userId = user.getId();
 
         UserFormRequest studentToSave = UserFormRequest.builder()
@@ -266,7 +266,7 @@ class UserServiceImplTest {
     @Test
     void updateTeacher() {
         RequestPage page = PageUtils.createPage(0, 4);
-        UserResponse user = userService.findAllUsersWithPagination(page).toList().get(0);
+        UserDTO user = userService.findAllUsersWithPagination(page).toList().get(0);
         String userId = user.getId();
 
         StudyClassResponse onlineClassDTO = studyClassMapper.toDto(onlineClass);
@@ -292,7 +292,7 @@ class UserServiceImplTest {
     @Test
     void updateTeacherWithStudyClasses() {
         RequestPage page = PageUtils.createPage(0, 4);
-        UserResponse user = userService.findAllUsersWithPagination(page).toList().get(0);
+        UserDTO user = userService.findAllUsersWithPagination(page).toList().get(0);
         String userId = user.getId();
 
         StudyClassResponse onlineClassDTO = studyClassMapper.toDto(onlineClass);
@@ -311,7 +311,7 @@ class UserServiceImplTest {
     @Test
     void updateTeacherWithStudyClassesThrowsException() {
         RequestPage page = PageUtils.createPage(0, 4);
-        UserResponse user = userService.findAllUsersWithPagination(page).toList().get(0);
+        UserDTO user = userService.findAllUsersWithPagination(page).toList().get(0);
         String userId = user.getId();
 
         TeacherClassUpdateRequest teacherToSave = TeacherClassUpdateRequest.builder()
@@ -325,7 +325,7 @@ class UserServiceImplTest {
     @Test
     void deleteUserById() {
         RequestPage page = PageUtils.createPage(0, 4);
-        UserResponse user = userService.findAllUsersWithPagination(page).toList().get(0);
+        UserDTO user = userService.findAllUsersWithPagination(page).toList().get(0);
         String userId = user.getId();
 
         userService.deleteUserById(userId);
@@ -347,8 +347,8 @@ class UserServiceImplTest {
                 .username("username2")
                 .password(password)
                 .build();
-        List<UserResponse> expectedUsers = Arrays.asList(aliceDTO, bobDTO);
-        List<UserResponse> actualUsers = userService.findAllUsersWithPagination(page).toList().subList(0, 2);
+        List<UserDTO> expectedUsers = Arrays.asList(aliceDTO, bobDTO);
+        List<UserDTO> actualUsers = userService.findAllUsersWithPagination(page).toList().subList(0, 2);
         actualUsers.forEach(user -> {
             user.setId(null);
         });

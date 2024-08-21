@@ -24,7 +24,7 @@ import com.foxminded.university.model.dtos.response.schedule.StudyClassScheduleR
 import com.foxminded.university.model.dtos.response.schedule.ViewScheduleResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
-import com.foxminded.university.model.dtos.response.users.UserResponse;
+import com.foxminded.university.model.dtos.response.users.UserDTO;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
@@ -131,7 +131,7 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowAllUsersList() throws Exception {
-        Page<UserResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(UserResponse.builder()
+        Page<UserDTO> pageDtoImpl = new PageImpl<>(Collections.singletonList(UserDTO.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .build()));
@@ -154,7 +154,7 @@ class AdminControllerTest {
     void testShowAddUserForm() throws Exception {
         mockMvc.perform(get("/admin/users/new"))
                 .andExpect(model().attributeExists("user"))
-                .andExpect(model().attribute("user", new UserResponse()))
+                .andExpect(model().attribute("user", new UserDTO()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/user/add-user"));
     }

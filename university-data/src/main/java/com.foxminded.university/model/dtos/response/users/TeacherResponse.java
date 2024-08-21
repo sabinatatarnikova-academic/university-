@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class TeacherResponse extends UserResponse {
+public class TeacherResponse extends UserDTO {
 
     private List<StudyClassResponse> studyClasses;
 }
