@@ -25,7 +25,7 @@ public class StudentRestController {
     private final ScheduleService scheduleService;
 
     @GetMapping()
-    public Page<StudentResponse> getStudentsList (@RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
+    public Page<StudentResponse> getStudentsList(@RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
         RequestPage page = PageUtils.createPage(pageStr, sizeStr);
         return userService.findAllStudentsWithPagination(page);
     }

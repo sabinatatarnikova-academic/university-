@@ -1,20 +1,31 @@
 package com.foxminded.university.security;
 
+import com.foxminded.university.model.entity.users.User;
+import com.foxminded.university.model.entity.users.UserToken;
+import com.foxminded.university.service.user.UserService;
+import com.foxminded.university.service.user.UserTokenService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.authentication.BadCredentialsException;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.stereotype.Service;
 
+@AllArgsConstructor
+@Service
 public class AuthenticationService {
+
+    private UserTokenService tokenService;
+    private UserService userService;
+
     private static final String AUTH_TOKEN_HEADER_NAME = "X-API-KEY";
-    private static final String AUTH_TOKEN = "Foxminded";
 
-    public static Authentication getAuthentication(HttpServletRequest request) {
-        String apiKey = request.getHeader(AUTH_TOKEN_HEADER_NAME);
-        if (apiKey == null || !apiKey.equals(AUTH_TOKEN)) {
-            throw new BadCredentialsException("Invalid API Key");
+    public Authentication getAuthentication(HttpServletRequest request) {
+        String token = request.getHeader(AUTH_TOKEN_HEADER_NAME);
+        UserToken userToken = tokenService.getUserTokenIfValid(token);
+        if (userToken == null) {
+            throw new RuntimeException();
         }
-
-        return new ApiKeyAuthentication(apiKey, AuthorityUtils.NO_AUTHORITIES);
+        String userId = userToken.getUserId();
+        User user = userService.findUserById(userId);
+        return new BasePlatformAuthentication(new UserPrincipal(userId, user.getUsername()), true);
     }
 }
