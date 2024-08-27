@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class StudentResponse extends UserDTO {
+public class StudentResponse extends UserResponse {
 
     private GroupFormation group;
 }

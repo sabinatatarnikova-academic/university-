@@ -11,13 +11,14 @@ import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.request.schedule.GlobalStudyClassRequest;
 import com.foxminded.university.model.dtos.request.schedule.ScheduleCreateRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
+import com.foxminded.university.model.dtos.request.users.UserRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.schedule.ScheduleClassesResponse;
 import com.foxminded.university.model.dtos.response.schedule.ScheduleViewResponse;
 import com.foxminded.university.model.dtos.response.schedule.ViewScheduleResponse;
-import com.foxminded.university.model.dtos.response.users.UserDTO;
+import com.foxminded.university.model.dtos.response.users.UserResponse;
 import com.foxminded.university.service.classes.GlobalStudyClassesService;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.course.CourseService;
@@ -62,20 +63,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AdminRestControllerTest {
 
     WebClient webClient;
+
     @Autowired
     private MockMvc mockMvc;
+
     @MockBean
     private UserService userService;
+
     @MockBean
     private GroupService groupService;
+
     @MockBean
     private StudyClassService studyClassService;
+
     @MockBean
     private CourseService courseService;
+
     @MockBean
     private ScheduleService scheduleService;
+
     @MockBean
     private GlobalStudyClassesService globalStudyClassesService;
+
     @Autowired
     private WebApplicationContext context;
 
@@ -92,7 +101,7 @@ class AdminRestControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowAllUsersList() throws Exception {
-        Page<UserDTO> pageDtoImpl = new PageImpl<>(Collections.singletonList(UserDTO.builder()
+        Page<UserResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(UserResponse.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .build()));
@@ -110,7 +119,7 @@ class AdminRestControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testAddUser() throws Exception {
-        UserDTO userResponse = UserDTO.builder()
+        UserRequest userResponse = UserRequest.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .build();

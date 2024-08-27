@@ -8,6 +8,7 @@ import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.request.schedule.GlobalStudyClassRequest;
 import com.foxminded.university.model.dtos.request.schedule.ScheduleCreateRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
+import com.foxminded.university.model.dtos.request.users.UserRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.GroupEditResponse;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
@@ -17,7 +18,7 @@ import com.foxminded.university.model.dtos.response.schedule.ScheduleClassesResp
 import com.foxminded.university.model.dtos.response.schedule.ScheduleViewResponse;
 import com.foxminded.university.model.dtos.response.schedule.ViewScheduleResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
-import com.foxminded.university.model.dtos.response.users.UserDTO;
+import com.foxminded.university.model.dtos.response.users.UserResponse;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.service.classes.GlobalStudyClassesService;
 import com.foxminded.university.service.classes.StudyClassService;
@@ -97,19 +98,19 @@ public class AdminController {
     @GetMapping("/users")
     public String showAllUsersList(Model model, @RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
         RequestPage page = PageUtils.createPage(pageStr, sizeStr);
-        Page<UserDTO> usersPage = userService.findAllUsersWithPagination(page);
+        Page<UserResponse> usersPage = userService.findAllUsersWithPagination(page);
         model.addAttribute("usersPage", usersPage);
         return "admin/user/admin_users";
     }
 
     @GetMapping("/users/new")
     public String showAddUserForm(Model model) {
-        model.addAttribute("user", new UserDTO());
+        model.addAttribute("user", new UserRequest());
         return "admin/user/add-user";
     }
 
     @PostMapping("/users/new")
-    public String addUser(@ModelAttribute UserDTO user) {
+    public String addUser(@ModelAttribute UserRequest user) {
         userService.saveUser(user);
         return USERS_VIEW_REDIRECT;
     }

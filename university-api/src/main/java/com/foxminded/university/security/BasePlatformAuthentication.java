@@ -47,6 +47,6 @@ public class BasePlatformAuthentication implements Authentication {
 
     @Override
     public String getName() {
-        return "";
+        return userPrincipal.getName();
     }
 }

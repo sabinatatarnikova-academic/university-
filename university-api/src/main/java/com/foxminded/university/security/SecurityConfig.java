@@ -35,8 +35,9 @@ public class SecurityConfig {
     @Order(0)
     public SecurityFilterChain apiToken(HttpSecurity http) throws Exception {
         return http
-                .securityMatcher("/api-token")
+                .securityMatcher("/api-v1-token")
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
 

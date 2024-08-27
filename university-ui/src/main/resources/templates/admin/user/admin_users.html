@@ -22,7 +22,6 @@
         <th th:text="#{lastName}"></th>
         <th th:text="#{type}"></th>
         <th th:text="#{username}"></th>
-        <th th:text="#{password}"></th>
         <th th:text="#{actions}"></th>
     </tr>
     </thead>
@@ -33,7 +32,6 @@
         <td th:text="${user.lastName}"></td>
         <td th:text="${user.getUserType()}"></td>
         <td th:text="${user.getUsername()}"></td>
-        <td th:text="${user.getPassword()}"></td>
         <td>
             <a class="btn btn-primary" th:href="@{/admin/users/edit(id=${user.id})}" th:text="#{edit}"></a>
             <form method="post" style="display:inline-block;" th:action="@{/admin/users/delete/{id}(id=${user.id})}">

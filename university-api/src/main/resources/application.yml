@@ -46,3 +46,10 @@ app:
   pagination:
     default-page: 0
     default-size: 10
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store-type: PKCS12
+    key-store: classpath:ssl/foxminded_university.pfx
+    key-store-password: 1111

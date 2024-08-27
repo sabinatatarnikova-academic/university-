@@ -1,8 +1,8 @@
 package com.foxminded.university.utils.mappers.users;
 
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
+import com.foxminded.university.model.dtos.request.users.UserRequest;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
-import com.foxminded.university.model.dtos.response.users.UserDTO;
 import com.foxminded.university.model.entity.users.Student;
 import com.foxminded.university.utils.mappers.GroupMapper;
 import org.mapstruct.InheritInverseConfiguration;
@@ -20,5 +20,5 @@ public interface StudentMapper {
     @InheritInverseConfiguration
     Student toEntity(UserFormRequest studentDTO);
 
-    Student toEntity(UserDTO userDTO);
+    Student toEntity(UserRequest userDTO);
 }

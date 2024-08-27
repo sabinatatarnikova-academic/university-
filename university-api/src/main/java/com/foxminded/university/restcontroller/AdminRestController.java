@@ -8,13 +8,14 @@ import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.request.schedule.GlobalStudyClassRequest;
 import com.foxminded.university.model.dtos.request.schedule.ScheduleCreateRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
+import com.foxminded.university.model.dtos.request.users.UserRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.schedule.ScheduleClassesResponse;
 import com.foxminded.university.model.dtos.response.schedule.ScheduleViewResponse;
 import com.foxminded.university.model.dtos.response.schedule.ViewScheduleResponse;
-import com.foxminded.university.model.dtos.response.users.UserDTO;
+import com.foxminded.university.model.dtos.response.users.UserResponse;
 import com.foxminded.university.service.classes.GlobalStudyClassesService;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.course.CourseService;
@@ -69,13 +70,13 @@ public class AdminRestController {
     }
 
     @GetMapping("/users")
-    public Page<UserDTO> showAllUsersList(@RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
+    public Page<UserResponse> showAllUsersList(@RequestParam(value = "page", defaultValue = "0") String pageStr, @RequestParam(value = "size", defaultValue = "10") String sizeStr) {
         RequestPage page = PageUtils.createPage(pageStr, sizeStr);
         return userService.findAllUsersWithPagination(page);
     }
 
     @PostMapping("/users/new")
-    public void addUser(@RequestBody UserDTO user) {
+    public void addUser(@RequestBody UserRequest user) {
         userService.saveUser(user);
     }
 

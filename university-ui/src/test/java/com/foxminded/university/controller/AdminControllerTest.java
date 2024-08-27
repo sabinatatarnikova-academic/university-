@@ -13,6 +13,7 @@ import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.request.schedule.GlobalStudyClassRequest;
 import com.foxminded.university.model.dtos.request.schedule.ScheduleCreateRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
+import com.foxminded.university.model.dtos.request.users.UserRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.GroupEditResponse;
 import com.foxminded.university.model.dtos.response.classes.EditStudyClassResponse;
@@ -24,7 +25,7 @@ import com.foxminded.university.model.dtos.response.schedule.StudyClassScheduleR
 import com.foxminded.university.model.dtos.response.schedule.ViewScheduleResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
-import com.foxminded.university.model.dtos.response.users.UserDTO;
+import com.foxminded.university.model.dtos.response.users.UserResponse;
 import com.foxminded.university.model.entity.Course;
 import com.foxminded.university.model.entity.Group;
 import com.foxminded.university.model.entity.Location;
@@ -131,7 +132,7 @@ class AdminControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testShowAllUsersList() throws Exception {
-        Page<UserDTO> pageDtoImpl = new PageImpl<>(Collections.singletonList(UserDTO.builder()
+        Page<UserResponse> pageDtoImpl = new PageImpl<>(Collections.singletonList(UserResponse.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .build()));
@@ -154,7 +155,7 @@ class AdminControllerTest {
     void testShowAddUserForm() throws Exception {
         mockMvc.perform(get("/admin/users/new"))
                 .andExpect(model().attributeExists("user"))
-                .andExpect(model().attribute("user", new UserDTO()))
+                .andExpect(model().attribute("user", new UserRequest()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/user/add-user"));
     }

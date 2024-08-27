@@ -1,5 +1,6 @@
 package com.foxminded.university.restcontroller;
 
+import com.foxminded.university.model.dtos.request.LoginRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.entity.users.User;
 import com.foxminded.university.service.course.CourseService;
@@ -16,6 +17,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,14 +38,14 @@ public class LandingRestController {
         return courseService.findAllCoursesWithPagination(page);
     }
 
-    @GetMapping("/api-token")
-    public ResponseEntity<String> generateToken(@RequestParam String username, @RequestParam String password) {
+    @PostMapping("/api-v1-token")
+    public ResponseEntity<String> generateToken(@RequestBody LoginRequest loginRequest) {
         try {
-            Authentication authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+            Authentication authenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
             Authentication authenticate = authenticationManager.authenticate(authenticationToken);
 
             if (authenticate.isAuthenticated()) {
-                User user = userService.findUserByUsername(username);
+                User user = userService.findUserByUsername(loginRequest.getUsername());
                 return ResponseEntity.ok().body(tokenService.generateToken(user.getId()));
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");

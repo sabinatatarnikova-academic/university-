@@ -1,8 +1,8 @@
 package com.foxminded.university.utils.mappers.users;
 
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
+import com.foxminded.university.model.dtos.request.users.UserRequest;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
-import com.foxminded.university.model.dtos.response.users.UserDTO;
 import com.foxminded.university.model.entity.classes.plainclasses.StudyClass;
 import com.foxminded.university.model.entity.users.Teacher;
 import com.foxminded.university.utils.mappers.classes.StudyClassMapper;
@@ -22,12 +22,12 @@ public interface TeacherMapper {
     @Mapping(target = "studyClasses", source = "studyClasses")
     TeacherResponse toDto(Teacher teacher);
 
-    TeacherResponse toDto(UserDTO userResponse);
+    TeacherResponse toDto(UserRequest userResponse);
 
     @InheritInverseConfiguration
     Teacher toEntity(TeacherResponse teacherResponse);
 
-    Teacher toEntity(UserDTO userResponse);
+    Teacher toEntity(UserRequest userResponse);
 
     @Mapping(target = "studyClasses", source = "studyClassesIds", qualifiedByName = "mapStudyClasses")
     Teacher toEntity(UserFormRequest teacherDTO);
