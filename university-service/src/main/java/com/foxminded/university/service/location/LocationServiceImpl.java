@@ -19,8 +19,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Log4j2
 public class LocationServiceImpl implements LocationService {
-    private final LocationMapper locationMapper;
 
+    private final LocationMapper locationMapper;
     private final LocationRepository locationRepository;
 
     @Override

@@ -29,5 +29,5 @@ public interface UserMapper {
     @BeanMapping(builder = @Builder(disableBuilder = true))
     @SubclassMapping(source = TeacherResponse.class, target = Teacher.class)
     @SubclassMapping(source = StudentResponse.class, target = Student.class)
-    User toEntity(UserResponse userResponse);
+    User toEntity(UserResponse userDTO);
 }

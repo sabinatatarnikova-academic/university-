@@ -4,6 +4,8 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+  main:
+    allow-bean-definition-overriding: true
   datasource:
     url: jdbc:postgresql://localhost:5432/university
     username: university_user

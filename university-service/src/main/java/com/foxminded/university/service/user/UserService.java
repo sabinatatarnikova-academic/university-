@@ -2,6 +2,7 @@ package com.foxminded.university.service.user;
 
 import com.foxminded.university.model.dtos.request.users.TeacherClassUpdateRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
+import com.foxminded.university.model.dtos.request.users.UserRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
 import com.foxminded.university.model.dtos.response.users.TeacherResponse;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public interface UserService {
 
-    void saveUser(UserResponse userResponse);
+    void saveUser(UserRequest userResponse);
 
     <U extends User> U findUserById(String userId);
 

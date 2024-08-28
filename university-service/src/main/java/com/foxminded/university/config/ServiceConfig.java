@@ -9,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @Import(DataSourceConfig.class)
-@ComponentScan(basePackages = "com.foxminded.university.service")
+@ComponentScan(basePackages = {"com.foxminded.university.service", "com.foxminded.university.utils"})
 public class ServiceConfig {
 
     @Bean

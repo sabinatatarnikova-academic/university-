@@ -8,6 +8,7 @@ import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.request.schedule.GlobalStudyClassRequest;
 import com.foxminded.university.model.dtos.request.schedule.ScheduleCreateRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
+import com.foxminded.university.model.dtos.request.users.UserRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.GroupEditResponse;
 import com.foxminded.university.model.dtos.response.classes.CreateStudyClassResponse;
@@ -104,12 +105,12 @@ public class AdminController {
 
     @GetMapping("/users/new")
     public String showAddUserForm(Model model) {
-        model.addAttribute("user", new UserResponse());
+        model.addAttribute("user", new UserRequest());
         return "admin/user/add-user";
     }
 
     @PostMapping("/users/new")
-    public String addUser(@ModelAttribute UserResponse user) {
+    public String addUser(@ModelAttribute UserRequest user) {
         userService.saveUser(user);
         return USERS_VIEW_REDIRECT;
     }

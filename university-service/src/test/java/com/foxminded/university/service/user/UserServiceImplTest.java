@@ -4,6 +4,7 @@ import com.foxminded.university.config.TestConfig;
 import com.foxminded.university.model.dtos.request.GroupFormation;
 import com.foxminded.university.model.dtos.request.users.TeacherClassUpdateRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
+import com.foxminded.university.model.dtos.request.users.UserRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.classes.StudyClassResponse;
 import com.foxminded.university.model.dtos.response.users.StudentResponse;
@@ -186,7 +187,7 @@ class UserServiceImplTest {
 
     @Test
     void saveUser() {
-        UserResponse userToSave = UserResponse.builder()
+        UserRequest userToSave = UserRequest.builder()
                 .firstName("Test")
                 .lastName("Test")
                 .userType("TEACHER")
@@ -339,13 +340,11 @@ class UserServiceImplTest {
                 .firstName("Alice")
                 .lastName("Smith")
                 .username("username1")
-                .password(password)
                 .build();
         TeacherResponse bobDTO = TeacherResponse.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .username("username2")
-                .password(password)
                 .build();
         List<UserResponse> expectedUsers = Arrays.asList(aliceDTO, bobDTO);
         List<UserResponse> actualUsers = userService.findAllUsersWithPagination(page).toList().subList(0, 2);
@@ -365,14 +364,12 @@ class UserServiceImplTest {
                 .lastName("Williams")
                 .group(GroupFormation.builder().name("Group A").build())
                 .username("username3")
-                .password(password)
                 .build();
         StudentResponse dianaDTO = StudentResponse.builder()
                 .firstName("Diana")
                 .lastName("Brown")
                 .group(GroupFormation.builder().name("Group B").build())
                 .username("username4")
-                .password(password)
                 .build();
 
         List<StudentResponse> expectedStudents = Arrays.asList(charlieDTO, dianaDTO);
@@ -393,13 +390,11 @@ class UserServiceImplTest {
                 .firstName("Alice")
                 .lastName("Smith")
                 .username("username1")
-                .password(password)
                 .build();
         TeacherResponse bobDTO = TeacherResponse.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .username("username2")
-                .password(password)
                 .build();
 
         List<TeacherResponse> expectedTeachers = Arrays.asList(aliceDTO, bobDTO);
@@ -417,13 +412,11 @@ class UserServiceImplTest {
                 .firstName("Alice")
                 .lastName("Smith")
                 .username("username1")
-                .password(password)
                 .build();
         TeacherResponse bobDTO = TeacherResponse.builder()
                 .firstName("Bob")
                 .lastName("Johnson")
                 .username("username2")
-                .password(password)
                 .build();
 
         List<TeacherResponse> expectedTeachers = Arrays.asList(aliceDTO, bobDTO);

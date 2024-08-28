@@ -24,9 +24,6 @@ public class UserResponse {
     @ToString.Exclude
     private String username;
 
-    @ToString.Exclude
-    private String password;
-
     @NotBlank(message = "User type is mandatory")
     private String userType;
 }

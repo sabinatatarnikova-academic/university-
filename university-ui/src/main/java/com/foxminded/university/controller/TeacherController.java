@@ -35,9 +35,9 @@ import java.time.LocalDate;
 public class TeacherController {
 
     private final UserService userService;
-    private final CourseService courseService;
     private final GroupService groupService;
     private final StudyClassService studyClassService;
+    private final CourseService courseService;
     private final ScheduleService scheduleService;
 
     @GetMapping()
@@ -130,5 +130,4 @@ public class TeacherController {
         model.addAttribute("userDate", userDate);
         return "teacher/teacher_schedule";
     }
-
 }

@@ -13,6 +13,7 @@ import com.foxminded.university.model.dtos.request.classes.StudyClassRequest;
 import com.foxminded.university.model.dtos.request.schedule.GlobalStudyClassRequest;
 import com.foxminded.university.model.dtos.request.schedule.ScheduleCreateRequest;
 import com.foxminded.university.model.dtos.request.users.UserFormRequest;
+import com.foxminded.university.model.dtos.request.users.UserRequest;
 import com.foxminded.university.model.dtos.response.CourseDTO;
 import com.foxminded.university.model.dtos.response.GroupEditResponse;
 import com.foxminded.university.model.dtos.response.classes.EditStudyClassResponse;
@@ -40,7 +41,6 @@ import com.foxminded.university.service.classes.GlobalStudyClassesService;
 import com.foxminded.university.service.classes.StudyClassService;
 import com.foxminded.university.service.course.CourseService;
 import com.foxminded.university.service.group.GroupService;
-import com.foxminded.university.service.location.LocationService;
 import com.foxminded.university.service.schedule.ScheduleService;
 import com.foxminded.university.service.user.UserService;
 import com.foxminded.university.utils.PageUtils;
@@ -52,11 +52,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.htmlunit.MockMvcWebClientBuilder;
 import org.springframework.web.context.WebApplicationContext;
@@ -90,7 +90,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @WebMvcTest(AdminController.class)
-@Import({TestSecurityConfig.class, AdminControllerConfig.class})
+@ContextConfiguration(classes = {TestSecurityConfig.class, AdminControllerConfig.class})
 class AdminControllerTest {
 
     @Autowired
@@ -107,9 +107,6 @@ class AdminControllerTest {
 
     @MockBean
     private CourseService courseService;
-
-    @MockBean
-    private LocationService locationService;
 
     @MockBean
     private ScheduleService scheduleService;
@@ -158,7 +155,7 @@ class AdminControllerTest {
     void testShowAddUserForm() throws Exception {
         mockMvc.perform(get("/admin/users/new"))
                 .andExpect(model().attributeExists("user"))
-                .andExpect(model().attribute("user", new UserResponse()))
+                .andExpect(model().attribute("user", new UserRequest()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/user/add-user"));
     }
