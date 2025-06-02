@@ -16,7 +16,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ../Dockerfile
     container_name: university-api
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://dpg-d0ur2nmuk2gs739bpbmg-a.frankfurt-postgres.render.com:5432/university_qqi8
