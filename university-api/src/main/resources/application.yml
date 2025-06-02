@@ -7,9 +7,9 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/university
-    username: university_user
-    password: password
+    url: jdbc:postgresql://dpg-d0ur2nmuk2gs739bpbmg-a.frankfurt-postgres.render.com:5432/university_qqi8
+    username: university_qqi8_user
+    password: h8kffDTXLuM9ZoUk4qKoejRIvACoF1c6
     driver-class-name: org.postgresql.Driver
   application:
     name: Bootstrap Spring Boot

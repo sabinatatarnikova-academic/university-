@@ -19,9 +19,9 @@ services:
       dockerfile: Dockerfile
     container_name: university-api
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://university-postgres:5432/university
-      SPRING_DATASOURCE_USERNAME: common_university_user
-      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dpg-d0ur2nmuk2gs739bpbmg-a.frankfurt-postgres.render.com:5432/university_qqi8
+      SPRING_DATASOURCE_USERNAME: university_qqi8_user
+      SPRING_DATASOURCE_PASSWORD: h8kffDTXLuM9ZoUk4qKoejRIvACoF1c6
     ports:
       - "8080:8080"
     depends_on:
