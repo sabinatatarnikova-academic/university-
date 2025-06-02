@@ -1,3 +1,17 @@
+Цей проект був створен в рамках начання на курсі Foxminded. Зараз скопійован з іншого навчального репозиторію для курсу Digijed 3: Enterprise Java. Посилання на задеплоєний проект https://university-6ta7.onrender.com . 
+Креденшели для входу за ролями:
+- ADMIN:
+username: admin
+password: password
+
+- STUDENT:
+username: student
+password: password
+
+- TEACHER:
+username: teacher
+password: password
+
 # university-cms
 
 This project is designed to manage university schedules, catering to three user groups: students, teachers, and
